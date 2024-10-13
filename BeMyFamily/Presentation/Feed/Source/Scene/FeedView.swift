@@ -32,8 +32,7 @@ struct FeedView: View {
 
     @ViewBuilder
     private var feedList: some View {
-        VStack(spacing: UIConstants.Spacing.interFeedItem) {
-            // TODO: - Feed와 Favorite을 뷰를 분리하는게 좋겠다. 
+        LazyVStack(spacing: UIConstants.Spacing.interFeedItem) {
             ForEach(reducer.animalDict[
                 reducer.menu, default: []]) { animal in
                 NavigationLink {
