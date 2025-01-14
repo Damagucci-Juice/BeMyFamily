@@ -38,14 +38,18 @@ final class FeedViewModel: ObservableObject {
         }
         lastFetchTime = now
 
-        let fetchedAnimals = await fetchMultiKindsAnimals(filters)
-        animalDict[self.menu, default: []] += fetchedAnimals
+        Task { @MainActor in
+            let fetchedAnimals = await fetchMultiKindsAnimals(filters)
+            animalDict[self.menu, default: []] += fetchedAnimals
+        }
      }
 
     // TODO: - 리펙터링 해야함
     private func fetchMultiKindsAnimals(_ filters: [AnimalFilter]) async -> [Animal] {
         guard !isLoading else { return [] }
-            isLoading = true
+        Task { @MainActor [weak self] in
+            self?.isLoading = true
+        }
 
         // 필터가 이전과 다르면 초기화하고 새로 설정
         resetOccupied(filters)
