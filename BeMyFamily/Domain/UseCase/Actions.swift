@@ -26,71 +26,58 @@ struct Actions {
         let service: SearchService
 
         private func execute(_ sidoCode: String) async throws -> Response<Sigungu> {
-            do {
-                let fetched = try await service.search(.sigungu(sido: sidoCode))
-                let sigunguResponse = try JSONDecoder().decode(APIResponse<Sigungu>.self, from: fetched)
-                return Response(results: sigunguResponse.items)
-            } catch let error {
-                throw error
-            }
+            let fetched = try await service.search(.sigungu(sido: sidoCode))
+            let sigunguResponse = try JSONDecoder().decode(APIResponse<Sigungu>.self, from: fetched)
+            return Response(results: sigunguResponse.items)
         }
 
-        public func execute(by sidos: [Sido]) async -> [Sido: [Sigungu]] {
-            await withTaskGroup(of: (Sido, [Sigungu]).self) { group in
+        public func execute(by sidos: [Sido]) async throws -> [Sido: [Sigungu]] {
+            try await withThrowingTaskGroup(of: (Sido, [Sigungu]).self) { group in
                 for sido in sidos {
                     group.addTask {
-                        do {
-                            let fetchedSigungu = try await execute(sido.id).results
-                            return (sido, fetchedSigungu)
-                        } catch {
-                            NSLog("Error fetching Sigungu for \(sido.id): \(error)")
-                            return (sido, [])
-                        }
+                        let fetchedSigungu = try await execute(sido.id).results
+                        return (sido, fetchedSigungu)
                     }
                 }
 
                 var sigungus = [Sido: [Sigungu]]()
-                for await (eachSido, fetchedSigungu) in group {
+
+                for try await (eachSido, fetchedSigungu) in group {
                     sigungus[eachSido] = fetchedSigungu
                 }
+
                 return sigungus
             }
         }
     }
 
     // TODO: - SetSigungu
-
     struct FetchShelter: AsyncAction {
         let service: SearchService
 
         private func execute(_ sidoCode: String, _ sigunguCode: String) async throws -> [Shelter] {
-            do {
-                let fetched = try await service.search(.shelter(sido: sidoCode, sigungu: sigunguCode))
-                return try SetShelter(data: fetched).excute().results
-            } catch let error {
-                throw error
-            }
+            // 불필요한 do-catch를 제거하고 바로 try await를 사용하여 에러를 상위로 던집니다.
+            let fetched = try await service.search(.shelter(sido: sidoCode, sigungu: sigunguCode))
+            return try SetShelter(data: fetched).excute().results
         }
 
-        public func execute(by province: [Sido: [Sigungu]]) async -> [Sigungu: [Shelter]] {
-            await withTaskGroup(of: (Sigungu, [Shelter]).self) { group in
+        public func execute(by province: [Sido: [Sigungu]]) async throws -> [Sigungu: [Shelter]] {
+            try await withThrowingTaskGroup(of: (Sigungu, [Shelter]).self) { group in
                 for (sido, sigungus) in province {
                     for eachSigungu in sigungus {
                         group.addTask {
-                            do {
-                                let fetchedShelter = try await execute(sido.id, eachSigungu.id)
-                                return (eachSigungu, fetchedShelter)
-                            } catch {
-                                NSLog("Error fetching Shelter for \(sido.id): \(error)")
-                                return (eachSigungu, [])
-                            }
+                            let fetchedShelter = try await execute(sido.id, eachSigungu.id)
+                            return (eachSigungu, fetchedShelter)
                         }
                     }
                 }
+
                 var shelters = [Sigungu: [Shelter]]()
-                for await (eachSigungu, fetchedShelter) in group {
+
+                for try await (eachSigungu, fetchedShelter) in group {
                     shelters[eachSigungu] = fetchedShelter
                 }
+
                 return shelters
             }
         }
