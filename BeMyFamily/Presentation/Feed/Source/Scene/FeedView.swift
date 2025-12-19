@@ -33,8 +33,7 @@ struct FeedView: View {
     @ViewBuilder
     private var feedList: some View {
         LazyVStack(spacing: UIConstants.Spacing.interFeedItem) {
-            ForEach(reducer.animalDict[
-                reducer.menu, default: []]) { animal in
+            ForEach(reducer.currentAnimals) { animal in
                 NavigationLink {
                     AnimalDetailView(animal: animal)
                 } label: {
@@ -60,7 +59,7 @@ struct FeedView: View {
                             // TODO: - 캡슐화 위반.. 뭔지 어떻게 알아야하는 것인가? 차라리 현재 선택된 메뉴를 넘기는게 맞아보인다.
                             await reducer.fetchAnimalsIfCan(reducer.selectedFilter)
                         case .favorite:
-                            // No action needed for favorite
+                            // TODO: Favorite List에서는 어쨋든 이 흐름을 Background 에서 불러오는 것을 하고 있겠구나.
                             break
                         }
                     }
@@ -83,9 +82,10 @@ struct FeedView: View {
     }
 
     // MARK: - 로딩이나 빈 공고를 알려주는 토글 메시지
+    // TODO: - 빈화면일 때, 계속해서 이미지를 요청하고 하는건 에러임
     @ViewBuilder
     private var toggleMessage: some View {
-        if reducer.animalDict.isEmpty || reducer.isLoading {
+        if reducer.currentAnimals.isEmpty || reducer.isLoading {
             ProgressView()
         } else if !filterReducer.emptyResultFilters.isEmpty {
             VStack {

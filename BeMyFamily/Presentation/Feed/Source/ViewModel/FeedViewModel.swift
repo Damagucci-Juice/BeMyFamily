@@ -16,7 +16,12 @@ final class FeedViewModel: ObservableObject {
     private(set) var selectedFilter: [AnimalFilter] = [.example]
     private(set) var filterPage = 1
 
-    private(set) var animalDict = [FriendMenu: [Animal]]()
+    private var animalDict = [FriendMenu: [Animal]]()
+
+    var currentAnimals: [Animal] {
+        animalDict[menu] ?? []
+    }
+    
     private(set) var isLoading = false
     private(set) var isLast = false
     private(set) var page = 1
