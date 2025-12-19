@@ -15,6 +15,6 @@ class LoadFavoriteListUseCase {
     }
 
     func excute() -> [Animal] {
-        favoriteRepository.loadFavoriteAnimlaList()
+        favoriteRepository.fetchAll()
     }
 }

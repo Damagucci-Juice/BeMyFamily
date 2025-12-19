@@ -53,7 +53,7 @@ class DIContainer: ObservableObject {
     }
 
     func makeFavoriteRepository() -> FavoriteRepository {
-        FavoriteAnimalRepositoryImpl(
+        FavoriteRepositoryImpl(
             storage: favoriteAnimalStorage
         )
     }

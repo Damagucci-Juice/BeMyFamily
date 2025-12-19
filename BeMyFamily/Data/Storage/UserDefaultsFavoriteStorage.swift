@@ -9,8 +9,8 @@ import Foundation
 
 protocol FavoriteStorage {
     func add(animal: Animal)
-    func remove(animal: Animal)
-    func contains(animal: Animal) -> Bool
+    func remove(_ id: String)
+    func contains(_ id: String) -> Bool
     func list() -> [Animal]
 }
 
@@ -48,15 +48,12 @@ class UserDefaultsFavoriteStorage: FavoriteStorage {
         update(favorites)
     }
 
-    func remove(animal: Animal) {
-        var favorites = set()
-        favorites.remove(animal)
-        update(favorites)
+    func remove(_ id: String) {
+        update(set().filter { $0.id != id })
     }
 
-    func contains(animal: Animal) -> Bool {
-        let favorites = set()
-        return favorites.contains(animal)
+    func contains(_ id: String) -> Bool {
+        return set().contains { $0.id == id }
     }
 
     func list() -> [Animal] {

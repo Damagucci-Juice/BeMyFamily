@@ -14,18 +14,18 @@ class FavoriteButtonViewModel: ObservableObject {
     init(animal: Animal, repository: FavoriteRepository) {
         self.animal = animal
         self.repository = repository
-        isFavorite = repository.contains(animal: animal)
+        isFavorite = repository.exists(id: animal.id)
     }
 
     @Published var isFavorite: Bool
 
     func toggle() {
         if isFavorite {
-            repository.removeFavoriteAnimal(animal: animal)
+            repository.delete(id: animal.id)
         } else {
-            repository.saveFavoriteAnimal(animal: animal)
+            repository.save(animal)
         }
 
-        isFavorite = repository.contains(animal: animal)
+        isFavorite = repository.exists(id: animal.id)
     }
 }

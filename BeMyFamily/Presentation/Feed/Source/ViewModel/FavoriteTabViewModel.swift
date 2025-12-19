@@ -17,6 +17,10 @@ class FavoriteTabViewModel: ObservableObject {
     @Published var favorites: [Animal]?
 
     func load() {
-        favorites = loadFavoriteListUseCase.excute()
+        Task { [weak self] in
+            if let favorites = try? await self?.loadFavoriteListUseCase.excute() {
+                self?.favorites = favorites
+            }
+        }
     }
 }
