@@ -63,7 +63,7 @@ extension FamilyEndpoint {
             dict.updateValue("\(sigungu)", forKey: "org_cd")
         case .kind(let upkind):
             dict.updateValue("\(upkind)", forKey: "up_kind_cd")
-            dict.updateValue("999", forKey: "numOfRows")
+            dict.updateValue(NetworkConstants.Params.kindPayload, forKey: "numOfRows")
         case .animal(let animalFilter, let page):
             animalFilter.toParams().enumerated().forEach { (_, value) in
                 dict.updateValue("\(value.value)", forKey: "\(value.key)")
