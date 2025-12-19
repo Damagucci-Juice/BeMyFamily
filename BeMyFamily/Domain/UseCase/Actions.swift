@@ -25,24 +25,36 @@ struct Actions {
     struct FetchSigungu: AsyncAction {
         let service: SearchService
 
-        private func execute(_ sidoCode: String) async throws -> Response<Sigungu> {
-            let fetched = try await service.search(.sigungu(sido: sidoCode))
-            let sigunguResponse = try JSONDecoder().decode(APIResponse<Sigungu>.self, from: fetched)
-            return Response(results: sigunguResponse.items)
+        private func execute(_ sidoCode: String) async -> Response<Sigungu> {
+            let fetched: Data
+            do {
+                fetched = try await service.search(.sigungu(sido: sidoCode))
+            } catch {
+                print("에러코드: \(sidoCode), 해당 시도에 대한 데이터를 가져오지 못했습니다.")
+                return Response(results: [])
+            }
+
+            do {
+                let sigunguResponse = try JSONDecoder().decode(APIResponse<Sigungu>.self, from: fetched)
+                return Response(results: sigunguResponse.items)
+            } catch {
+                print("에러코드: \(sidoCode), 해당 시도에 속한 시군구 데이터를 디코딩하지 못함")
+                return Response(results: [])
+            }
         }
 
-        public func execute(by sidos: [Sido]) async throws -> [Sido: [Sigungu]] {
-            try await withThrowingTaskGroup(of: (Sido, [Sigungu]).self) { group in
+        public func execute(by sidos: [Sido]) async -> [Sido: [Sigungu]] {
+            await withTaskGroup(of: (Sido, [Sigungu]).self) { group in
                 for sido in sidos {
                     group.addTask {
-                        let fetchedSigungu = try await execute(sido.id).results
+                        let fetchedSigungu = await execute(sido.id).results
                         return (sido, fetchedSigungu)
                     }
                 }
 
                 var sigungus = [Sido: [Sigungu]]()
 
-                for try await (eachSido, fetchedSigungu) in group {
+                for await (eachSido, fetchedSigungu) in group {
                     sigungus[eachSido] = fetchedSigungu
                 }
 
@@ -55,18 +67,29 @@ struct Actions {
     struct FetchShelter: AsyncAction {
         let service: SearchService
 
-        private func execute(_ sidoCode: String, _ sigunguCode: String) async throws -> [Shelter] {
-            // 불필요한 do-catch를 제거하고 바로 try await를 사용하여 에러를 상위로 던집니다.
-            let fetched = try await service.search(.shelter(sido: sidoCode, sigungu: sigunguCode))
-            return try SetShelter(data: fetched).excute().results
+        private func execute(_ sidoCode: String, _ sigunguCode: String) async -> [Shelter] {
+            let fetched: Data
+            do {
+                fetched = try await service.search(.shelter(sido: sidoCode, sigungu: sigunguCode))
+            } catch {
+                print("시도: \(sidoCode), 시군구: \(sigunguCode):: 보건소 정보를 가져오지 못함")
+                return []
+            }
+
+            do {
+                return try SetShelter(data: fetched).excute().results
+            } catch {
+                print("시도: \(sidoCode), 시군구: \(sigunguCode):: 보건소 정보를 디코딩하지 못함")
+                return []
+            }
         }
 
-        public func execute(by province: [Sido: [Sigungu]]) async throws -> [Sigungu: [Shelter]] {
-            try await withThrowingTaskGroup(of: (Sigungu, [Shelter]).self) { group in
+        public func execute(by province: [Sido: [Sigungu]]) async -> [Sigungu: [Shelter]] {
+            await withTaskGroup(of: (Sigungu, [Shelter]).self) { group in
                 for (sido, sigungus) in province {
                     for eachSigungu in sigungus {
                         group.addTask {
-                            let fetchedShelter = try await execute(sido.id, eachSigungu.id)
+                            let fetchedShelter = await execute(sido.id, eachSigungu.id)
                             return (eachSigungu, fetchedShelter)
                         }
                     }
@@ -74,7 +97,7 @@ struct Actions {
 
                 var shelters = [Sigungu: [Shelter]]()
 
-                for try await (eachSigungu, fetchedShelter) in group {
+                for await (eachSigungu, fetchedShelter) in group {
                     shelters[eachSigungu] = fetchedShelter
                 }
 
@@ -96,10 +119,11 @@ struct Actions {
         let service: SearchService
 
         private func execute(_ upkindCode: String) async throws -> [Kind] {
+            let fetched = try await service.search(.kind(upkind: upkindCode))
             do {
-                let fetched = try await service.search(.kind(upkind: upkindCode))
                 return try SetKind(data: fetched).excute().results
             } catch {
+                print("축종코드: \(upkindCode), 해당 축종의 정보를 디코딩하지 못했습니다.")
                 throw error
             }
         }
