@@ -105,9 +105,12 @@ final class FeedViewModel: ObservableObject {
         let animals: [Animal]
 
         do {
-            animals = try await Actions
-                .FetchAnimal(service: service, filter: filter, page: pageToFetch)
-                .execute()
+            animals = try await FetchAnimal(
+                service: service,
+                filter: filter,
+                page: pageToFetch
+            )
+            .execute()
             return (animals, animals.isEmpty)
         } catch {
             throw error

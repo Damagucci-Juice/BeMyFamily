@@ -24,20 +24,20 @@ final class ProvinceViewModel: ObservableObject {
 
     public func loadInfos() async {
         do {
-            self.kind = try await Actions.FetchKind(service: service).execute(by: Upkind.allCases)
+            self.kind = try await FetchKind(service: service).execute(by: Upkind.allCases)
         } catch {
             print("failed at fetching kind using by upkind")
             print(error.localizedDescription)
         }
 
         do {
-            self.sido = try await Actions.FetchSido(service: service).execute().results
+            self.sido = try await FetchSido(service: service).execute().results
         } catch {
             print("failed at fetching sido")
             print(error.localizedDescription)
         }
 
-        self.province = await Actions.FetchSigungu(service: service).execute(by: sido)
-        self.shelter = await Actions.FetchShelter(service: service).execute(by: province)
+        self.province = await FetchSigungu(service: service).execute(by: sido)
+        self.shelter = await FetchShelter(service: service).execute(by: province)
     }
 }

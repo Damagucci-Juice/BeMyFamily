@@ -7,183 +7,164 @@
 //
 import Foundation
 
-struct Actions {
-    struct FetchSido: AsyncAction {
-        let service: SearchService
+protocol Action {
+    associatedtype Payload: Codable
+    var data: Data { get }
+}
 
-        public func execute() async throws -> Response<Sido> {
-            let fetched = try await service.search(.sido)
-            return try SetSido(data: fetched).excute()
+extension Action {
+    // 모든 Set 액션들이 공유할 공통 디코딩 로직
+    func decode() throws -> Response<Payload> {
+        let response = try JSONDecoder().decode(APIResponse<Payload>.self, from: data)
+        return Response(results: response.items)
+    }
+}
+
+protocol AsyncAction: Action { }
+
+// MARK: - Sido
+struct FetchSido: AsyncAction {
+    typealias Payload = Sido
+    let data: Data = Data() // 프로토콜 준수를 위한 더미 (실제로는 사용 X)
+    let service: SearchService
+
+    func execute() async throws -> Response<Sido> {
+        let fetched = try await service.search(.sido)
+        return try SetSido(data: fetched).execute()
+    }
+}
+
+struct SetSido: Action {
+    typealias Payload = Sido
+    let data: Data
+    func execute() throws -> Response<Sido> { try decode() }
+}
+
+// MARK: - Sigungu
+struct FetchSigungu: AsyncAction {
+    typealias Payload = Sigungu
+    let data: Data = Data()
+    let service: SearchService
+
+    private func fetchSingle(by sidoCode: String) async -> [Sigungu] {
+        do {
+            let fetched = try await service.search(.sigungu(sido: sidoCode))
+            return try SetSigungu(data: fetched).execute().results
+        } catch {
+            print("Error: \(sidoCode) 데이터를 가져오거나 디코딩하는 데 실패함")
+            return []
         }
     }
 
-    struct SetSido: Action {
-        let data: Data
-
-        func excute() throws -> Response<Sido> {
-            let response = try JSONDecoder().decode(APIResponse<Sido>.self, from: data)
-            return Response(results: response.items)
-        }
-    }
-
-    struct FetchSigungu: AsyncAction {
-        let service: SearchService
-
-        private func execute(_ sidoCode: String) async -> Response<Sigungu> {
-            let fetched: Data
-            do {
-                fetched = try await service.search(.sigungu(sido: sidoCode))
-            } catch {
-                print("에러코드: \(sidoCode), 해당 시도에 대한 데이터를 가져오지 못했습니다.")
-                return Response(results: [])
-            }
-
-            do {
-                return try SetSigungu(data: fetched).excute()
-            } catch {
-                print("에러코드: \(sidoCode), 해당 시도에 속한 시군구 데이터를 디코딩하지 못함")
-                return Response(results: [])
-            }
-        }
-
-        public func execute(by sidos: [Sido]) async -> [Sido: [Sigungu]] {
-            await withTaskGroup(of: (Sido, [Sigungu]).self) { group in
-                for sido in sidos {
-                    group.addTask {
-                        let fetchedSigungu = await execute(sido.id).results
-                        return (sido, fetchedSigungu)
-                    }
+    public func execute(by sidos: [Sido]) async -> [Sido: [Sigungu]] {
+        await withTaskGroup(of: (Sido, [Sigungu]).self) { group in
+            for sido in sidos {
+                group.addTask {
+                    let results = await fetchSingle(by: sido.id)
+                    return (sido, results)
                 }
-
-                var sigungus = [Sido: [Sigungu]]()
-
-                for await (eachSido, fetchedSigungu) in group {
-                    sigungus[eachSido] = fetchedSigungu
-                }
-
-                return sigungus
-            }
-        }
-    }
-
-    struct SetSigungu: Action {
-        let data: Data
-
-        func excute() throws -> Response<Sigungu> {
-            let response = try JSONDecoder().decode(APIResponse<Sigungu>.self, from: data)
-            return Response(results: response.items)
-        }
-    }
-
-    struct FetchShelter: AsyncAction {
-        let service: SearchService
-
-        private func execute(_ sidoCode: String, _ sigunguCode: String) async -> [Shelter] {
-            let fetched: Data
-            do {
-                fetched = try await service.search(.shelter(sido: sidoCode, sigungu: sigunguCode))
-            } catch {
-                return []
             }
 
-            do {
-                return try SetShelter(data: fetched).excute().results
-            } catch {
-                return []
+            return await group.reduce(into: [Sido: [Sigungu]]()) { dict, pair in
+                dict[pair.0] = pair.1
             }
-        }
-
-        public func execute(by province: [Sido: [Sigungu]]) async -> [Sigungu: [Shelter]] {
-            await withTaskGroup(of: (Sigungu, [Shelter]).self) { group in
-                for (sido, sigungus) in province {
-                    for eachSigungu in sigungus {
-                        group.addTask {
-                            let fetchedShelter = await execute(sido.id, eachSigungu.id)
-                            return (eachSigungu, fetchedShelter)
-                        }
-                    }
-                }
-
-                var shelters = [Sigungu: [Shelter]]()
-
-                for await (eachSigungu, fetchedShelter) in group {
-                    shelters[eachSigungu] = fetchedShelter
-                }
-
-                return shelters
-            }
-        }
-    }
-
-    struct SetShelter: Action {
-        let data: Data
-
-        public func excute() throws -> Response<Shelter> {
-            let shelterResponse = try JSONDecoder().decode(APIResponse<Shelter>.self, from: data)
-            return Response(results: shelterResponse.items)
-        }
-    }
-
-    struct FetchKind: AsyncAction {
-        let service: SearchService
-
-        private func execute(_ upkindCode: String) async throws -> [Kind] {
-            let fetched = try await service.search(.kind(upkind: upkindCode))
-            return try SetKind(data: fetched).excute().results
-        }
-
-        public func execute(by upkinds: [Upkind]) async throws -> [Upkind: [Kind]] {
-            try await withThrowingTaskGroup(of: (Upkind, [Kind]).self) { group in
-                for upkind in upkinds {
-                    group.addTask {
-                        let fetchedKind = try await execute(upkind.id)
-                        return (upkind, fetchedKind)
-                    }
-                }
-                var kinds = [Upkind: [Kind]]()
-
-                for try await (upkind, fetchedKind) in group {
-                    kinds[upkind] = fetchedKind
-                }
-
-                return kinds
-            }
-        }
-    }
-
-    struct SetKind: Action {
-        let data: Data
-
-        func excute() throws -> Response<Kind> {
-            do {
-                let sigunguResponse = try JSONDecoder().decode(APIResponse<Kind>.self, from: data)
-                return Response(results: sigunguResponse.items)
-            } catch {
-                throw error
-            }
-        }
-    }
-
-    struct FetchAnimal: AsyncAction {
-        let service: SearchService
-        let filter: AnimalFilter
-        let page: Int
-
-        public func execute() async throws -> [Animal] {
-            let fetched = try await service.search(.animal(filteredItem: filter, page: page))
-            return try SetAnimal(data: fetched).excute().results
-        }
-    }
-
-    struct SetAnimal: Action {
-        let data: Data
-
-        public func excute() throws -> Response<Animal> {
-            let animalResponse = try JSONDecoder().decode(APIResponse<Animal>.self, from: data)
-            return Response(results: animalResponse.items)
         }
     }
 }
 
-protocol Action { }
-protocol AsyncAction: Action { }
+struct SetSigungu: Action {
+    typealias Payload = Sigungu
+    let data: Data
+    func execute() throws -> Response<Sigungu> { try decode() }
+}
+
+// MARK: - Shelter
+struct FetchShelter: AsyncAction {
+    typealias Payload = Shelter
+    let data: Data = Data()
+    let service: SearchService
+
+    private func fetchSingle(_ sidoCode: String, _ sigunguCode: String) async -> [Shelter] {
+        do {
+            let fetched = try await service.search(.shelter(sido: sidoCode, sigungu: sigunguCode))
+            return try SetShelter(data: fetched).execute().results
+        } catch {
+            return []
+        }
+    }
+
+    public func execute(by province: [Sido: [Sigungu]]) async -> [Sigungu: [Shelter]] {
+        await withTaskGroup(of: (Sigungu, [Shelter]).self) { group in
+            for (sido, sigungus) in province {
+                for sigungu in sigungus {
+                    group.addTask {
+                        let results = await fetchSingle(sido.id, sigungu.id)
+                        return (sigungu, results)
+                    }
+                }
+            }
+
+            return await group.reduce(into: [Sigungu: [Shelter]]()) { dict, pair in
+                dict[pair.0] = pair.1
+            }
+        }
+    }
+}
+
+struct SetShelter: Action {
+    typealias Payload = Shelter
+    let data: Data
+    func execute() throws -> Response<Shelter> { try decode() }
+}
+
+// MARK: - Kind (Animal Type)
+struct FetchKind: AsyncAction {
+    typealias Payload = Kind
+    let data: Data = Data()
+    let service: SearchService
+
+    private func fetchSingle(_ upkindCode: String) async throws -> [Kind] {
+        let fetched = try await service.search(.kind(upkind: upkindCode))
+        return try SetKind(data: fetched).execute().results
+    }
+
+    public func execute(by upkinds: [Upkind]) async throws -> [Upkind: [Kind]] {
+        try await withThrowingTaskGroup(of: (Upkind, [Kind]).self) { group in
+            for upkind in upkinds {
+                group.addTask {
+                    (upkind, try await fetchSingle(upkind.id))
+                }
+            }
+
+            return try await group.reduce(into: [Upkind: [Kind]]()) { dict, pair in
+                dict[pair.0] = pair.1
+            }
+        }
+    }
+}
+
+struct SetKind: Action {
+    typealias Payload = Kind
+    let data: Data
+    func execute() throws -> Response<Kind> { try decode() }
+}
+
+// MARK: - Animal
+struct FetchAnimal: AsyncAction {
+    typealias Payload = Animal
+    let data: Data = Data()
+    let service: SearchService
+    let filter: AnimalFilter
+    let page: Int
+
+    func execute() async throws -> [Animal] {
+        let fetched = try await service.search(.animal(filteredItem: filter, page: page))
+        return try SetAnimal(data: fetched).execute().results
+    }
+}
+
+struct SetAnimal: Action {
+    typealias Payload = Animal
+    let data: Data
+    func execute() throws -> Response<Animal> { try decode() }
+}
