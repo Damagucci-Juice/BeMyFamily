@@ -51,7 +51,7 @@ struct FetchSigungu: AsyncAction {
             let fetched = try await service.search(.sigungu(sido: sidoCode))
             return try SetSigungu(data: fetched).execute().results
         } catch {
-            print("Error: \(sidoCode) 데이터를 가져오거나 디코딩하는 데 실패함")
+            print("Error: \(sidoCode) 데이터를 가져오거나 디코딩하는 데 실패함, response items가 빈 경우도 있음")
             return []
         }
     }
