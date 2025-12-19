@@ -47,6 +47,7 @@ extension FamilyEndpoint {
             "_type": "json",
             // swiftlint:disable line_length
             // Decoding key
+            // TODO: 중요 키 보안 강화
             "serviceKey": "dPXa2aDAK4Zlqst8P1kjsxl3oIsq49aExnzH7RhLCzUrX8rOrIkNyYRPf/shHLbq/LtgAnK7jtfeXwPSPZpr5g=="
             // swiftlint:enable line_length
         ]
@@ -62,6 +63,7 @@ extension FamilyEndpoint {
             dict.updateValue("\(sigungu)", forKey: "org_cd")
         case .kind(let upkind):
             dict.updateValue("\(upkind)", forKey: "up_kind_cd")
+            dict.updateValue("999", forKey: "numOfRows")
         case .animal(let animalFilter, let page):
             animalFilter.toParams().enumerated().forEach { (_, value) in
                 dict.updateValue("\(value.value)", forKey: "\(value.key)")
