@@ -12,16 +12,24 @@ struct Actions {
         let service: SearchService
 
         public func execute() async throws -> Response<Sido> {
+            let fetched = try await service.search(.sido)
+            return try SetSido(data: fetched).excute()
+        }
+    }
+
+    struct SetSido: Action {
+        let data: Data
+
+        func excute() throws -> Response<Sido> {
             do {
-                let fetched = try await service.search(.sido)
-                let sidoResponse = try JSONDecoder().decode(APIResponse<Sido>.self, from: fetched)
-                return Response(results: sidoResponse.items)
-            } catch let error {
+                let response = try JSONDecoder().decode(APIResponse<Sido>.self, from: data)
+                return Response(results: response.items)
+            } catch {
                 throw error
             }
         }
     }
-    // TODO: - SetSido
+
     struct FetchSigungu: AsyncAction {
         let service: SearchService
 
@@ -35,8 +43,7 @@ struct Actions {
             }
 
             do {
-                let sigunguResponse = try JSONDecoder().decode(APIResponse<Sigungu>.self, from: fetched)
-                return Response(results: sigunguResponse.items)
+                return try SetSigungu(data: fetched).excute()
             } catch {
                 print("에러코드: \(sidoCode), 해당 시도에 속한 시군구 데이터를 디코딩하지 못함")
                 return Response(results: [])
@@ -63,7 +70,19 @@ struct Actions {
         }
     }
 
-    // TODO: - SetSigungu
+    struct SetSigungu: Action {
+        let data: Data
+
+        func excute() throws -> Response<Sigungu> {
+            do {
+                let response = try JSONDecoder().decode(APIResponse<Sigungu>.self, from: data)
+                return Response(results: response.items)
+            } catch {
+                throw error
+            }
+        }
+    }
+
     struct FetchShelter: AsyncAction {
         let service: SearchService
 
@@ -72,14 +91,12 @@ struct Actions {
             do {
                 fetched = try await service.search(.shelter(sido: sidoCode, sigungu: sigunguCode))
             } catch {
-                print("시도: \(sidoCode), 시군구: \(sigunguCode):: 보건소 정보를 가져오지 못함")
                 return []
             }
 
             do {
                 return try SetShelter(data: fetched).excute().results
             } catch {
-                print("시도: \(sidoCode), 시군구: \(sigunguCode):: 보건소 정보를 디코딩하지 못함")
                 return []
             }
         }
@@ -110,8 +127,12 @@ struct Actions {
         let data: Data
 
         public func excute() throws -> Response<Shelter> {
-            let shelterResponse = try JSONDecoder().decode(APIResponse<Shelter>.self, from: data)
-            return Response(results: shelterResponse.items)
+            do {
+                let shelterResponse = try JSONDecoder().decode(APIResponse<Shelter>.self, from: data)
+                return Response(results: shelterResponse.items)
+            } catch {
+                throw error
+            }
         }
     }
 
@@ -166,12 +187,8 @@ struct Actions {
         let page: Int
 
         public func execute() async throws -> [Animal] {
-            do {
-                let fetched = try await service.search(.animal(filteredItem: filter, page: page))
-                return try SetAnimal(data: fetched).excute().results
-            } catch let error {
-                throw error
-            }
+            let fetched = try await service.search(.animal(filteredItem: filter, page: page))
+            return try SetAnimal(data: fetched).excute().results
         }
     }
 
