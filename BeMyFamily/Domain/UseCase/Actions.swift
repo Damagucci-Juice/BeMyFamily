@@ -21,12 +21,8 @@ struct Actions {
         let data: Data
 
         func excute() throws -> Response<Sido> {
-            do {
-                let response = try JSONDecoder().decode(APIResponse<Sido>.self, from: data)
-                return Response(results: response.items)
-            } catch {
-                throw error
-            }
+            let response = try JSONDecoder().decode(APIResponse<Sido>.self, from: data)
+            return Response(results: response.items)
         }
     }
 
@@ -74,12 +70,8 @@ struct Actions {
         let data: Data
 
         func excute() throws -> Response<Sigungu> {
-            do {
-                let response = try JSONDecoder().decode(APIResponse<Sigungu>.self, from: data)
-                return Response(results: response.items)
-            } catch {
-                throw error
-            }
+            let response = try JSONDecoder().decode(APIResponse<Sigungu>.self, from: data)
+            return Response(results: response.items)
         }
     }
 
@@ -127,12 +119,8 @@ struct Actions {
         let data: Data
 
         public func excute() throws -> Response<Shelter> {
-            do {
-                let shelterResponse = try JSONDecoder().decode(APIResponse<Shelter>.self, from: data)
-                return Response(results: shelterResponse.items)
-            } catch {
-                throw error
-            }
+            let shelterResponse = try JSONDecoder().decode(APIResponse<Shelter>.self, from: data)
+            return Response(results: shelterResponse.items)
         }
     }
 
@@ -141,12 +129,7 @@ struct Actions {
 
         private func execute(_ upkindCode: String) async throws -> [Kind] {
             let fetched = try await service.search(.kind(upkind: upkindCode))
-            do {
-                return try SetKind(data: fetched).excute().results
-            } catch {
-                print("축종코드: \(upkindCode), 해당 축종의 정보를 디코딩하지 못했습니다.")
-                throw error
-            }
+            return try SetKind(data: fetched).excute().results
         }
 
         public func execute(by upkinds: [Upkind]) async throws -> [Upkind: [Kind]] {
@@ -196,12 +179,8 @@ struct Actions {
         let data: Data
 
         public func excute() throws -> Response<Animal> {
-            do {
-                let animalResponse = try JSONDecoder().decode(APIResponse<Animal>.self, from: data)
-                return Response(results: animalResponse.items)
-            } catch {
-                throw error
-            }
+            let animalResponse = try JSONDecoder().decode(APIResponse<Animal>.self, from: data)
+            return Response(results: animalResponse.items)
         }
     }
 }
