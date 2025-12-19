@@ -22,11 +22,11 @@ final class FavoriteRepositoryImpl: FavoriteRepository {
         storage.remove(id)
     }
 
-    func fetchAll() -> [Animal] {
+    func getAll() -> [Animal] {
         storage.list()
     }
 
-    func fetchIds() -> Set<String> {
+    func getIds() -> Set<String> {
         Set(storage.list().map { String($0.id) })
     }
 

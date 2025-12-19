@@ -12,7 +12,7 @@ enum FamilyEndpoint {
     case sigungu(sido: String)
     case shelter(sido: String, sigungu: String)
     case kind(upkind: String)
-    case animal(filteredItem: AnimalFilter, page: Int)
+    case animal(filteredItem: AnimalSearchFilter, page: Int)
 }
 
 // MARK: - For URL Ingredients, Path, Params, Method etc..

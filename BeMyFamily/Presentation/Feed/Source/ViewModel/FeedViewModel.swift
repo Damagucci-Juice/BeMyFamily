@@ -13,7 +13,7 @@ final class FeedViewModel: ObservableObject {
 
     // TODO: - Tab 전환을 담당하는 로직을 여기서 들고 있으면 안될 것 같다. 
     var menu = FriendMenu.feed
-    private(set) var selectedFilter: [AnimalFilter] = [.example]
+    private(set) var selectedFilter: [AnimalSearchFilter] = [.example]
     private(set) var filterPage = 1
 
     private var animalDict = [FriendMenu: [Animal]]()
@@ -35,7 +35,7 @@ final class FeedViewModel: ObservableObject {
     }
 
     // 이미 실행을 보낸 작업이 있다면 취소하고 새로운 작업을 지시 + 쓰로틀링
-    public func fetchAnimalsIfCan(_ filters: [AnimalFilter] = [.example]) async {
+    public func fetchAnimalsIfCan(_ filters: [AnimalSearchFilter] = [.example]) async {
         let now = Date()
         let fetchIntervalSec = 0.3
         guard lastFetchTime == nil || now.timeIntervalSince(lastFetchTime!) > fetchIntervalSec else {
@@ -50,7 +50,7 @@ final class FeedViewModel: ObservableObject {
      }
 
     // TODO: - 리펙터링 해야함
-    private func fetchMultiKindsAnimals(_ filters: [AnimalFilter]) async -> [Animal] {
+    private func fetchMultiKindsAnimals(_ filters: [AnimalSearchFilter]) async -> [Animal] {
         guard !isLoading else { return [] }
         Task { @MainActor [weak self] in
             self?.isLoading = true
@@ -60,7 +60,7 @@ final class FeedViewModel: ObservableObject {
         resetOccupied(filters)
 
         // 들어온 모든 필터로 테스크 그룹을 선언
-        let results = await withTaskGroup(of: (AnimalFilter, [Animal]).self) { group in
+        let results = await withTaskGroup(of: (AnimalSearchFilter, [Animal]).self) { group in
             for filter in filters {
                 group.addTask {
                     do {
@@ -72,7 +72,7 @@ final class FeedViewModel: ObservableObject {
                 }
             }
 
-            var aggregatedResults = [AnimalFilter: [Animal]]()
+            var aggregatedResults = [AnimalSearchFilter: [Animal]]()
             for await (filter, animals) in group {
                 aggregatedResults[filter, default: []].append(contentsOf: animals)
             }
@@ -86,7 +86,7 @@ final class FeedViewModel: ObservableObject {
     /// 그렇지 않다면 selectedFilter에서 제거하고 emptyFIlter에 값을 저장
     /// 추후 emptyFilter는 토글로써 쓰임
     @MainActor
-    private func updateUI(_ results: [AnimalFilter: [Animal]]) -> [Animal] {
+    private func updateUI(_ results: [AnimalSearchFilter: [Animal]]) -> [Animal] {
         var animalContainer = [Animal]()
         for (filter, animals) in results {
             if animals.isEmpty {
@@ -105,7 +105,7 @@ final class FeedViewModel: ObservableObject {
         return animalContainer
     }
 
-    private func fetchAnimals(with filter: AnimalFilter) async throws -> ([Animal], Bool) {
+    private func fetchAnimals(with filter: AnimalSearchFilter) async throws -> ([Animal], Bool) {
         let pageToFetch = self.menu == .feed ? page : filterPage
         let animals: [Animal]
 
@@ -169,7 +169,7 @@ final class FeedViewModel: ObservableObject {
     }
 
     // 기존에 들고 있던 필터와 새로 들어온 필터가 다르면 초기화
-    private func resetOccupied(_ filter: [AnimalFilter]) {
+    private func resetOccupied(_ filter: [AnimalSearchFilter]) {
         if selectedFilter != filter {
             animalDict[.filter, default: []].removeAll()
             selectedFilter = filter

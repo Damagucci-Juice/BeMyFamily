@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AnimalFilter: Codable, Hashable {          // MARK: 데이터 항목 설명 친구
+struct AnimalSearchFilter: Codable, Hashable {          // MARK: 데이터 항목 설명 친구
                                         // 설명::필수여부(1-필,0-선택)::예시::
     var beginDate: Date?                // 시작날짜::0::YYYYMMDD
     var endDate: Date?                  // 종료날짜::0::YYYYMMDD
@@ -29,6 +29,7 @@ struct AnimalFilter: Codable, Hashable {          // MARK: 데이터 항목 설�
                                      processState: nil,
                                      neutralizationState: nil)
 
+    // TODO: - 데이터 계층으로 가야하는 로직
     func toParams() -> [String: String] {
         var dict = [String: String]()
         if let beginDate {

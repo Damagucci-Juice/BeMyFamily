@@ -15,6 +15,6 @@ final class GetFavoriteAnimalsUseCase {
     }
 
     func excute() -> [Animal] {
-        favoriteRepository.fetchAll()
+        favoriteRepository.getAll()
     }
 }

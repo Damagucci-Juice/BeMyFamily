@@ -154,7 +154,7 @@ struct FetchAnimal: AsyncAction {
     typealias Payload = Animal
     let data: Data = Data()
     let service: SearchService
-    let filter: AnimalFilter
+    let filter: AnimalSearchFilter
     let page: Int
 
     func execute() async throws -> [Animal] {

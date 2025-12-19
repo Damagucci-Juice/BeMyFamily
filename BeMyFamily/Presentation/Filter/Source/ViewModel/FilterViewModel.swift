@@ -11,7 +11,7 @@ import Foundation
 final class FilterViewModel: ObservableObject {
     init() { self.kinds = [] }
     private(set) var onProcessing = false
-    private(set) var emptyResultFilters = [AnimalFilter]()
+    private(set) var emptyResultFilters = [AnimalSearchFilter]()
 
     var beginDate = Date.now.addingTimeInterval(UIConstants.Date.aDayBefore*10) // 10일 전
     var endDate = Date()
@@ -23,11 +23,11 @@ final class FilterViewModel: ObservableObject {
     var state = ProcessState.all
     var neutral: Neutralization?
 
-    func makeFilter() -> [AnimalFilter] {
+    func makeFilter() -> [AnimalSearchFilter] {
         onProcessing = true
         emptyResultFilters.removeAll()
 
-        let baseFilter = AnimalFilter(
+        let baseFilter = AnimalSearchFilter(
             beginDate: beginDate,
             endDate: endDate,
             upkind: upkind?.id,
@@ -65,7 +65,7 @@ final class FilterViewModel: ObservableObject {
         neutral = .none
     }
 
-    func updateEmptyReulst(with filter: AnimalFilter) {
+    func updateEmptyReulst(with filter: AnimalSearchFilter) {
         self.emptyResultFilters.append(filter)
     }
 }
