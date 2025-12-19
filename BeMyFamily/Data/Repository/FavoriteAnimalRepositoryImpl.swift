@@ -7,7 +7,7 @@
 
 import Foundation
 
-class FavoriteAnimalRepositoryImpl: FavoriteAnimalRepository {
+class FavoriteAnimalRepositoryImpl: FavoriteRepository {
     private let storage: FavoriteStorage
 
     init(storage: FavoriteStorage) {

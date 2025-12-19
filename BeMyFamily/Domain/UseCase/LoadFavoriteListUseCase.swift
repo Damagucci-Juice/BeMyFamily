@@ -8,9 +8,9 @@
 import Foundation
 
 class LoadFavoriteListUseCase {
-    let favoriteRepository: FavoriteAnimalRepository
+    let favoriteRepository: FavoriteRepository
 
-    init(favoriteRepository: FavoriteAnimalRepository) {
+    init(favoriteRepository: FavoriteRepository) {
         self.favoriteRepository = favoriteRepository
     }
 

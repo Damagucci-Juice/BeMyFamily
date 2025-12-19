@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol FavoriteAnimalRepository {
+protocol FavoriteRepository {
     func saveFavoriteAnimal(animal: Animal)
     func removeFavoriteAnimal(animal: Animal)
     func loadFavoriteAnimlaList() -> [Animal]
