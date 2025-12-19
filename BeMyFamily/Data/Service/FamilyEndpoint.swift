@@ -46,7 +46,8 @@ extension FamilyEndpoint {
         var dict: [String: String] = [
             "_type": "json",
             // swiftlint:disable line_length
-            "serviceKey": "dPXa2aDAK4Zlqst8P1kjsxl3oIsq49aExnzH7RhLCzUrX8rOrIkNyYRPf%2FshHLbq%2FLtgAnK7jtfeXwPSPZpr5g%3D%3D"
+            // Decoding key
+            "serviceKey": "dPXa2aDAK4Zlqst8P1kjsxl3oIsq49aExnzH7RhLCzUrX8rOrIkNyYRPf/shHLbq/LtgAnK7jtfeXwPSPZpr5g=="
             // swiftlint:enable line_length
         ]
 
