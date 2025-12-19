@@ -39,8 +39,8 @@ final class Animal: Codable, Equatable, Identifiable {
     let careTel: String
     let careAddr: String
     let orgNm: String
-    let chargeNm: String
-    let officetel: String
+    let chargeNm: String?
+    let officetel: String?
     let careRegNo: String
     let careOwnerNm: String
 
