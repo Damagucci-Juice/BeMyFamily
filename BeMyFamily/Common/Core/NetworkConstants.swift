@@ -15,7 +15,7 @@ struct NetworkConstants {
         static let sigungu = "sigungu_v2"
         static let shelter = "shelter_v2"
         static let kind = "kind_v2"
-        static let animal = "abandonmentPublic"
+        static let animal = "abandonmentPublic_v2"
         static let dataBase = "SavedAnimals"
     }
 
