@@ -43,10 +43,10 @@ struct AnimalDetailView: View {
             if let image = state.image {
                 image
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
+                    .aspectRatio(contentMode: .fill)
                     .frame(width: UIConstants.Frame.screenWidth,
                            height: UIConstants.Frame.feedImageHeight)
-                    .clipShape(Rectangle())
+                    .clipShape(RoundedRectangle(cornerRadius: 8.0))
                     .onAppear { self.loadedImage = image }
             }
             if state.isLoading || hasError {
