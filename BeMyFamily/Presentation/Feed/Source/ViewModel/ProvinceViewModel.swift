@@ -37,19 +37,7 @@ final class ProvinceViewModel: ObservableObject {
             print(error.localizedDescription)
         }
 
-        do {
-            self.province = try await Actions.FetchSigungu(service: service).execute(by: sido)
-        } catch {
-            print("failed at fetching Sigungu")
-            print(error.localizedDescription)
-        }
-
-        do {
-            self.shelter = try await Actions.FetchShelter(service: service).execute(by: province)
-        } catch {
-            print("failed at fetching shelter")
-            print(error.localizedDescription)
-        }
-
+        self.province = await Actions.FetchSigungu(service: service).execute(by: sido)
+        self.shelter = await Actions.FetchShelter(service: service).execute(by: province)
     }
 }
