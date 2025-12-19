@@ -10,7 +10,7 @@ import Foundation
 struct NetworkConstants {
 
     struct Path {
-        static let baseUrl = "http://apis.data.go.kr/1543061/abandonmentPublicSrvc_v2/"
+        static let baseUrl = "https://apis.data.go.kr/1543061/abandonmentPublicService_v2/"
         static let sido = "sido_v2"
         static let sigungu = "sigungu_v2"
         static let shelter = "shelter_v2"
