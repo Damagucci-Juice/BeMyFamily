@@ -13,7 +13,7 @@ struct Kind: Codable, Hashable, Identifiable {
 
     enum CodingKeys: String, CodingKey {
         case id = "kindCd"
-        case name = "knm"
+        case name = "kindNm"
     }
 
     static let example = Kind(id: "000054", name: "골든 리트리버")
