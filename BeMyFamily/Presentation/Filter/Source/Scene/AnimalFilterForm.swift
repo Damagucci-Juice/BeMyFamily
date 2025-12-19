@@ -142,35 +142,35 @@ extension AnimalFilterForm {
 
     @ViewBuilder
     private var kindSection: some View {
-        Section("어떤 종을 보고 싶으신가요?") {
+        Section(header: Text("어떤 종을 보고 싶으신가요?")) {
+            // 상위 카테고리 (강아지, 고양이 등)
             Picker("축종", selection: $filterReducer.upkind) {
-                Text(UIConstants.FilterForm.showAll)
-                    .tag(nil as Upkind?)
-
+                Text(UIConstants.FilterForm.showAll).tag(nil as Upkind?)
                 ForEach(Upkind.allCases, id: \.self) { upkind in
-                    Text(upkind.text)
-                        .tag(upkind as Upkind?)
+                    Text(upkind.text).tag(upkind as Upkind?)
                 }
             }
-            // 예: `강아지`에서 `고양이`로 선택이 바뀌면 들고 있던 Kinds를 초기화해 고양이 축종인데 `강아지 품종`의 검색 방지
             .onChange(of: filterReducer.upkind) { _, _ in
                 filterReducer.kinds.removeAll()
             }
 
+            // 품종 리스트 - List 대신 ForEach를 사용하여 Section에 직접 배치
             if let upkind = filterReducer.upkind, let kinds = provinceReducer.kind[upkind] {
-                // MARK: - 선택한 품종이 없다면 모든 품종을 부름
-                List(kinds, selection: $filterReducer.kinds) { kind in
-                    let isContained = filterReducer.kinds.contains(kind)
+                // 품종이 너무 많을 경우를 대비해 검색 버튼이나 내비게이션 링크로 빼는 것이 좋지만,
+                // 일단 화면에 바로 노출하려면 ForEach를 씁니다.
+                ForEach(kinds, id: \.id) { kind in
+                    let isSelected = filterReducer.kinds.contains(kind)
+
                     Button {
-                        if isContained {
+                        if isSelected {
                             filterReducer.kinds.remove(kind)
                         } else {
                             filterReducer.kinds.insert(kind)
                         }
                     } label: {
-                        togglingCheckbox(kind, isContained)
+                        togglingCheckbox(kind, isSelected)
                     }
-                    .tint(.primary)
+                    .buttonStyle(.plain)
                 }
             }
         }
