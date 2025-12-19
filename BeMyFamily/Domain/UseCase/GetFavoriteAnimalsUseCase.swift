@@ -8,7 +8,7 @@
 import Foundation
 
 final class GetFavoriteAnimalsUseCase {
-    let favoriteRepository: FavoriteRepository
+    private let favoriteRepository: FavoriteRepository
 
     init(favoriteRepository: FavoriteRepository) {
         self.favoriteRepository = favoriteRepository

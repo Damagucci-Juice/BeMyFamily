@@ -8,9 +8,9 @@
 import Foundation
 
 class FavoriteTabViewModel: ObservableObject {
-    let loadFavoriteListUseCase: LoadFavoriteListUseCase
+    let loadFavoriteListUseCase: GetFavoriteAnimalsUseCase
 
-    init(loadFavoriteListUseCase: LoadFavoriteListUseCase) {
+    init(loadFavoriteListUseCase: GetFavoriteAnimalsUseCase) {
         self.loadFavoriteListUseCase = loadFavoriteListUseCase
     }
 

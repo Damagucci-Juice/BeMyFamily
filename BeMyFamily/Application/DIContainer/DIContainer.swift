@@ -41,8 +41,8 @@ class DIContainer: ObservableObject {
         FavoriteTabViewModel(loadFavoriteListUseCase: makeLoadFavoriteUseCase())
     }
 
-    func makeLoadFavoriteUseCase() -> LoadFavoriteListUseCase {
-        LoadFavoriteListUseCase(favoriteRepository: makeFavoriteRepository())
+    func makeLoadFavoriteUseCase() -> GetFavoriteAnimalsUseCase {
+        GetFavoriteAnimalsUseCase(favoriteRepository: makeFavoriteRepository())
     }
 
     func makeFavoriteButtonViewModel(with animal: Animal) -> FavoriteButtonViewModel {
