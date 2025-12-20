@@ -45,7 +45,7 @@ class DIContainer: ObservableObject {
         GetFavoriteAnimalsUseCase(favoriteRepository: makeFavoriteRepository())
     }
 
-    func makeFavoriteButtonViewModel(with animal: Animal) -> FavoriteButtonViewModel {
+    func makeFavoriteButtonViewModel(with animal: AnimalDTO) -> FavoriteButtonViewModel {
         FavoriteButtonViewModel(
             animal: animal,
             repository: makeFavoriteRepository()

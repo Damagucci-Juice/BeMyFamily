@@ -11,10 +11,10 @@ import Foundation
 final class ProvinceViewModel: ObservableObject {
     private let service: SearchService
 
-    private(set) var kind = [Upkind: [Kind]]()
-    private(set) var sido = [Sido]()    // MAYBE: - 1안, Dictionary로 빼기, 2안 Sido안에 Sigungu, Shelter를 포함한 새로운 Entity를 제작
-    private(set) var province = [Sido: [Sigungu]]()
-    private(set) var shelter = [Sigungu: [Shelter]]()
+    private(set) var kind = [Upkind: [KindDTO]]()
+    private(set) var sido = [SidoDTO]()    // MAYBE: - 1안, Dictionary로 빼기, 2안 Sido안에 Sigungu, Shelter를 포함한 새로운 Entity를 제작
+    private(set) var province = [SidoDTO: [SigunguDTO]]()
+    private(set) var shelter = [SigunguDTO: [ShelterDTO]]()
 
     init(service: SearchService) {
         self.service = service

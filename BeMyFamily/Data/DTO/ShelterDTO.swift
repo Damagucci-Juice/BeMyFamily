@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Shelter: Codable, Hashable, Identifiable {
+struct ShelterDTO: Codable, Hashable, Identifiable {
     let id: String
     let name: String
 

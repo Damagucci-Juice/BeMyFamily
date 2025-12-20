@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CardNewsView: View {
     let image: Image
-    let animal: Animal
+    let animal: AnimalDTO
 
     var body: some View {
 

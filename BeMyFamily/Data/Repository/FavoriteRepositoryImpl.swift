@@ -14,7 +14,7 @@ final class FavoriteRepositoryImpl: FavoriteRepository {
         self.storage = storage
     }
 
-    func save(_ animal: Animal) {
+    func save(_ animal: AnimalDTO) {
         storage.add(animal: animal)
     }
 
@@ -22,7 +22,7 @@ final class FavoriteRepositoryImpl: FavoriteRepository {
         storage.remove(id)
     }
 
-    func getAll() -> [Animal] {
+    func getAll() -> [AnimalDTO] {
         storage.list()
     }
 

@@ -45,11 +45,11 @@ struct AnimalFilterForm: View {
                 Section("지역을 골라주세요") {
                     Picker("시도", selection: $filterReducer.sido) {
                         Text(UIConstants.FilterForm.showAll)
-                            .tag(nil as Sido?)
+                            .tag(nil as SidoDTO?)
 
                         ForEach(provinceReducer.sido, id: \.self) { eachSido in
                             Text(eachSido.name)
-                                .tag(eachSido as Sido?)
+                                .tag(eachSido as SidoDTO?)
                         }
                     }
                     .onChange(of: filterReducer.sido) { _, _ in
@@ -60,12 +60,12 @@ struct AnimalFilterForm: View {
                         Picker("시군구", selection: $filterReducer.sigungu) {
                             let sigungus = provinceReducer.province[sido, default: []]
                             Text(UIConstants.FilterForm.showAll)
-                                .tag(nil as Sigungu?)
+                                .tag(nil as SigunguDTO?)
 
                             ForEach(sigungus, id: \.self) { eachSigungu in
                                 if let sigunguName = eachSigungu.name {
                                     Text(sigunguName)
-                                        .tag(eachSigungu as Sigungu?)
+                                        .tag(eachSigungu as SigunguDTO?)
                                 }
                             }
                         }
@@ -79,12 +79,12 @@ struct AnimalFilterForm: View {
                     Section("보호소를 선택하세요.") {
                         Picker("보호소", selection: $filterReducer.shelter) {
                             Text(UIConstants.FilterForm.showAll)
-                                .tag(nil as Shelter?)
+                                .tag(nil as ShelterDTO?)
 
                             let shelter = provinceReducer.shelter[sigungu, default: []]
                             ForEach(shelter, id: \.self) { eachShelter in
                                 Text(eachShelter.name)
-                                    .tag(eachShelter as Shelter?)
+                                    .tag(eachShelter as ShelterDTO?)
                             }
                         }
                     }
@@ -177,7 +177,7 @@ extension AnimalFilterForm {
     }
 
     @ViewBuilder
-    private func togglingCheckbox(_ kind: Kind, _ isSelected: Bool) -> some View {
+    private func togglingCheckbox(_ kind: KindDTO, _ isSelected: Bool) -> some View {
         let image = isSelected ? "checkmark.circle.fill" : "circle"
         HStack {
             Image(systemName: image)

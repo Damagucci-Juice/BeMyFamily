@@ -8,10 +8,10 @@
 import Foundation
 
 class FavoriteButtonViewModel: ObservableObject {
-    private let animal: Animal
+    private let animal: AnimalDTO
     private let repository: FavoriteRepository
 
-    init(animal: Animal, repository: FavoriteRepository) {
+    init(animal: AnimalDTO, repository: FavoriteRepository) {
         self.animal = animal
         self.repository = repository
         isFavorite = repository.exists(id: animal.id)

@@ -8,10 +8,10 @@
 import Foundation
 
 protocol FavoriteStorage {
-    func add(animal: Animal)
+    func add(animal: AnimalDTO)
     func remove(_ id: String)
     func contains(_ id: String) -> Bool
-    func list() -> [Animal]
+    func list() -> [AnimalDTO]
 }
 
 class UserDefaultsFavoriteStorage: FavoriteStorage {
@@ -20,29 +20,29 @@ class UserDefaultsFavoriteStorage: FavoriteStorage {
     init() {
         // Ensure the UserDefaults contains a valid array at initialization
         if UserDefaults.standard.object(forKey: databaseKey) == nil {
-            UserDefaults.standard.set([Animal](), forKey: databaseKey)
+            UserDefaults.standard.set([AnimalDTO](), forKey: databaseKey)
         }
     }
 
-    private func set() -> Set<Animal> {
+    private func set() -> Set<AnimalDTO> {
         // Retrieve and decode the array of favorite IDs from UserDefaults, converting to a Set
         if let data = UserDefaults.standard.object(forKey: NetworkConstants.Path.dataBase) as? Data {
             let decoder = JSONDecoder()
-            if let loadedAnimals = try? decoder.decode([Animal].self, from: data) {
+            if let loadedAnimals = try? decoder.decode([AnimalDTO].self, from: data) {
                 return Set(loadedAnimals)
             }
         }
-        return Set<Animal>()
+        return Set<AnimalDTO>()
     }
 
-    private func update(_ favorites: Set<Animal>) {
+    private func update(_ favorites: Set<AnimalDTO>) {
         let encoder = JSONEncoder()
         if let encoded = try? encoder.encode(favorites) {
             UserDefaults.standard.set(encoded, forKey: NetworkConstants.Path.dataBase)
         }
     }
 
-    func add(animal: Animal) {
+    func add(animal: AnimalDTO) {
         var favorites = set()
         favorites.insert(animal)
         update(favorites)
@@ -56,7 +56,7 @@ class UserDefaultsFavoriteStorage: FavoriteStorage {
         return set().contains { $0.id == id }
     }
 
-    func list() -> [Animal] {
+    func list() -> [AnimalDTO] {
         let favorites = set()
         return Array(favorites).sorted(by: { $0.happenDt > $1.happenDt })
     }

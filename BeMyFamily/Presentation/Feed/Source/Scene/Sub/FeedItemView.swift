@@ -13,7 +13,7 @@ struct FeedItemView: View {
     @EnvironmentObject var diContainer: DIContainer
     @State private var loadedImage: Image?
     @State private var renderedImage: Image?
-    let animal: Animal
+    let animal: AnimalDTO
     private var hasImage: Bool { loadedImage != nil ? false : true }
 
     var body: some View {

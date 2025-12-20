@@ -10,7 +10,7 @@ protocol AnimalRepository {
     func getAnimals(
         filter: AnimalSearchFilter,
         pageNo: Int
-    ) async throws -> [Animal]
+    ) async throws -> [AnimalDTO]
     
-    func refreshAnimals(filter: AnimalSearchFilter) async throws -> [Animal]
+    func refreshAnimals(filter: AnimalSearchFilter) async throws -> [AnimalDTO]
 }

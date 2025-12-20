@@ -8,8 +8,8 @@
 import Foundation
 
 protocol MetadataRepository {
-    func getKinds() async throws -> [Upkind: [Kind]]
-    func getSidos() async throws -> [Sido]
-    func getProvinces(_ sidos: [Sido]) async throws -> Province
-    func getShelters(_ province: Province) async throws -> [Sigungu: [Shelter]]
+    func getKinds() async throws -> [Upkind: [KindDTO]]
+    func getSidos() async throws -> [SidoDTO]
+    func getProvinces(_ sidos: [SidoDTO]) async throws -> Province
+    func getShelters(_ province: Province) async throws -> [SigunguDTO: [ShelterDTO]]
 }

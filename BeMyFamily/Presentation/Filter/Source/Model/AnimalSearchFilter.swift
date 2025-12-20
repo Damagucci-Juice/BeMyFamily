@@ -12,7 +12,7 @@ struct AnimalSearchFilter: Codable, Hashable {          // MARK: 데이터 항�
     var beginDate: Date?                // 시작날짜::0::YYYYMMDD
     var endDate: Date?                  // 종료날짜::0::YYYYMMDD
     var upkind: String?                 // 상위종(개고양이기타)::0::개-"417000", 고양이-"422400", 기타-"429900"
-    var kind: Kind?                   // 품종코드::0::라브라도 리트리버-"000069"
+    var kind: KindDTO?                   // 품종코드::0::라브라도 리트리버-"000069"
     var sido: String?                   // 시도코드::0::제주특별자치도-"6500000"
     var sigungu: String?                // 시군구코드::0::서귀포시-   "6520000"
     var shelterNumber: String?          // 보호소번호::0::우리동물병원생명사회-"311322202000001"

@@ -9,7 +9,7 @@ import NukeUI
 import SwiftUI
 
 struct AnimalThumbnailView: View {
-    let animal: Animal
+    let animal: AnimalDTO
     private let width = UIConstants.Frame.screenWidth / 3 + 2
 
     var body: some View {

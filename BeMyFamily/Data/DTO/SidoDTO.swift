@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Sido: Codable, Identifiable, Hashable {
+struct SidoDTO: Codable, Identifiable, Hashable {
     let id: String
     let name: String
 

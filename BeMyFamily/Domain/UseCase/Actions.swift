@@ -24,29 +24,29 @@ protocol AsyncAction: Action { }
 
 // MARK: - Sido
 struct FetchSido: AsyncAction {
-    typealias Payload = Sido
+    typealias Payload = SidoDTO
     let data: Data = Data() // 프로토콜 준수를 위한 더미 (실제로는 사용 X)
     let service: SearchService
 
-    func execute() async throws -> Response<Sido> {
+    func execute() async throws -> Response<SidoDTO> {
         let fetched = try await service.search(.sido)
         return try SetSido(data: fetched).execute()
     }
 }
 
 struct SetSido: Action {
-    typealias Payload = Sido
+    typealias Payload = SidoDTO
     let data: Data
-    func execute() throws -> Response<Sido> { try decode() }
+    func execute() throws -> Response<SidoDTO> { try decode() }
 }
 
 // MARK: - Sigungu
 struct FetchSigungu: AsyncAction {
-    typealias Payload = Sigungu
+    typealias Payload = SigunguDTO
     let data: Data = Data()
     let service: SearchService
 
-    private func fetchSingle(by sidoCode: String) async -> [Sigungu] {
+    private func fetchSingle(by sidoCode: String) async -> [SigunguDTO] {
         do {
             let fetched = try await service.search(.sigungu(sido: sidoCode))
             return try SetSigungu(data: fetched).execute().results
@@ -56,8 +56,8 @@ struct FetchSigungu: AsyncAction {
         }
     }
 
-    public func execute(by sidos: [Sido]) async -> [Sido: [Sigungu]] {
-        await withTaskGroup(of: (Sido, [Sigungu]).self) { group in
+    public func execute(by sidos: [SidoDTO]) async -> [SidoDTO: [SigunguDTO]] {
+        await withTaskGroup(of: (SidoDTO, [SigunguDTO]).self) { group in
             for sido in sidos {
                 group.addTask {
                     let results = await fetchSingle(by: sido.id)
@@ -65,7 +65,7 @@ struct FetchSigungu: AsyncAction {
                 }
             }
 
-            return await group.reduce(into: [Sido: [Sigungu]]()) { dict, pair in
+            return await group.reduce(into: [SidoDTO: [SigunguDTO]]()) { dict, pair in
                 dict[pair.0] = pair.1
             }
         }
@@ -73,18 +73,18 @@ struct FetchSigungu: AsyncAction {
 }
 
 struct SetSigungu: Action {
-    typealias Payload = Sigungu
+    typealias Payload = SigunguDTO
     let data: Data
-    func execute() throws -> Response<Sigungu> { try decode() }
+    func execute() throws -> Response<SigunguDTO> { try decode() }
 }
 
 // MARK: - Shelter
 struct FetchShelter: AsyncAction {
-    typealias Payload = Shelter
+    typealias Payload = ShelterDTO
     let data: Data = Data()
     let service: SearchService
 
-    private func fetchSingle(_ sidoCode: String, _ sigunguCode: String) async -> [Shelter] {
+    private func fetchSingle(_ sidoCode: String, _ sigunguCode: String) async -> [ShelterDTO] {
         do {
             let fetched = try await service.search(.shelter(sido: sidoCode, sigungu: sigunguCode))
             return try SetShelter(data: fetched).execute().results
@@ -93,8 +93,8 @@ struct FetchShelter: AsyncAction {
         }
     }
 
-    public func execute(by province: [Sido: [Sigungu]]) async -> [Sigungu: [Shelter]] {
-        await withTaskGroup(of: (Sigungu, [Shelter]).self) { group in
+    public func execute(by province: [SidoDTO: [SigunguDTO]]) async -> [SigunguDTO: [ShelterDTO]] {
+        await withTaskGroup(of: (SigunguDTO, [ShelterDTO]).self) { group in
             for (sido, sigungus) in province {
                 for sigungu in sigungus {
                     group.addTask {
@@ -104,7 +104,7 @@ struct FetchShelter: AsyncAction {
                 }
             }
 
-            return await group.reduce(into: [Sigungu: [Shelter]]()) { dict, pair in
+            return await group.reduce(into: [SigunguDTO: [ShelterDTO]]()) { dict, pair in
                 dict[pair.0] = pair.1
             }
         }
@@ -112,31 +112,31 @@ struct FetchShelter: AsyncAction {
 }
 
 struct SetShelter: Action {
-    typealias Payload = Shelter
+    typealias Payload = ShelterDTO
     let data: Data
-    func execute() throws -> Response<Shelter> { try decode() }
+    func execute() throws -> Response<ShelterDTO> { try decode() }
 }
 
 // MARK: - Kind (Animal Type)
 struct FetchKind: AsyncAction {
-    typealias Payload = Kind
+    typealias Payload = KindDTO
     let data: Data = Data()
     let service: SearchService
 
-    private func fetchSingle(_ upkindCode: String) async throws -> [Kind] {
+    private func fetchSingle(_ upkindCode: String) async throws -> [KindDTO] {
         let fetched = try await service.search(.kind(upkind: upkindCode))
         return try SetKind(data: fetched).execute().results
     }
 
-    public func execute(by upkinds: [Upkind]) async throws -> [Upkind: [Kind]] {
-        try await withThrowingTaskGroup(of: (Upkind, [Kind]).self) { group in
+    public func execute(by upkinds: [Upkind]) async throws -> [Upkind: [KindDTO]] {
+        try await withThrowingTaskGroup(of: (Upkind, [KindDTO]).self) { group in
             for upkind in upkinds {
                 group.addTask {
                     (upkind, try await fetchSingle(upkind.id))
                 }
             }
 
-            return try await group.reduce(into: [Upkind: [Kind]]()) { dict, pair in
+            return try await group.reduce(into: [Upkind: [KindDTO]]()) { dict, pair in
                 dict[pair.0] = pair.1
             }
         }
@@ -144,27 +144,27 @@ struct FetchKind: AsyncAction {
 }
 
 struct SetKind: Action {
-    typealias Payload = Kind
+    typealias Payload = KindDTO
     let data: Data
-    func execute() throws -> Response<Kind> { try decode() }
+    func execute() throws -> Response<KindDTO> { try decode() }
 }
 
 // MARK: - Animal
 struct FetchAnimal: AsyncAction {
-    typealias Payload = Animal
+    typealias Payload = AnimalDTO
     let data: Data = Data()
     let service: SearchService
     let filter: AnimalSearchFilter
     let page: Int
 
-    func execute() async throws -> [Animal] {
+    func execute() async throws -> [AnimalDTO] {
         let fetched = try await service.search(.animal(filteredItem: filter, page: page))
         return try SetAnimal(data: fetched).execute().results
     }
 }
 
 struct SetAnimal: Action {
-    typealias Payload = Animal
+    typealias Payload = AnimalDTO
     let data: Data
-    func execute() throws -> Response<Animal> { try decode() }
+    func execute() throws -> Response<AnimalDTO> { try decode() }
 }

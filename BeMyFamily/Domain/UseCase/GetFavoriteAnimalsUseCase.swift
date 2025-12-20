@@ -14,7 +14,7 @@ final class GetFavoriteAnimalsUseCase {
         self.favoriteRepository = favoriteRepository
     }
 
-    func excute() -> [Animal] {
+    func excute() -> [AnimalDTO] {
         favoriteRepository.getAll()
     }
 }

@@ -14,7 +14,7 @@ final class ToggleFavoriteUseCase {
         self.favoriteRepository = favoriteRepository
     }
     
-    func execute(animal: Animal) -> Result<Bool, Error> {
+    func execute(animal: AnimalDTO) -> Result<Bool, Error> {
         if animal.isFavorite {
             favoriteRepository.delete(id: animal.id)
             return .success(false)

@@ -8,9 +8,9 @@
 import Foundation
 
 protocol FavoriteRepository {
-    func save(_ animal: Animal)
+    func save(_ animal: AnimalDTO)
     func delete(id: String)
-    func getAll() -> [Animal]
+    func getAll() -> [AnimalDTO]
     func getIds() -> Set<String>
     func exists(id: String) -> Bool
 }

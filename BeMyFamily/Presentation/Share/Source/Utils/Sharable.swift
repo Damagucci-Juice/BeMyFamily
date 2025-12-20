@@ -8,12 +8,12 @@
 import SwiftUI
 
 protocol Sharable: View {
-    func render(object: Animal, img image: Image, displayScale: CGFloat) -> Image?
+    func render(object: AnimalDTO, img image: Image, displayScale: CGFloat) -> Image?
 }
 
 extension Sharable {
     @MainActor
-    func render(object: Animal, img image: Image, displayScale: CGFloat) -> Image? {
+    func render(object: AnimalDTO, img image: Image, displayScale: CGFloat) -> Image? {
         let renderer = ImageRenderer(content: CardNewsView(image: image, animal: object))
 
         // make sure and use the correct display scale for this device

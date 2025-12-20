@@ -14,7 +14,7 @@ class FavoriteTabViewModel: ObservableObject {
         self.loadFavoriteListUseCase = loadFavoriteListUseCase
     }
 
-    @Published var favorites: [Animal]?
+    @Published var favorites: [AnimalDTO]?
 
     func load() {
         favorites = loadFavoriteListUseCase.excute()

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Sigungu: Codable, Hashable, Identifiable {
+struct SigunguDTO: Codable, Hashable, Identifiable {
     let id: String
     let name: String?
     let sidoId: String

@@ -21,7 +21,7 @@ final class FetchAnimalsUseCase {
     func execute(
         filter: AnimalSearchFilter,
         pageNo: Int
-    ) async -> Result<(animals: [Animal], pagingInfo: PagingInfo), Error> {
+    ) async -> Result<(animals: [AnimalDTO], pagingInfo: PagingInfo), Error> {
         do {
             let animals = try await animalRepository.getAnimals(
                 filter: filter,

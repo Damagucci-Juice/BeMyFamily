@@ -16,9 +16,9 @@ final class FeedViewModel: ObservableObject {
     private(set) var selectedFilter: [AnimalSearchFilter] = [.example]
     private(set) var filterPage = 1
 
-    private var animalDict = [FriendMenu: [Animal]]()
+    private var animalDict = [FriendMenu: [AnimalDTO]]()
 
-    var currentAnimals: [Animal] {
+    var currentAnimals: [AnimalDTO] {
         animalDict[menu] ?? []
     }
     
@@ -50,7 +50,7 @@ final class FeedViewModel: ObservableObject {
      }
 
     // TODO: - 리펙터링 해야함
-    private func fetchMultiKindsAnimals(_ filters: [AnimalSearchFilter]) async -> [Animal] {
+    private func fetchMultiKindsAnimals(_ filters: [AnimalSearchFilter]) async -> [AnimalDTO] {
         guard !isLoading else { return [] }
         Task { @MainActor [weak self] in
             self?.isLoading = true
@@ -60,7 +60,7 @@ final class FeedViewModel: ObservableObject {
         resetOccupied(filters)
 
         // 들어온 모든 필터로 테스크 그룹을 선언
-        let results = await withTaskGroup(of: (AnimalSearchFilter, [Animal]).self) { group in
+        let results = await withTaskGroup(of: (AnimalSearchFilter, [AnimalDTO]).self) { group in
             for filter in filters {
                 group.addTask {
                     do {
@@ -72,7 +72,7 @@ final class FeedViewModel: ObservableObject {
                 }
             }
 
-            var aggregatedResults = [AnimalSearchFilter: [Animal]]()
+            var aggregatedResults = [AnimalSearchFilter: [AnimalDTO]]()
             for await (filter, animals) in group {
                 aggregatedResults[filter, default: []].append(contentsOf: animals)
             }
@@ -86,8 +86,8 @@ final class FeedViewModel: ObservableObject {
     /// 그렇지 않다면 selectedFilter에서 제거하고 emptyFIlter에 값을 저장
     /// 추후 emptyFilter는 토글로써 쓰임
     @MainActor
-    private func updateUI(_ results: [AnimalSearchFilter: [Animal]]) -> [Animal] {
-        var animalContainer = [Animal]()
+    private func updateUI(_ results: [AnimalSearchFilter: [AnimalDTO]]) -> [AnimalDTO] {
+        var animalContainer = [AnimalDTO]()
         for (filter, animals) in results {
             if animals.isEmpty {
                 /// filter가 빈 값을 내보내면 selectedFilter에서 제거
@@ -105,9 +105,9 @@ final class FeedViewModel: ObservableObject {
         return animalContainer
     }
 
-    private func fetchAnimals(with filter: AnimalSearchFilter) async throws -> ([Animal], Bool) {
+    private func fetchAnimals(with filter: AnimalSearchFilter) async throws -> ([AnimalDTO], Bool) {
         let pageToFetch = self.menu == .feed ? page : filterPage
-        let animals: [Animal]
+        let animals: [AnimalDTO]
 
         do {
             animals = try await FetchAnimal(
@@ -123,7 +123,7 @@ final class FeedViewModel: ObservableObject {
     }
 
     // 해당 동물의 isLiked 프로퍼티를 업데이트하고 이를 현재 선택된 menu의 동물 리스트와 업데이트함
-    public func updateFavorite(_ animal: Animal) {
+    public func updateFavorite(_ animal: AnimalDTO) {
         let selectedAnimalList = animalDict[menu, default: []]
         var likedAnimals = animalDict[FriendMenu.favorite, default: []]
 
@@ -137,32 +137,34 @@ final class FeedViewModel: ObservableObject {
             animalDict[FriendMenu.favorite] = likedAnimals
             saveFavorites(using: likedAnimals)
         }
-        animal.isFavorite.toggle()
+
+        // TODO: UseCase 변형 되면 확인
+//        animal.isFavorite.toggle()
     }
 
-    private func loadSavedAnimals() -> [Animal] {
+    private func loadSavedAnimals() -> [AnimalDTO] {
         if let savedAnimals = UserDefaults.standard.object(forKey: NetworkConstants.Path.dataBase) as? Data {
             let decoder = JSONDecoder()
-            if let loadedAnimals = try? decoder.decode([Animal].self, from: savedAnimals) {
-                loadedAnimals.forEach { $0.isFavorite = true }
+            if let loadedAnimals = try? decoder.decode([AnimalDTO].self, from: savedAnimals) {
+//                loadedAnimals.forEach { $0.isFavorite = true }
                 return loadedAnimals
             }
         }
         return []
     }
 
-    private func saveFavorites(using animals: [Animal]) {
+    private func saveFavorites(using animals: [AnimalDTO]) {
         let encoder = JSONEncoder()
         if let encoded = try? encoder.encode(animals) {
             UserDefaults.standard.set(encoded, forKey: NetworkConstants.Path.dataBase)
         }
     }
 
-    private func syncWithFavorites(_ animal: [Animal]) -> [Animal] {
+    private func syncWithFavorites(_ animal: [AnimalDTO]) -> [AnimalDTO] {
         let liked = self.animalDict[FriendMenu.favorite, default: []]
         liked.forEach { likedAnimal in
             if let first = animal.first(where: {$0 == likedAnimal }) {
-                first.isFavorite = true
+//                first.isFavorite = true
             }
         }
         return animal

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Kind: Codable, Hashable, Identifiable {
+struct KindDTO: Codable, Hashable, Identifiable {
     let id: String
     let name: String
 
@@ -16,5 +16,5 @@ struct Kind: Codable, Hashable, Identifiable {
         case name = "kindNm"
     }
 
-    static let example = Kind(id: "000054", name: "골든 리트리버")
+    static let example = KindDTO(id: "000054", name: "골든 리트리버")
 }

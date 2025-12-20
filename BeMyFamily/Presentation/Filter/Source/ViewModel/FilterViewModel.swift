@@ -16,10 +16,10 @@ final class FilterViewModel: ObservableObject {
     var beginDate = Date.now.addingTimeInterval(UIConstants.Date.aDayBefore*10) // 10일 전
     var endDate = Date()
     var upkind: Upkind?
-    var kinds: Set<Kind>
-    var sido: Sido?
-    var sigungu: Sigungu?
-    var shelter: Shelter?
+    var kinds: Set<KindDTO>
+    var sido: SidoDTO?
+    var sigungu: SigunguDTO?
+    var shelter: ShelterDTO?
     var state = ProcessState.all
     var neutral: Neutralization?
 
