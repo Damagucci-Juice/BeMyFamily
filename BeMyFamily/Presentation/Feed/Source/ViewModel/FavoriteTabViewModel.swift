@@ -8,7 +8,7 @@
 import Foundation
 
 class FavoriteTabViewModel: ObservableObject {
-    let loadFavoriteListUseCase: GetFavoriteAnimalsUseCase
+    private let loadFavoriteListUseCase: GetFavoriteAnimalsUseCase
 
     init(loadFavoriteListUseCase: GetFavoriteAnimalsUseCase) {
         self.loadFavoriteListUseCase = loadFavoriteListUseCase
@@ -17,10 +17,6 @@ class FavoriteTabViewModel: ObservableObject {
     @Published var favorites: [Animal]?
 
     func load() {
-        Task { [weak self] in
-            if let favorites = try? await self?.loadFavoriteListUseCase.excute() {
-                self?.favorites = favorites
-            }
-        }
+        favorites = loadFavoriteListUseCase.excute()
     }
 }
