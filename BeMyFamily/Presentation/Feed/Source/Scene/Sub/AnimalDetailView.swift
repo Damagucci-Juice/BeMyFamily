@@ -81,7 +81,7 @@ struct AnimalDetailView: View {
                 detailRow(label: "특이사항:", value: animal.specialMark)
                 detailRow(label: "접수일:", value: animal.happenDt)
                 detailRow(label: "발견장소:", value: animal.happenPlace)
-                detailRow(label: "품종:", value: animal.kindCD)
+                detailRow(label: "품종:", value: animal.kindNm)
                 detailRow(label: "색:", value: animal.colorCD)
                 detailRow(label: "나이:", value: animal.age)
                 detailRow(label: "무게:", value: animal.weight)
