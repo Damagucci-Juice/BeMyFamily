@@ -6,69 +6,111 @@
 //
 
 import Foundation
+import Foundation
 
 struct AnimalDTO: Codable, Equatable, Identifiable {
-    // 1. 기본 식별자 및 상태
-    let id: String
-    var isFavorite = false
+    var id: String { noticeNo }
+    let desertionNo: String                 // 구조번호: 새끼 여러마리 구조는 구조번호가 동일 할 수 있음
 
-    // 2. 이미지 및 공고 관련 (확장됨)
-    let thumbnailURL: String
-    let photoURL: String
+    // 2. 기본 공고 정보
     let noticeNo: String
     let noticeSdt: String
     let noticeEdt: String
     let processState: String
-
-    // 3. 동물 상세 정보 (String 타입으로 통합)
     let happenDt: String
     let happenPlace: String
-    let kindCD: String
+    let updTm: String?
+    let endReason: String?
+
+    // 3. 동물 상세 정보
+    let kindCd: String
     let kindNm: String
-    let upKindCD: String
-    let colorCD: String
+    let kindFullNm: String?
+    let upKindCd: String
+    let upKindNm: String?
+    let colorCd: String
     let age: String
     let weight: String
-    let sexCD: SexCD
-    let neuterYn: Neutralization
+    let sexCd: String              // 커스텀 Enum (JSON: "sexCd")
+    let neuterYn: String  // 커스텀 Enum (JSON: "neuterYn")
     let specialMark: String
+    let rfidCd: String?
 
-    // 4. 관리 및 보호소 정보 (확장됨)
+    // 4. 이미지 필드 (popfile 1~8)
+    let popfile1: String?
+    let popfile2: String?
+    let popfile3: String?
+    let popfile4: String?
+    let popfile5: String?
+    let popfile6: String?
+    let popfile7: String?
+    let popfile8: String?
+
+    // 5. 보호소 및 담당자 정보
     let careNm: String
     let careTel: String
     let careAddr: String
     let orgNm: String
-    let chargeNm: String?
-    let officetel: String?
     let careRegNo: String
     let careOwnerNm: String
 
-    // 5. 입양 관련 추가 정보 (Optional)
+    // 6. 건강 및 기타 정보
+    let healthChk: String?
+    let vaccinationChk: String?
+    let sfeSoci: String?
+    let sfeHealth: String?
+    let etcBigo: String?
+
+    // 7. 입양(adptn) / 지원(sprt) / 서비스(srvc) / 이벤트(evnt) 관련 확장 필드
     let adptnTitle: String?
     let adptnSDate: String?
     let adptnEDate: String?
+    let adptnConditionLimitTxt: String?
+    let adptnTxt: String?
+    let adptnImg: String?
 
+    let sprtTitle: String?
+    let sprtSDate: String?
+    let sprtEDate: String?
+    let sprtConditionLimitTxt: String?
+    let sprtTxt: String?
+    let sprtImg: String?
+
+    let srvcTitle: String?
+    let srvcSDate: String?
+    let srvcEDate: String?
+    let srvcConditionLimitTxt: String?
+    let srvcTxt: String?
+    let srvcImg: String?
+
+    let evntTitle: String?
+    let evntSDate: String?
+    let evntEDate: String?
+    let evntConditionLimitTxt: String?
+    let evntTxt: String?
+    let evntImg: String?
+
+    // JSON 키와 프로퍼티명이 일치하므로 CodingKeys는 불필요한 별칭(id) 설정 외에는 생략 가능합니다.
     enum CodingKeys: String, CodingKey {
-        case id = "desertionNo"
-        case thumbnailURL = "popfile1"
-        case photoURL = "popfile2"
-        case kindCD = "kindCd"
-        case upKindCD = "upKindCd"
-        case colorCD = "colorCd"
-        case sexCD = "sexCd"
-        case happenDt, happenPlace, kindNm, age, weight, noticeNo, noticeSdt, noticeEdt
-        case processState, neuterYn, specialMark, careNm, careTel, careAddr
-        case orgNm, chargeNm, officetel, careRegNo, careOwnerNm
-        case adptnTitle, adptnSDate, adptnEDate
+        case desertionNo, noticeNo, srvcTxt, popfile4, sprtEDate, rfidCd, happenDt
+        case happenPlace, kindCd, colorCd, age, weight, evntImg, updTm, endReason
+        case careRegNo, noticeSdt, noticeEdt, popfile1, processState, sexCd, neuterYn
+        case specialMark, careNm, careTel, careAddr, orgNm, sfeSoci, sfeHealth, etcBigo
+        case kindFullNm, upKindCd, upKindNm, kindNm, popfile2, popfile3, popfile5
+        case popfile6, popfile7, popfile8, careOwnerNm, vaccinationChk, healthChk
+        case adptnTitle, adptnSDate, adptnEDate, adptnConditionLimitTxt, adptnTxt
+        case adptnImg, sprtTitle, sprtSDate, sprtConditionLimitTxt, sprtTxt, sprtImg
+        case srvcTitle, srvcSDate, srvcEDate, srvcConditionLimitTxt, srvcImg
+        case evntTitle, evntSDate, evntEDate, evntConditionLimitTxt, evntTxt
     }
 }
 
 extension AnimalDTO: Hashable {
     static func == (lhs: AnimalDTO, rhs: AnimalDTO) -> Bool {
-        lhs.id == rhs.id
+        lhs.desertionNo == rhs.desertionNo
     }
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
+        hasher.combine(desertionNo)
     }
 }
