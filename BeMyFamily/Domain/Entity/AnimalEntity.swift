@@ -55,7 +55,7 @@ struct AnimalEntity: Identifiable {
     let adptnTxt: String?
     let adptnImg: String?
 
-    func updateFavoriteStatus(_ currentStatus: Bool = false) {
-        isFavorite = currentStatus
+    mutating func updateFavoriteStatus(_ currentStatus: Bool = false) {
+        self.isFavorite = currentStatus
     }
 }

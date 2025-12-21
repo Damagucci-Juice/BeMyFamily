@@ -14,10 +14,12 @@ protocol FavoriteStorage {
     func list() -> [AnimalDTO]
 }
 
-class UserDefaultsFavoriteStorage: FavoriteStorage {
+final class UserDefaultsFavoriteStorage: FavoriteStorage {
     private let databaseKey = NetworkConstants.Path.dataBase
 
-    init() {
+    static let shared = UserDefaultsFavoriteStorage()
+
+    private init() {
         // Ensure the UserDefaults contains a valid array at initialization
         if UserDefaults.standard.object(forKey: databaseKey) == nil {
             UserDefaults.standard.set([AnimalDTO](), forKey: databaseKey)

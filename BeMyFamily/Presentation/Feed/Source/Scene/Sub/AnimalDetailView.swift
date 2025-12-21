@@ -11,10 +11,10 @@ import SwiftUI
 
 struct AnimalDetailView: View {
     @Environment(\.displayScale) var displayScale
-    @EnvironmentObject var diContainer: DIContainer
+    @Environment(DIContainer.self) var diContainer: DIContainer
     @State private var loadedImage: Image?
     @State private var renderedImage: Image?
-    let animal: AnimalDTO
+    let animal: AnimalEntity
     private var hasImage: Bool { loadedImage != nil ? false : true }
 
     var body: some View {
@@ -36,7 +36,7 @@ struct AnimalDetailView: View {
     @MainActor
     @ViewBuilder
     private var imageSection: some View {
-        LazyImage(url: URL(string: animal.photoURL)) { state in
+        LazyImage(url: URL(string: animal.image1)) { state in
             let roundedRectangle = RoundedRectangle(cornerRadius: UIConstants.Radius.mainImagePlaceholder)
             let hasError = state.error != nil
 
@@ -79,16 +79,16 @@ struct AnimalDetailView: View {
         VStack(alignment: .leading, spacing: 8) {
             Group {
                 detailRow(label: "특이사항:", value: animal.specialMark)
-                detailRow(label: "접수일:", value: animal.happenDt)
+                detailRow(label: "접수일:", value: animal.happenDate)
                 detailRow(label: "발견장소:", value: animal.happenPlace)
-                detailRow(label: "품종:", value: animal.kindNm)
-                detailRow(label: "색:", value: animal.colorCD)
+                detailRow(label: "품종:", value: animal.kindName)
+                detailRow(label: "색:", value: animal.color)
                 detailRow(label: "나이:", value: animal.age)
                 detailRow(label: "무게:", value: animal.weight)
                 detailRow(label: "처리 상태:", value: animal.processState)
-                detailRow(label: "성별:", value: animal.sexCD.text)
+                detailRow(label: "성별:", value: animal.sexCd.text)
                 detailRow(label: "중성화 여부:", value: animal.neuterYn.text)
-                detailRow(label: "보호소 이름:", value: animal.careNm)
+                detailRow(label: "보호소 이름:", value: animal.careName)
                 detailRow(label: "보호소 연락처:", value: animal.careTel)
             }
         }
@@ -121,10 +121,9 @@ struct AnimalDetailView: View {
 extension AnimalDetailView: Sharable { }
 
 #Preview {
-    @StateObject var reducer = DIContainer.makeFeedListViewModel(DIContainer.makeFilterViewModel())
     let animals = ModelData().animals.items
 
-    return NavigationView {
-        AnimalDetailView(animal: animals[0])
+    NavigationView {
+        AnimalDetailView(animal: Mapper.animalDto2Entity(animals[0]))
     }
 }

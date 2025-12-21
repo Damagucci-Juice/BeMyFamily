@@ -6,11 +6,15 @@
 //
 
 import Foundation
+import Observation
 
-class DIContainer: ObservableObject {
+// TODO: - DIContainer의 역할과 Coordinator의 역할이 뭔지 확인하기
+@Observable
+final class DIContainer {
     struct Dependencies {
         // TODO: - 이미지 서비스 여기에 둬야함
         let apiService: SearchService
+        let favoriteStorage: FavoriteStorage
     }
 
     private let dependencies: Dependencies
@@ -19,42 +23,59 @@ class DIContainer: ObservableObject {
         self.dependencies = dependencies
     }
 
-    // TODO: - Cache 여기에 둬야함
-    lazy var favoriteAnimalStorage: FavoriteStorage = UserDefaultsFavoriteStorage()
+    var currentTap: FriendMenu = .feed
 
-    // TODO: - static 걷어내기
-    static func makeFeedListViewModel(_ viewModel: FilterViewModel, service: SearchService = FamilyService()) -> FeedViewModel {
-        return FeedViewModel(service: service, viewModel: viewModel)
+    func makeFeedListViewModel() -> FeedViewModel {
+        FeedViewModel(fetchAnimalsUseCase: makeFetchAnimalsUseCase())
     }
 
-    static func makeFilterViewModel() -> FilterViewModel {
+    func makeFilterViewModel() -> FilterViewModel {
         return FilterViewModel()
     }
 
-    static func makeProvinceViewModel(service: SearchService = FamilyService()) -> ProvinceViewModel {
-        return ProvinceViewModel(service: service)
+    func makeFetchAnimalsUseCase() -> FetchAnimalsUseCase {
+        FetchAnimalsUseCase(
+            animalRepository: makeAnimalRepository(),
+            favoriteRepository: makeFavoriteRepository()
+        )
+    }
+
+    func makeAnimalRepository() -> AnimalRepository {
+        AnimalRepositoryImpl(service: dependencies.apiService)
     }
 
     // MARK: - Favorites
 
     func makeFavoriteTabViewModel() -> FavoriteTabViewModel {
-        FavoriteTabViewModel(loadFavoriteListUseCase: makeLoadFavoriteUseCase())
+        FavoriteTabViewModel(getFavoriteAnimalsUseCase: makeLoadFavoriteUseCase())
     }
 
     func makeLoadFavoriteUseCase() -> GetFavoriteAnimalsUseCase {
         GetFavoriteAnimalsUseCase(favoriteRepository: makeFavoriteRepository())
     }
 
-    func makeFavoriteButtonViewModel(with animal: AnimalDTO) -> FavoriteButtonViewModel {
+    func makeFavoriteButtonViewModel(with animal: AnimalEntity) -> FavoriteButtonViewModel {
         FavoriteButtonViewModel(
             animal: animal,
-            repository: makeFavoriteRepository()
+            toggleUseCase: makeToggleFavortieUseCase(makeFavoriteRepository())
         )
     }
 
     func makeFavoriteRepository() -> FavoriteRepository {
         FavoriteRepositoryImpl(
-            storage: favoriteAnimalStorage
+            storage: dependencies.favoriteStorage
         )
+    }
+
+    func makeToggleFavortieUseCase(_ repo: FavoriteRepository) -> ToggleFavoriteUseCase {
+        ToggleFavoriteUseCase(favoriteRepository: repo)
+    }
+
+    func makeLoadPrerequisiteDataUseCase() -> LoadPrerequisiteDataUseCase {
+        LoadPrerequisiteDataUseCase(metadataRepository: makeMetaDataRepository())
+    }
+
+    func makeMetaDataRepository() -> MetadataRepository {
+        MetadataRepositoryImpl(service: dependencies.apiService)
     }
 }

@@ -8,7 +8,7 @@
 import Foundation
 
 @Observable
-final class FilterViewModel: ObservableObject {
+final class FilterViewModel {
     init() { self.kinds = [] }
     private(set) var onProcessing = false
     private(set) var emptyResultFilters = [AnimalSearchFilter]()

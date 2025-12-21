@@ -7,10 +7,11 @@
 import Foundation
 
 protocol AnimalRepository {
+    //
     func getAnimals(
         filter: AnimalSearchFilter,
         pageNo: Int
-    ) async throws -> [AnimalDTO]
-    
-    func refreshAnimals(filter: AnimalSearchFilter) async throws -> [AnimalDTO]
+    ) async throws -> ([AnimalEntity], Paging)
+
+    func refreshAnimals(filter: AnimalSearchFilter) async throws -> [AnimalEntity]
 }

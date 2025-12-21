@@ -6,11 +6,9 @@
 //
 import Foundation
 
-typealias Province = [SidoDTO: [SigunguDTO]]
-
 struct PrerequisiteData {
-    let kind: [Upkind: [KindDTO]]
-    let sido: [SidoDTO]
+    let kind: [Upkind: [KindEntity]]
+    let sido: [SidoEntity]
     let province: Province
-    let shelter: [SigunguDTO: [ShelterDTO]]
+    let shelter: [SigunguEntity: [ShelterEntity]]
 }

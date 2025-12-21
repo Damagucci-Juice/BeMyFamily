@@ -14,16 +14,16 @@ final class FavoriteRepositoryImpl: FavoriteRepository {
         self.storage = storage
     }
 
-    func save(_ animal: AnimalDTO) {
-        storage.add(animal: animal)
+    func save(_ animal: AnimalEntity) {
+        storage.add(animal: Mapper.animalEntity2Dto(animal))
     }
 
     func delete(id: String) {
         storage.remove(id)
     }
 
-    func getAll() -> [AnimalDTO] {
-        storage.list()
+    func getAll() -> [AnimalEntity] {
+        storage.list().map(Mapper.animalDto2Entity)
     }
 
     func getIds() -> Set<String> {

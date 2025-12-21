@@ -7,25 +7,25 @@
 
 import Foundation
 
-class FavoriteButtonViewModel: ObservableObject {
-    private let animal: AnimalDTO
-    private let repository: FavoriteRepository
-
-    init(animal: AnimalDTO, repository: FavoriteRepository) {
-        self.animal = animal
-        self.repository = repository
-        isFavorite = repository.exists(id: animal.id)
-    }
-
+final class FavoriteButtonViewModel: ObservableObject {
+    private var animal: AnimalEntity
+    private let toggleUseCase: ToggleFavoriteUseCase
     @Published var isFavorite: Bool
 
-    func toggle() {
-        if isFavorite {
-            repository.delete(id: animal.id)
-        } else {
-            repository.save(animal)
-        }
+    init(animal: AnimalEntity, toggleUseCase: ToggleFavoriteUseCase) {
+        self.animal = animal
+        self.toggleUseCase = toggleUseCase
+        self.isFavorite = animal.isFavorite
+    }
 
-        isFavorite = repository.exists(id: animal.id)
+    func heartButtonTapped() {
+        switch toggleUseCase.execute(animal: animal) {
+        case .success(let result):
+            isFavorite = result
+            animal.updateFavoriteStatus(result)
+        case .failure:
+            print("Heart Enroll Error")
+            break
+        }
     }
 }

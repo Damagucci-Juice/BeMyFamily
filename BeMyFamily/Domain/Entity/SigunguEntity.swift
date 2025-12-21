@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SigunguEntity {
+struct SigunguEntity: Hashable {
     let id: String
     let name: String?
     let sidoCode: String

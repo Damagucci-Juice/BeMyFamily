@@ -7,9 +7,11 @@
 
 import Foundation
 
+typealias Province = [SidoEntity: [SigunguEntity]]
+
 protocol MetadataRepository {
-    func getKinds() async throws -> [Upkind: [KindDTO]]
-    func getSidos() async throws -> [SidoDTO]
-    func getProvinces(_ sidos: [SidoDTO]) async throws -> Province
-    func getShelters(_ province: Province) async throws -> [SigunguDTO: [ShelterDTO]]
+    func fetchKinds() async throws -> [Upkind: [KindEntity]]
+    func fetchSidos() async throws -> [SidoEntity]
+    func fetchProvinces(_ sidos: [SidoEntity]) async throws -> Province
+    func fetchShelters(_ province: Province) async throws -> [SigunguEntity: [ShelterEntity]]
 }

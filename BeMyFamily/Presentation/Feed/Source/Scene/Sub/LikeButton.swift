@@ -12,7 +12,7 @@ struct FavoriteButtonView: View {
 
     var body: some View {
         Button {
-            viewModel.toggle()
+            viewModel.heartButtonTapped()
         } label: {
             Image(systemName: UIConstants.Image.heart)
                 .resizable()
@@ -34,9 +34,9 @@ struct FavoriteButtonView: View {
 
 #Preview {
     let animal = ModelData().animals.items.first!
-    let diContainer = DIContainer(dependencies: .init(apiService: MockFamilyService()))
+    let diContainer = DIContainer(dependencies: .init(apiService: MockFamilyService(), favoriteStorage: UserDefaultsFavoriteStorage.shared))
 
-    return FavoriteButtonView(
-        viewModel: diContainer.makeFavoriteButtonViewModel(with: animal)
+    FavoriteButtonView(
+        viewModel: diContainer.makeFavoriteButtonViewModel(with: Mapper.animalDto2Entity(animal))
     )
 }

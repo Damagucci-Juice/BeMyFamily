@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FavoriteTabView: View {
-    @ObservedObject var viewModel: FavoriteTabViewModel
+    @State var viewModel: FavoriteTabViewModel
 
     private let columns = [
         GridItem(.adaptive(minimum: 100, maximum: .infinity)),
@@ -18,34 +18,27 @@ struct FavoriteTabView: View {
 
     var body: some View {
         NavigationStack {
-            VStack {
-                if let favorites = viewModel.favorites {
-                    if favorites.isEmpty {
-                        EmptyView()
-                    } else {
-                        ScrollView(.vertical) {
-                            LazyVGrid(columns: columns, spacing: 0.0) {
-                                ForEach(favorites) { animal in
-                                    NavigationLink {
-                                        AnimalDetailView(animal: animal)
-                                    } label: {
-                                        AnimalThumbnailView(animal: animal)
-                                    }
-                                    .tint(.primary)
-                                }
-                            }
+            ScrollView(.vertical) {
+                LazyVGrid(columns: columns, spacing: 0.0) {
+                    ForEach(viewModel.favorites) { animal in
+                        NavigationLink {
+                            AnimalDetailView(animal: animal)
+                        } label: {
+                            AnimalThumbnailView(animal: animal)
                         }
+                        .tint(.primary)
                     }
                 }
             }
-            .onAppear(perform: viewModel.load)
+            .onAppear(perform: viewModel.didOnAppear)
             .navigationTitle(UIConstants.App.favorite)
         }
     }
 }
 
 #Preview {
-    let diContainer = DIContainer(dependencies: .init(apiService: FamilyService()))
+    let diContainer = DIContainer(dependencies: .init(apiService: MockFamilyService(),
+                                                      favoriteStorage: UserDefaultsFavoriteStorage.shared))
 
-    return FavoriteTabView(viewModel: diContainer.makeFavoriteTabViewModel())
+    FavoriteTabView(viewModel: diContainer.makeFavoriteTabViewModel())
 }

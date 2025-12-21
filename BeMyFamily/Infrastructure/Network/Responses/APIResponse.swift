@@ -11,6 +11,10 @@ struct APIResponse<T: Codable>: Decodable {
     let requestNumber: Int
     let resultCode: String
     let resultMessage: String
+    let numOfRows: Int
+    let pageNo: Int
+    let totalCount: Int
+
     let items: [T]
 
     enum CodingKeys: String, CodingKey {
@@ -28,7 +32,8 @@ struct APIResponse<T: Codable>: Decodable {
     }
 
     enum BodyCodingKeys: String, CodingKey {
-        case items
+        case items, numOfRows, pageNo, totalCount
+
     }
 
     enum ItemsCodingKeys: String, CodingKey {
@@ -45,6 +50,9 @@ struct APIResponse<T: Codable>: Decodable {
         resultMessage = try headerContainer.decode(String.self, forKey: .resultMessage)
 
         let bodyContainer = try responseContainer.nestedContainer(keyedBy: BodyCodingKeys.self, forKey: .body)
+        numOfRows = try bodyContainer.decode(Int.self, forKey: .numOfRows)
+        pageNo = try bodyContainer.decode(Int.self, forKey: .pageNo)
+        totalCount = try bodyContainer.decode(Int.self, forKey: .totalCount)
         let itemsContainer = try bodyContainer.nestedContainer(keyedBy: ItemsCodingKeys.self, forKey: .items)
         items = try itemsContainer.decode([T].self, forKey: .items)
     }

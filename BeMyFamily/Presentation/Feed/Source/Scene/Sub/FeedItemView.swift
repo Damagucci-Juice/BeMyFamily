@@ -10,10 +10,11 @@ import SwiftUI
 
 struct FeedItemView: View {
     @Environment(\.displayScale) var displayScale
-    @EnvironmentObject var diContainer: DIContainer
+    @Environment(DIContainer.self) private var diContainer
+
     @State private var loadedImage: Image?
     @State private var renderedImage: Image?
-    let animal: AnimalDTO
+    let animal: AnimalEntity
     private var hasImage: Bool { loadedImage != nil ? false : true }
 
     var body: some View {
@@ -27,7 +28,7 @@ struct FeedItemView: View {
                     .font(.processState)
             }
 
-            LazyImage(url: URL(string: animal.photoURL)) { state in
+            LazyImage(url: URL(string: animal.image1)) { state in
                 let roundedRectangle = RoundedRectangle(cornerRadius: UIConstants.Radius.mainImagePlaceholder)
                 let hasError = state.error != nil
 
@@ -79,15 +80,15 @@ struct FeedItemView: View {
 extension FeedItemView: Sharable { }
 
 #Preview {
-    @StateObject var reducer = DIContainer.makeFeedListViewModel(DIContainer.makeFilterViewModel())
+    @Previewable var dIContainer = DIContainer(dependencies: .init(apiService: FamilyService.shared, favoriteStorage: UserDefaultsFavoriteStorage.shared))
     let animals = ModelData().animals.items
 
-    return ScrollView {
+    ScrollView {
         VStack(spacing: UIConstants.Spacing.interFeedItem) {
-            FeedItemView(animal: animals[0])
-            FeedItemView(animal: animals[1])
+            FeedItemView(animal: Mapper.animalDto2Entity(animals[0]))
+            FeedItemView(animal: Mapper.animalDto2Entity(animals[1]))
         }
-        .environmentObject(reducer)
+        .environment(dIContainer)
     }
     .preferredColorScheme(.dark)
 }

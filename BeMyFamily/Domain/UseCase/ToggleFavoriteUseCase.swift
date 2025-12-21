@@ -9,12 +9,12 @@ import Foundation
 
 final class ToggleFavoriteUseCase {
     private let favoriteRepository: FavoriteRepository
-    
+
     init(favoriteRepository: FavoriteRepository) {
         self.favoriteRepository = favoriteRepository
     }
-    
-    func execute(animal: AnimalDTO) -> Result<Bool, Error> {
+
+    func execute(animal: AnimalEntity) -> Result<Bool, Error> {
         if animal.isFavorite {
             favoriteRepository.delete(id: animal.id)
             return .success(false)

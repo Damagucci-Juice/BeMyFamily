@@ -9,12 +9,12 @@ import NukeUI
 import SwiftUI
 
 struct AnimalThumbnailView: View {
-    let animal: AnimalDTO
+    let animal: AnimalEntity
     private let width = UIConstants.Frame.screenWidth / 3 + 2
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            LazyImage(url: URL(string: animal.photoURL)) { state in
+            LazyImage(url: URL(string: animal.image1)) { state in
                 if let image = state.image {
                     image
                         .resizable()
@@ -33,5 +33,5 @@ struct AnimalThumbnailView: View {
 #Preview {
     let model = ModelData().animals.items.first!
 
-    return AnimalThumbnailView(animal: model)
+    return AnimalThumbnailView(animal: Mapper.animalDto2Entity(model))
 }

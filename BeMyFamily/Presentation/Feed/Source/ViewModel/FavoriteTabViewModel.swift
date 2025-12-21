@@ -6,17 +6,20 @@
 //
 
 import Foundation
+import Observation
 
-class FavoriteTabViewModel: ObservableObject {
-    private let loadFavoriteListUseCase: GetFavoriteAnimalsUseCase
+@Observable
+final class FavoriteTabViewModel {
+    private let getFavoriteAnimalsUseCase: GetFavoriteAnimalsUseCase
 
-    init(loadFavoriteListUseCase: GetFavoriteAnimalsUseCase) {
-        self.loadFavoriteListUseCase = loadFavoriteListUseCase
+    init(getFavoriteAnimalsUseCase: GetFavoriteAnimalsUseCase) {
+        self.getFavoriteAnimalsUseCase = getFavoriteAnimalsUseCase
+        didOnAppear()
     }
 
-    @Published var favorites: [AnimalDTO]?
+    var favorites: [AnimalEntity] = []
 
-    func load() {
-        favorites = loadFavoriteListUseCase.excute()
+    func didOnAppear() {
+        favorites = getFavoriteAnimalsUseCase.excute()
     }
 }

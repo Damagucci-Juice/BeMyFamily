@@ -15,10 +15,10 @@ final class LoadPrerequisiteDataUseCase {
 
     func execute() async -> Result<PrerequisiteData, Error> {
         do {
-            let kind        = try await metadataRepository.getKinds()
-            let sido        = try await metadataRepository.getSidos()
-            let province    = try await metadataRepository.getProvinces(sido)
-            let shelter     = try await metadataRepository.getShelters(province)
+            let kind        = try await metadataRepository.fetchKinds()
+            let sido        = try await metadataRepository.fetchSidos()
+            let province    = try await metadataRepository.fetchProvinces(sido)
+            let shelter     = try await metadataRepository.fetchShelters(province)
 
             let data = PrerequisiteData(
                 kind: kind,

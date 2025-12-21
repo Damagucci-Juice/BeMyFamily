@@ -8,56 +8,39 @@
 import SwiftUI
 
 struct TabControlView: View {
-    @EnvironmentObject var reducer: FeedViewModel
-    @EnvironmentObject var filterReducer: FilterViewModel
-    @EnvironmentObject var diContainer: DIContainer
+    @Environment(DIContainer.self) private var diContainer
 
     var body: some View {
-        TabView(selection: $reducer.menu) {
-            ForEach(FriendMenu.allCases, id: \.self) { menu in
-                switch menu {
-                // MARK: - FeedView == Normal + Filter
-                case .feed, .filter:
-                    if menu == .feed {
-                        FeedView()
-                            .tabItem { Label(menu.title, systemImage: menu.image) }
-                            .tag(
-                                currentMenu(menu)
-                            )
-                    }
-                // MARK: - FavoriteView
-                case .favorite:
-                    FavoriteTabView(viewModel: diContainer.makeFavoriteTabViewModel())
-                        .tabItem { Label(menu.title, systemImage: menu.image) }
-                        .tag(
-                            currentMenu(menu)
-                        )
-                }
-            }
-        }
-    }
-}
+        @Bindable var container = diContainer
 
-extension TabControlView {
-    // filtering list가 진행 중일 때는 현재 menu가 .feed 더라도 .filter를 반환하도록 설정
-    private func currentMenu(_ menu: FriendMenu) -> FriendMenu {
-        if menu == .feed {
-            if filterReducer.onProcessing {
-                return .filter
-            } else {
-                return .feed
+        // 1. TabView에 selection 바인딩을 반드시 연결해야 합니다.
+        TabView(selection: $container.currentTap) {
+
+            // 2. ForEach에는 바인딩($)이 아닌 일반 배열을 넣으세요.
+            ForEach(FriendMenu.allCases, id: \.self) { menu in
+                Group {
+                    switch menu {
+                    case .feed:
+                        FeedView(viewModel: diContainer.makeFeedListViewModel())
+                    case .filter:
+                        Text("Filter View Content")
+                    case .favorite:
+                        FavoriteTabView(viewModel: diContainer.makeFavoriteTabViewModel())
+                    }
+                }
+                .tabItem {
+                    Label(menu.title, systemImage: menu.image)
+                }
+                .tag(menu)
             }
         }
-        return menu
     }
 }
 
 #Preview {
-    @StateObject var reducer = DIContainer.makeFeedListViewModel(DIContainer.makeFilterViewModel())
-    @StateObject var diContainer = DIContainer(dependencies: .init(apiService: FamilyService()))
-
-    return TabControlView()
-        .environmentObject(reducer)
-        .environmentObject(diContainer)
+    @Previewable var diContainer = DIContainer(dependencies: .init(apiService: MockFamilyService(),
+                                                             favoriteStorage: UserDefaultsFavoriteStorage.shared))
+    TabControlView()
+        .environment(diContainer)
         .preferredColorScheme(.dark)
 }
