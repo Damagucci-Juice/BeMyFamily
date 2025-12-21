@@ -8,18 +8,21 @@
 import Foundation
 import Observation
 
-// TODO: - DIContainer의 역할과 Coordinator의 역할이 뭔지 확인하기
 @Observable
 final class DIContainer {
+    static let shared = DIContainer(dependencies: .init(
+        apiService: FamilyService.shared,
+        favoriteStorage: UserDefaultsFavoriteStorage.shared
+    ))
+
     struct Dependencies {
-        // TODO: - 이미지 서비스 여기에 둬야함
         let apiService: SearchService
         let favoriteStorage: FavoriteStorage
     }
 
     private let dependencies: Dependencies
 
-    init(dependencies: Dependencies) {
+    private init(dependencies: Dependencies) {
         self.dependencies = dependencies
     }
 
