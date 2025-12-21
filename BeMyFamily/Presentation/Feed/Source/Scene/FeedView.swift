@@ -90,7 +90,7 @@ struct FeedView: View {
 
 #Preview {
     @Previewable
-    var diContainer = DIContainer(dependencies: .init(apiService: MockFamilyService(), favoriteStorage: UserDefaultsFavoriteStorage.shared))
+    var diContainer = DIContainer.shared
 
     FeedView(viewModel: diContainer.makeFeedListViewModel())
         .preferredColorScheme(.dark)

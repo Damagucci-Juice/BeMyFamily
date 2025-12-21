@@ -38,8 +38,8 @@ struct TabControlView: View {
 }
 
 #Preview {
-    @Previewable var diContainer = DIContainer(dependencies: .init(apiService: MockFamilyService(),
-                                                             favoriteStorage: UserDefaultsFavoriteStorage.shared))
+    @Previewable var diContainer = DIContainer.shared
+    
     TabControlView()
         .environment(diContainer)
         .preferredColorScheme(.dark)

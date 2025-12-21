@@ -37,8 +37,7 @@ struct FavoriteTabView: View {
 }
 
 #Preview {
-    let diContainer = DIContainer(dependencies: .init(apiService: MockFamilyService(),
-                                                      favoriteStorage: UserDefaultsFavoriteStorage.shared))
+    let diContainer = DIContainer.shared
 
     FavoriteTabView(viewModel: diContainer.makeFavoriteTabViewModel())
 }

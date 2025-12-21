@@ -80,7 +80,7 @@ struct FeedItemView: View {
 extension FeedItemView: Sharable { }
 
 #Preview {
-    @Previewable var dIContainer = DIContainer(dependencies: .init(apiService: FamilyService.shared, favoriteStorage: UserDefaultsFavoriteStorage.shared))
+    @Previewable var dIContainer = DIContainer.shared
     let animals = ModelData().animals.items
 
     ScrollView {

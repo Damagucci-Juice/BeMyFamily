@@ -34,7 +34,7 @@ struct FavoriteButtonView: View {
 
 #Preview {
     let animal = ModelData().animals.items.first!
-    let diContainer = DIContainer(dependencies: .init(apiService: MockFamilyService(), favoriteStorage: UserDefaultsFavoriteStorage.shared))
+    let diContainer = DIContainer.shared
 
     FavoriteButtonView(
         viewModel: diContainer.makeFavoriteButtonViewModel(with: Mapper.animalDto2Entity(animal))

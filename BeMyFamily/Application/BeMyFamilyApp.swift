@@ -12,12 +12,7 @@ struct BeMyFamilyApp: App {
     @State private var diContainer: DIContainer
 
     init() {
-        _diContainer = State(
-            wrappedValue: .init(
-                dependencies: .init(apiService: FamilyService.shared,
-                                    favoriteStorage: UserDefaultsFavoriteStorage.shared)
-            )
-        )
+        _diContainer = State(wrappedValue: .shared)
     }
 
     var body: some Scene {
