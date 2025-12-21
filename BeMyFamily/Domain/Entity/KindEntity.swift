@@ -10,5 +10,4 @@ import Foundation
 struct KindEntity {
     let id: String
     let name: String
-    let upkind: Upkind
 }

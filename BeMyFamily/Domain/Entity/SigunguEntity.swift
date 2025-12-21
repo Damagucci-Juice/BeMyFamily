@@ -9,5 +9,6 @@ import Foundation
 
 struct SigunguEntity {
     let id: String
-    let name: String
+    let name: String?
+    let sidoCode: String
 }

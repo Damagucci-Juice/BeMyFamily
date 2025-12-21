@@ -5,12 +5,13 @@
 //  Created by Gucci on 12/21/25.
 //
 
-struct AnimalEntity {
+struct AnimalEntity: Identifiable {
     var id: String { noticeNumber }
-    let isFavorite: Bool
+    private(set) var isFavorite: Bool
+    let desertionNo: String
     let noticeNumber: String
-    let noticeStartdate: String
-    let noticeEnddate: String
+    let noticeStartDate: String
+    let noticeEndDate: String
     let processState: String
     let happenDate: String
     let happenPlace: String
@@ -19,7 +20,7 @@ struct AnimalEntity {
 
     let kindCode: String            // 610000
     let kindName: String            // 비숑프리제
-    let kindFullName: String?
+    let kindFullName: String        // [개] 비숑프리제
     let upKindCode: String          // 417000
     let upKindName: String          // 개
     let color: String
@@ -53,4 +54,8 @@ struct AnimalEntity {
     let adptnConditionLimitTxt: String?
     let adptnTxt: String?
     let adptnImg: String?
+
+    func updateFavoriteStatus(_ currentStatus: Bool = false) {
+        isFavorite = currentStatus
+    }
 }

@@ -25,9 +25,9 @@ struct AnimalDTO: Codable, Equatable, Identifiable {
     // 3. 동물 상세 정보
     let kindCd: String
     let kindNm: String
-    let kindFullNm: String?
+    let kindFullNm: String
     let upKindCd: String
-    let upKindNm: String?
+    let upKindNm: String
     let colorCd: String
     let age: String
     let weight: String
@@ -37,8 +37,8 @@ struct AnimalDTO: Codable, Equatable, Identifiable {
     let rfidCd: String?
 
     // 4. 이미지 필드 (popfile 1~8)
-    let popfile1: String?
-    let popfile2: String?
+    let popfile1: String
+    let popfile2: String
     let popfile3: String?
     let popfile4: String?
     let popfile5: String?
