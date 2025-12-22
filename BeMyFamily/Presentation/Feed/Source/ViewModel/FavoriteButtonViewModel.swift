@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import Combine
 
 @Observable
 final class FavoriteButtonViewModel {
@@ -14,17 +15,31 @@ final class FavoriteButtonViewModel {
     private let repository: FavoriteRepository
     var isFavorite: Bool
 
+    private var cancellables = Set<AnyCancellable>()
+
     init(animal: AnimalEntity, repository: FavoriteRepository) {
         self.animal = animal
         self.repository = repository
         self.isFavorite = animal.isFavorite
+
+        self.setupBind()
     }
 
     func heartButtonTapped() {
-        if repository.exists(id: animal.id) {
-            repository.delete(id: animal.id)
-        } else {
-            repository.save(animal)
-        }
+        repository.toggle(animal)
+    }
+
+    private func setupBind() {
+        repository.favoriteIdsPublisher
+            .sink { [weak self] favoriteIds in
+                self?.updateFavorites(favoriteIds)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func updateFavorites(_ favoriteIds: Set<String>) {
+        let isContain = favoriteIds.contains(animal.id)
+        animal.updateFavoriteStatus(isContain)
+        isFavorite = isContain
     }
 }

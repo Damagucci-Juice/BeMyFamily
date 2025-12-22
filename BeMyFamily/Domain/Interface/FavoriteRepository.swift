@@ -6,11 +6,12 @@
 //
 
 import Foundation
+import Combine
 
 protocol FavoriteRepository {
-    func save(_ animal: AnimalEntity)
-    func delete(id: String)
+    func toggle(_ animal: AnimalEntity)
     func getAll() -> [AnimalEntity]
     func getIds() -> Set<String>
-    func exists(id: String) -> Bool
+
+    var favoriteIdsPublisher: AnyPublisher<Set<String>, Never> { get }
 }

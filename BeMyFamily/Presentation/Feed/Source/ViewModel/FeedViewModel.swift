@@ -6,23 +6,45 @@
 //
 import SwiftUI
 import Observation
+import Combine
 
 // TODO: - 이거를 UseCase 기준으로 개편
 @Observable
 final class FeedViewModel {
     private let fetchAnimalsUseCase: FetchAnimalsUseCase
+    private let favoriteRepository: FavoriteRepository
 
     var animals: [AnimalEntity] = []
     var isLoading = false
     var hasMore = true
-    var lastError: Error? = nil
+    var lastError: Error?
+    private var cancellables = Set<AnyCancellable>()
 
     private var page = 1
     private var lastFetchTime: Date?
     private let throttleInterval: TimeInterval = 0.3
 
-    init(fetchAnimalsUseCase: FetchAnimalsUseCase) {
+    init(fetchAnimalsUseCase: FetchAnimalsUseCase, favorRepo: FavoriteRepository) {
         self.fetchAnimalsUseCase = fetchAnimalsUseCase
+        self.favoriteRepository = favorRepo
+        
+        self.setupBind()
+    }
+
+    private func setupBind() {
+        favoriteRepository.favoriteIdsPublisher
+            .sink { [weak self] favoriteIds in
+                self?.updateAnimalsFavoriteStatus(favoriteIds)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func updateAnimalsFavoriteStatus(_ favoriteIds: Set<String>) {
+        animals = animals.map { animal in
+            var updated = animal
+            updated.updateFavoriteStatus(favoriteIds.contains(animal.id))
+            return updated
+        }
     }
 
     @MainActor
