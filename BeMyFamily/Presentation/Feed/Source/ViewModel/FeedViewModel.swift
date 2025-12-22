@@ -83,13 +83,4 @@ final class FeedViewModel {
         self.page = pageInfo.currentPage + 1
         self.hasMore = pageInfo.hasMore
     }
-
-    /**
-     // 사용자가 재시도 버튼을 누른다면 수행. 근데 안 누를 가능성이 높아보임
-     func retryFetch() async {
-     self.lastError = nil
-     await fetchAnimalsIfCan()
-     }
-     */
-
 }
