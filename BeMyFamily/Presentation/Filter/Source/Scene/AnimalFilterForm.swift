@@ -59,12 +59,14 @@ struct AnimalFilterForm: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
-                        dismiss()
+                        // 새로운 뷰로 가면 된다.
+                        
                     } label: {
-                        Text("Done")
+                        Text("찾기")
                     }
                     .disabled(viewModel.metadata == nil)
                 }
+
                 ToolbarItem(placement: .cancellationAction) {
                     resetButton()
                 }
