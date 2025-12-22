@@ -41,14 +41,13 @@ final class DIContainer {
             let loadInfoUsecase = LoadMetaDataUseCase(metadataRepository: metaRepo)
             registerSingleton(LoadMetaDataUseCase.self,
                               instance: loadInfoUsecase)
-            // 선결 필요 정보를 미리 로드
-            Task {
+
+            Task.detached(priority: .userInitiated) {
                 let result = await loadInfoUsecase.execute()
-                switch result {
-                case .success(let data):
-                    registerSingleton(ProvinceMetadata.self, instance: data)
-                case .failure(let error):
-                    print(error.localizedDescription)
+                if case .success(let data) = result {
+                    await MainActor.run {
+                        self.registerSingleton(ProvinceMetadata.self, instance: data)
+                    }
                 }
             }
         }
@@ -89,8 +88,20 @@ final class DIContainer {
             return FavoriteTabViewModel(repository: repo)
         }
 
-        registerFactory(FilterViewModel.self) { [] in
-            return FilterViewModel()
+        // FilterViewModel
+        registerFactory(FilterViewModel.self) { [weak self] in
+            guard let self,
+                  let useCase = self.resolveSingleton(LoadMetaDataUseCase.self)
+            else {
+                fatalError("Failed to resolve LoadMetaDataUseCase")
+            }
+            let viewModel = FilterViewModel(useCase: useCase)
+
+            if let cached = self.resolveSingleton(ProvinceMetadata.self) {
+                viewModel.metadata = cached
+            }
+
+            return viewModel
         }
     }
 

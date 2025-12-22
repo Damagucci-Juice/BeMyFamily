@@ -22,9 +22,8 @@ struct TabControlView: View {
                             FeedView(viewModel: feedVM)
                         }
                     case .filter:
-                        if let viewModel = diContainer.resolveFactory(FilterViewModel.self),
-                           let metaData = diContainer.resolveSingleton(ProvinceMetadata.self) {
-                            AnimalFilterForm(viewModel: viewModel, metaData: metaData)
+                        if let viewModel = diContainer.resolveFactory(FilterViewModel.self) {
+                            AnimalFilterForm(viewModel: viewModel)
                         }
                     case .favorite:
                         if let favTabVM = diContainer.resolveFactory(FavoriteTabViewModel.self) {

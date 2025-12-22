@@ -76,7 +76,7 @@ private extension MetadataRepositoryImpl {
             )
             .items
             .compactMap({
-                Mapper.sidoDto2Entity ($0)
+                Mapper.sidoDto2Entity($0)
             })
     }
 
