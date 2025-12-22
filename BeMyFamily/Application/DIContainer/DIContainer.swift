@@ -40,8 +40,6 @@ final class DIContainer {
         if let favoriteRepo = resolveSingleton(FavoriteRepositoryImpl.self) {
             registerSingleton(GetFavoriteAnimalsUseCase.self,
                               instance: GetFavoriteAnimalsUseCase(favoriteRepository: favoriteRepo))
-            registerSingleton(ToggleFavoriteUseCase.self,
-                              instance: ToggleFavoriteUseCase(favoriteRepository: favoriteRepo))
         }
 
         if let metaRepo = resolveSingleton(MetadataRepositoryImpl.self) {
@@ -69,10 +67,10 @@ final class DIContainer {
 
         registerFactory(FavoriteButtonViewModel.self) { [weak self] animal in
             guard let self = self,
-                  let useCase = self.resolveSingleton(ToggleFavoriteUseCase.self) else {
+                  let repository = self.resolveSingleton(FavoriteRepositoryImpl.self) else {
                 fatalError("Failed to resolve ToggleFavoriteUseCase")
             }
-            return FavoriteButtonViewModel(animal: animal, toggleUseCase: useCase)
+            return FavoriteButtonViewModel(animal: animal, repository: repository)
         }
 
         registerFactory(FavoriteTabViewModel.self) { [weak self] in
