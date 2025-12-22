@@ -13,5 +13,5 @@ protocol MetadataRepository {
     func fetchKinds() async throws -> [Upkind: [KindEntity]]
     func fetchSidos() async throws -> [SidoEntity]
     func fetchProvinces(_ sidos: [SidoEntity]) async throws -> Province
-    func fetchShelters(_ province: Province) async throws -> [SigunguEntity: [ShelterEntity]]
+    func fetchShelter(_ sidoId: String, _ sigunguId: String) async throws -> [ShelterEntity]
 }

@@ -10,5 +10,4 @@ struct ProvinceMetadata {
     let kind: [Upkind: [KindEntity]]
     let sido: [SidoEntity]
     let province: Province
-    let shelter: [SigunguEntity: [ShelterEntity]]
 }

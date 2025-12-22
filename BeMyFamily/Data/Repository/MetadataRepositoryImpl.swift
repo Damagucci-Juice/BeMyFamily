@@ -47,23 +47,11 @@ final class MetadataRepositoryImpl: MetadataRepository {
             }
         }
     }
-    
-    func fetchShelters(_ province: Province) async throws -> [SigunguEntity : [ShelterEntity]] {
-        await withTaskGroup(of: (SigunguEntity, [ShelterEntity]).self) { group in
-            for (sido, sigungus) in province {
-                for sigungu in sigungus {
-                    group.addTask { [unowned self] in
-                        let results = await self.fetchShelter(sido.id, sigungu.id)
-                        return (sigungu, results)
-                    }
-                }
-            }
 
-            return await group
-                .reduce(into: [SigunguEntity: [ShelterEntity]]()) { dict, pair in
-                dict[pair.0] = pair.1
-            }
-        }
+    func fetchShelter(_ sidoId: String, _ sigunguId: String) async throws -> [ShelterEntity] {
+        let fetched = try await service
+            .search(.shelter(sido: sidoId, sigungu: sigunguId))
+        return try setShelter(fetched)
     }
 }
 
@@ -101,16 +89,6 @@ private extension MetadataRepositoryImpl {
             .compactMap({
                 Mapper.sigunguDto2Entity($0)
             })
-    }
-
-    func fetchShelter(_ sidoId: String, _ sigunguId: String) async -> [ShelterEntity] {
-        do {
-            let fetched = try await service
-                .search(.shelter(sido: sidoId, sigungu: sigunguId))
-            return try setShelter(fetched)
-        } catch {
-            return []
-        }
     }
 
     func setShelter(_ data: Data) throws -> [ShelterEntity] {

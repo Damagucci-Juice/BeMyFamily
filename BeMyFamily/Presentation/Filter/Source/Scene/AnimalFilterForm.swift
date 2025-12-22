@@ -125,13 +125,21 @@ struct AnimalFilterForm: View {
                 }
             }
 
-            if let sigungu = viewModel.sigungu {
+            if viewModel.sigungu != nil {
                 Section("보호소를 선택하세요.") {
-                    Picker("보호소", selection: $viewModel.shelter) {
-                        Text(UIConstants.FilterForm.showAll)
-                            .tag(nil as ShelterEntity?)
-                        if let shelter = viewModel.metadata?.shelter[sigungu] {
-                            ForEach(shelter, id: \.self) { eachShelter in
+                    if viewModel.isLoadingShelters {
+                        HStack {
+                            ProgressView()
+                                .padding(.trailing, 8)
+                            Text("보호소 목록 불러오는 중...")
+                        }
+                    } else {
+                        Picker("보호소", selection: $viewModel.shelter) {
+                            Text(UIConstants.FilterForm.showAll)
+                                .tag(nil as ShelterEntity?)
+
+                            let shelters = viewModel.getSheltersForCurrentSigungu()
+                            ForEach(shelters, id: \.self) { eachShelter in
                                 Text(eachShelter.name)
                                     .tag(eachShelter as ShelterEntity?)
                             }
@@ -175,7 +183,6 @@ struct AnimalFilterForm: View {
                 viewModel.kinds.removeAll()
             }
 
-            // MARK: - 품종 선택할 때 칸 리스트
             if let upkind = viewModel.upkind,
                let kinds = viewModel.metadata?.kind[upkind] {
                 ForEach(kinds, id: \.id) { kind in

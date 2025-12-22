@@ -4,6 +4,7 @@
 //
 //  Created by Gucci on 12/20/25.
 //
+
 import Foundation
 
 final class LoadMetaDataUseCase {
@@ -13,21 +14,33 @@ final class LoadMetaDataUseCase {
         self.metadataRepository = metadataRepository
     }
 
+    // 초기 로딩: kind, sido, province만 (빠름!)
     func execute() async -> Result<ProvinceMetadata, Error> {
         do {
-            let kind        = try await metadataRepository.fetchKinds()
-            let sido        = try await metadataRepository.fetchSidos()
-            let province    = try await metadataRepository.fetchProvinces(sido)
-            let shelter     = try await metadataRepository.fetchShelters(province)
+            async let kindTask = metadataRepository.fetchKinds()
+            async let sidoTask = metadataRepository.fetchSidos()
 
+            let (kind, sido) = try await (kindTask, sidoTask)
+            let province = try await metadataRepository.fetchProvinces(sido)
+
+            // ✅ shelter는 빈 딕셔너리로 시작
             let data = ProvinceMetadata(
                 kind: kind,
                 sido: sido,
-                province: province,
-                shelter: shelter
+                province: province
             )
 
             return .success(data)
+        } catch {
+            return .failure(error)
+        }
+    }
+
+    // 특정 시군구의 shelter만 로드
+    func fetchSheltersForSigungu(sido: String, sigungu: String) async -> Result<[ShelterEntity], Error> {
+        do {
+            let shelters = try await metadataRepository.fetchShelter(sido, sigungu)
+            return .success(shelters)
         } catch {
             return .failure(error)
         }

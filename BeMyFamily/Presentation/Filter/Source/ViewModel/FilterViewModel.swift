@@ -6,79 +6,52 @@
 //
 
 import Foundation
+import Observation
 
 @Observable
 final class FilterViewModel {
-    private(set) var onProcessing = false
-    private(set) var emptyResultFilters = [AnimalSearchFilter]()
     private let useCase: LoadMetaDataUseCase
+
+    // MARK: - Metadata
     var metadata: ProvinceMetadata?
-    var isLoading = false
+    var isLoading: Bool = false
     var error: Error?
 
-    var beginDate = Date.now.addingTimeInterval(UIConstants.Date.aDayBefore*10) // 10일 전
-    var endDate = Date()
-    var upkind: Upkind?
-    var kinds = Set<KindEntity>()
-    var sido: SidoEntity?
-    var sigungu: SigunguEntity?
-    var shelter: ShelterEntity?
-    var state = ProcessState.all
-    var neutral: Neutralization?
+    // MARK: - Shelter 지연 로딩
+    private var shelterCache: [SigunguEntity: [ShelterEntity]] = [:]
+    var isLoadingShelters: Bool = false
 
+    // MARK: - Filter Properties
+    var beginDate: Date = Calendar.current.date(byAdding: .month, value: -1, to: Date()) ?? Date()
+    var endDate: Date = Date()
+
+    var upkind: Upkind?
+    var kinds: Set<KindEntity> = []
+
+    var sido: SidoEntity?
+    var sigungu: SigunguEntity? {
+        didSet {
+            shelter = nil // 시군구 변경 시 shelter 초기화
+
+            // 시군구 선택 시 해당 shelter 로드
+            if let sigungu = sigungu, let sido = sido {
+                Task {
+                    await loadSheltersIfNeeded(sido: sido.id, sigungu: sigungu)
+                }
+            }
+        }
+    }
+    var shelter: ShelterEntity?
+
+    var state: ProcessState = .notice
+    var neutral: Neutralization?
 
     init(useCase: LoadMetaDataUseCase) {
         self.useCase = useCase
     }
 
-    func makeFilter() -> [AnimalSearchFilter] {
-        onProcessing = true
-        emptyResultFilters.removeAll()
-
-        let baseFilter = AnimalSearchFilter(
-            beginDate: beginDate,
-            endDate: endDate,
-            upkind: upkind?.id,
-            kind: nil,
-            sido: sido?.id,
-            sigungu: sigungu?.id,
-            shelterNumber: shelter?.id,
-            processState: state.id,
-            neutralizationState: neutral?.id
-        )
-
-        if kinds.isEmpty {
-            return [baseFilter]
-        } else {
-            return kinds.map { kind in
-                var filter = baseFilter
-                filter.kind = kind.id
-                return filter
-            }
-        }
-    }
-
-    func reset() {
-        onProcessing = false
-        emptyResultFilters.removeAll()
-
-        beginDate = Date.now.addingTimeInterval(UIConstants.Date.aDayBefore*10)
-        endDate = Date()
-        upkind = .none
-        kinds.removeAll()
-        sido = .none
-        sigungu = .none
-        shelter = .none
-        state = .all
-        neutral = .none
-    }
-
-    func updateEmptyReulst(with filter: AnimalSearchFilter) {
-        self.emptyResultFilters.append(filter)
-    }
-
+    // 초기 메타데이터 로드 (kind, sido, province만)
     func loadMetadataIfNeeded() async {
-        // 이미 로드되었으면 스킵
         guard metadata == nil, !isLoading else { return }
 
         isLoading = true
@@ -90,6 +63,39 @@ final class FilterViewModel {
             self.metadata = data
         case .failure(let error):
             self.error = error
+            print("Failed to load metadata: \(error)")
         }
+    }
+
+    // 특정 시군구의 shelter만 로드 (지연 로딩)
+    private func loadSheltersIfNeeded(sido: String, sigungu: SigunguEntity) async {
+        // 이미 캐시에 있으면 스킵
+        guard shelterCache[sigungu] == nil else { return }
+
+        isLoadingShelters = true
+        let result = await useCase.fetchSheltersForSigungu(sido: sido, sigungu: sigungu.id)
+        isLoadingShelters = false
+
+        if case .success(let shelters) = result {
+            shelterCache[sigungu] = shelters
+        }
+    }
+
+    // 현재 시군구의 shelter 반환
+    func getSheltersForCurrentSigungu() -> [ShelterEntity] {
+        guard let sigungu = sigungu else { return [] }
+        return shelterCache[sigungu] ?? []
+    }
+
+    func reset() {
+        beginDate = Calendar.current.date(byAdding: .month, value: -1, to: Date()) ?? Date()
+        endDate = Date()
+        upkind = nil
+        kinds.removeAll()
+        sido = nil
+        sigungu = nil
+        shelter = nil
+        state = .notice
+        neutral = nil
     }
 }
