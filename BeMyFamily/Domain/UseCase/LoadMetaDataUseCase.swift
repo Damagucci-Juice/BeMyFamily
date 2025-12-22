@@ -6,7 +6,7 @@
 //
 import Foundation
 
-final class LoadPrerequisiteDataUseCase {
+final class LoadMetaDataUseCase {
     private let metadataRepository: MetadataRepository
 
     init(metadataRepository: MetadataRepository) {

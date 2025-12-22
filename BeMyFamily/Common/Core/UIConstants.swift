@@ -33,7 +33,7 @@ struct UIConstants {
         static let heartWithStroke = "heart"
         static let share = "square.and.arrow.up.circle.fill"
         static let filter = "line.3.horizontal.decrease.circle"
-        static let reset = "arrow.uturn.backward"
+        static let reset = "arrow.counterclockwise"
     }
 
     struct Radius {

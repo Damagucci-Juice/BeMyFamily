@@ -22,21 +22,7 @@ struct AnimalFilterForm: View {
     var body: some View {
         NavigationStack {
             Form {
-                Button {
-                    viewModel.reset()
-                    Task {
-                        let sleepTimeNanoSec: UInt64 = 500 * 1_000_000
-                        try? await Task.sleep(nanoseconds: sleepTimeNanoSec)
-
-                        await MainActor.run { dismiss() }
-                    }
-                } label: {
-                    Label {
-                        Text("필터 초기화")
-                    } icon: {
-                        Image(systemName: UIConstants.Image.reset)
-                    }
-                }
+                kindSection
 
                 Section(header: Text("검색 일자")) {
                     DatePicker("시작일", selection: $viewModel.beginDate,
@@ -114,8 +100,6 @@ struct AnimalFilterForm: View {
                         }
                     }
                 }
-
-                kindSection
             }
             .navigationTitle(UIConstants.FilterForm.title)
             .navigationBarTitleDisplayMode(.inline)
@@ -123,21 +107,13 @@ struct AnimalFilterForm: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
                         // TODO: - 여기서 동물 공고 요청
-//                        reducer.setMenu(.filter)
-//                        Task {
-//                            await fetchAnimalsWithFilter()
-//                        }
                         dismiss()
                     } label: {
                         Text("Done")
                     }
                 }
                 ToolbarItem(placement: .cancellationAction) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Text("Cancel")
-                    }
+                    resetButton()
                 }
             }
         }
@@ -189,6 +165,19 @@ extension AnimalFilterForm {
             Image(systemName: image)
                 .foregroundStyle(isSelected ? .blue : .gray)
             Text(kind.name)
+        }
+    }
+
+    @ViewBuilder
+    private func resetButton() -> some View {
+        Button {
+            viewModel.reset()
+        } label: {
+            Label {
+                Text("필터 초기화")
+            } icon: {
+                Image(systemName: UIConstants.Image.reset)
+            }
         }
     }
 }
