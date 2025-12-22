@@ -25,11 +25,6 @@ final class FavoriteRepositoryImpl: FavoriteRepository {
     func getAll() -> [AnimalEntity] {
         storage.list()
             .map(Mapper.animalDto2Entity)
-            .map { entity in
-                var updatedEntity = entity
-                updatedEntity.updateFavoriteStatus(true)
-                return updatedEntity
-            }
     }
 
     func getIds() -> Set<String> {

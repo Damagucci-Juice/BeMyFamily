@@ -16,5 +16,10 @@ final class GetFavoriteAnimalsUseCase {
 
     func excute() -> [AnimalEntity] {
         favoriteRepository.getAll()
+            .map { entity in
+                var updatedEntity = entity
+                updatedEntity.updateFavoriteStatus(true)
+                return updatedEntity
+            }
     }
 }
