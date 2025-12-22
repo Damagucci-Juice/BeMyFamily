@@ -14,7 +14,7 @@ final class LoadMetaDataUseCase {
         self.metadataRepository = metadataRepository
     }
 
-    // 초기 로딩: kind, sido, province만 (빠름!)
+    // 초기 로딩: kind, sido, province
     func execute() async -> Result<ProvinceMetadata, Error> {
         do {
             async let kindTask = metadataRepository.fetchKinds()
@@ -23,7 +23,6 @@ final class LoadMetaDataUseCase {
             let (kind, sido) = try await (kindTask, sidoTask)
             let province = try await metadataRepository.fetchProvinces(sido)
 
-            // ✅ shelter는 빈 딕셔너리로 시작
             let data = ProvinceMetadata(
                 kind: kind,
                 sido: sido,
