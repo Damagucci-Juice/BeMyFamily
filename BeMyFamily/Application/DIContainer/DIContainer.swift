@@ -37,11 +37,6 @@ final class DIContainer {
         }
 
         // enroll usecage
-        if let favoriteRepo = resolveSingleton(FavoriteRepositoryImpl.self) {
-            registerSingleton(GetFavoriteAnimalsUseCase.self,
-                              instance: GetFavoriteAnimalsUseCase(favoriteRepository: favoriteRepo))
-        }
-
         if let metaRepo = resolveSingleton(MetadataRepositoryImpl.self) {
             registerSingleton(LoadPrerequisiteDataUseCase.self,
                               instance: LoadPrerequisiteDataUseCase(metadataRepository: metaRepo))
@@ -75,10 +70,10 @@ final class DIContainer {
 
         registerFactory(FavoriteTabViewModel.self) { [weak self] in
             guard let self = self,
-                  let useCase = self.resolveSingleton(GetFavoriteAnimalsUseCase.self) else {
+                  let repo = self.resolveSingleton(FavoriteRepositoryImpl.self) else {
                 fatalError("Failed to resolve GetFavoriteAnimalsUseCase")
             }
-            return FavoriteTabViewModel(useCase: useCase)
+            return FavoriteTabViewModel(repository: repo)
         }
 
         registerFactory(FilterViewModel.self) { [] in
