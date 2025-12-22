@@ -109,8 +109,11 @@ struct AnimalDetailView: View {
     private var actionButtons: some View {
         HStack {
             Spacer()
-
-            FavoriteButtonView(viewModel: diContainer.makeFavoriteButtonViewModel(with: animal))
+            if let favoriteVM = diContainer.resolveFactory(
+                FavoriteButtonViewModel.self, parameter: animal
+            ) {
+                FavoriteButtonView(viewModel: favoriteVM)
+            }
 
             ShareButton(renderedImage: $renderedImage, hasImage: hasImage)
         }

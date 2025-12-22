@@ -10,16 +10,16 @@ import Observation
 
 @Observable
 final class FavoriteTabViewModel {
-    private let getFavoriteAnimalsUseCase: GetFavoriteAnimalsUseCase
+    private let useCase: GetFavoriteAnimalsUseCase
 
-    init(getFavoriteAnimalsUseCase: GetFavoriteAnimalsUseCase) {
-        self.getFavoriteAnimalsUseCase = getFavoriteAnimalsUseCase
+    init(useCase: GetFavoriteAnimalsUseCase) {
+        self.useCase = useCase
         didOnAppear()
     }
 
     var favorites: [AnimalEntity] = []
 
     func didOnAppear() {
-        favorites = getFavoriteAnimalsUseCase.excute()
+        favorites = useCase.excute()
     }
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FavoriteButtonView: View {
-    @ObservedObject var viewModel: FavoriteButtonViewModel
+    @State var viewModel: FavoriteButtonViewModel
 
     var body: some View {
         Button {
@@ -36,7 +36,10 @@ struct FavoriteButtonView: View {
     let animal = ModelData().animals.items.first!
     let diContainer = DIContainer.shared
 
-    FavoriteButtonView(
-        viewModel: diContainer.makeFavoriteButtonViewModel(with: Mapper.animalDto2Entity(animal))
-    )
+    if let viewModel = diContainer.resolveFactory(
+        FavoriteButtonViewModel.self,
+        parameter: animal) {
+
+        FavoriteButtonView(viewModel: viewModel)
+    }
 }

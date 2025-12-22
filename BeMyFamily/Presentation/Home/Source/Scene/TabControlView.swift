@@ -13,19 +13,20 @@ struct TabControlView: View {
     var body: some View {
         @Bindable var container = diContainer
 
-        // 1. TabView에 selection 바인딩을 반드시 연결해야 합니다.
         TabView(selection: $container.currentTap) {
-
-            // 2. ForEach에는 바인딩($)이 아닌 일반 배열을 넣으세요.
             ForEach(FriendMenu.allCases, id: \.self) { menu in
                 Group {
                     switch menu {
                     case .feed:
-                        FeedView(viewModel: diContainer.makeFeedListViewModel())
+                        if let feedVM = diContainer.resolveFactory(FeedViewModel.self) {
+                            FeedView(viewModel: feedVM)
+                        }
                     case .filter:
                         Text("Filter View Content")
                     case .favorite:
-                        FavoriteTabView(viewModel: diContainer.makeFavoriteTabViewModel())
+                        if let favTabVM = diContainer.resolveFactory(FavoriteTabViewModel.self) {
+                            FavoriteTabView(viewModel: favTabVM)
+                        }
                     }
                 }
                 .tabItem {
@@ -39,7 +40,7 @@ struct TabControlView: View {
 
 #Preview {
     @Previewable var diContainer = DIContainer.shared
-    
+
     TabControlView()
         .environment(diContainer)
         .preferredColorScheme(.dark)

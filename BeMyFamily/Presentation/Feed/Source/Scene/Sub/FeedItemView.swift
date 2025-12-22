@@ -68,7 +68,11 @@ struct FeedItemView: View {
             HStack {
                 Spacer()
 
-                FavoriteButtonView(viewModel: diContainer.makeFavoriteButtonViewModel(with: animal))
+                if let favoriteViweModel = diContainer.resolveFactory(
+                    FavoriteButtonViewModel.self, parameter: animal
+                ) {
+                    FavoriteButtonView(viewModel: favoriteViweModel)
+                }
 
                 ShareButton(renderedImage: $renderedImage, hasImage: hasImage)
             }

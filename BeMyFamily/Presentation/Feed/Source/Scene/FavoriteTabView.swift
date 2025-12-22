@@ -38,6 +38,7 @@ struct FavoriteTabView: View {
 
 #Preview {
     let diContainer = DIContainer.shared
-
-    FavoriteTabView(viewModel: diContainer.makeFavoriteTabViewModel())
+    if let favTabVM = diContainer.resolveFactory(FavoriteTabViewModel.self) {
+        FavoriteTabView(viewModel: favTabVM)
+    }
 }

@@ -10,75 +10,120 @@ import Observation
 
 @Observable
 final class DIContainer {
-    static let shared = DIContainer(dependencies: .init(
-        apiService: FamilyService.shared,
-        favoriteStorage: UserDefaultsFavoriteStorage.shared
-    ))
+    static let shared = DIContainer()
 
-    struct Dependencies {
-        let apiService: SearchService
-        let favoriteStorage: FavoriteStorage
-    }
-
-    private let dependencies: Dependencies
-
-    private init(dependencies: Dependencies) {
-        self.dependencies = dependencies
-    }
-
+    private var singletons: [String: Any] = [:]
+    private var factories: [String: Any] = [:]
     var currentTap: FriendMenu = .feed
 
-    func makeFeedListViewModel() -> FeedViewModel {
-        FeedViewModel(fetchAnimalsUseCase: makeFetchAnimalsUseCase())
+    private init() {
+        setupDependencies()
     }
 
-    func makeFilterViewModel() -> FilterViewModel {
-        return FilterViewModel()
+    private func setupDependencies() {
+        // MARK: - Singleton
+        // enroll service
+        registerSingleton(FamilyService.self, instance: FamilyService.shared)
+        registerSingleton(UserDefaultsFavoriteStorage.self, instance: UserDefaultsFavoriteStorage.shared)
+
+        // enroll repository
+        if let storage = resolveSingleton(UserDefaultsFavoriteStorage.self) {
+            registerSingleton(FavoriteRepositoryImpl.self, instance: FavoriteRepositoryImpl(storage: storage))
+        }
+
+        if let service = resolveSingleton(FamilyService.self) {
+            registerSingleton(AnimalRepositoryImpl.self, instance: AnimalRepositoryImpl(service: service))
+            registerSingleton(MetadataRepositoryImpl.self, instance: MetadataRepositoryImpl(service: service))
+        }
+
+        // enroll usecage
+        if let favoriteRepo = resolveSingleton(FavoriteRepositoryImpl.self) {
+            registerSingleton(GetFavoriteAnimalsUseCase.self,
+                              instance: GetFavoriteAnimalsUseCase(favoriteRepository: favoriteRepo))
+            registerSingleton(ToggleFavoriteUseCase.self,
+                              instance: ToggleFavoriteUseCase(favoriteRepository: favoriteRepo))
+        }
+
+        if let metaRepo = resolveSingleton(MetadataRepositoryImpl.self) {
+            registerSingleton(LoadPrerequisiteDataUseCase.self,
+                              instance: LoadPrerequisiteDataUseCase(metadataRepository: metaRepo))
+        }
+
+        if let favoriteRepo = resolveSingleton(FavoriteRepositoryImpl.self),
+           let animalRepo = resolveSingleton(AnimalRepositoryImpl.self) {
+            registerSingleton(FetchAnimalsUseCase.self,
+                              instance: FetchAnimalsUseCase(
+                                animalRepository: animalRepo,
+                                favoriteRepository: favoriteRepo
+                              ))
+        }
+
+        // MARK: - ViewModels(Factory)
+        registerFactory(FeedViewModel.self) { [weak self] in
+            guard let self = self,
+                  let useCase = self.resolveSingleton(FetchAnimalsUseCase.self) else {
+                fatalError("Failed to resolve FetchAnimalsUseCase")
+            }
+            return FeedViewModel(fetchAnimalsUseCase: useCase)
+        }
+
+        registerFactory(FavoriteButtonViewModel.self) { [weak self] animal in
+            guard let self = self,
+                  let useCase = self.resolveSingleton(ToggleFavoriteUseCase.self) else {
+                fatalError("Failed to resolve ToggleFavoriteUseCase")
+            }
+            return FavoriteButtonViewModel(animal: animal, toggleUseCase: useCase)
+        }
+
+        registerFactory(FavoriteTabViewModel.self) { [weak self] in
+            guard let self = self,
+                  let useCase = self.resolveSingleton(GetFavoriteAnimalsUseCase.self) else {
+                fatalError("Failed to resolve GetFavoriteAnimalsUseCase")
+            }
+            return FavoriteTabViewModel(useCase: useCase)
+        }
+
+        registerFactory(FilterViewModel.self) { [] in
+            return FilterViewModel()
+        }
     }
 
-    func makeFetchAnimalsUseCase() -> FetchAnimalsUseCase {
-        FetchAnimalsUseCase(
-            animalRepository: makeAnimalRepository(),
-            favoriteRepository: makeFavoriteRepository()
-        )
+    // MARK: - Singleton 관리
+    private func registerSingleton<T>(_ type: T.Type, instance: T) {
+        let key = String(describing: type)
+        singletons[key] = instance
     }
 
-    func makeAnimalRepository() -> AnimalRepository {
-        AnimalRepositoryImpl(service: dependencies.apiService)
+    func resolveSingleton<T>(_ type: T.Type) -> T? {
+        let key = String(describing: type)
+        return singletons[key] as? T
     }
 
-    // MARK: - Favorites
-
-    func makeFavoriteTabViewModel() -> FavoriteTabViewModel {
-        FavoriteTabViewModel(getFavoriteAnimalsUseCase: makeLoadFavoriteUseCase())
+    // MARK: - Factory (파라미터 없음)
+    private func registerFactory<T>(_ type: T.Type, factory: @escaping () -> T) {
+        let key = String(describing: type)
+        factories[key] = factory
     }
 
-    func makeLoadFavoriteUseCase() -> GetFavoriteAnimalsUseCase {
-        GetFavoriteAnimalsUseCase(favoriteRepository: makeFavoriteRepository())
+    func resolveFactory<T>(_ type: T.Type) -> T? {
+        let key = String(describing: type)
+        guard let factory = factories[key] as? () -> T else {
+            return nil
+        }
+        return factory()
     }
 
-    func makeFavoriteButtonViewModel(with animal: AnimalEntity) -> FavoriteButtonViewModel {
-        FavoriteButtonViewModel(
-            animal: animal,
-            toggleUseCase: makeToggleFavortieUseCase(makeFavoriteRepository())
-        )
+    // MARK: - Factory 관리 (파라미터 1개)
+    private func registerFactory<T, P>(_ type: T.Type, factory: @escaping (P) -> T) {
+        let key = String(describing: type)
+        factories[key] = factory
     }
 
-    func makeFavoriteRepository() -> FavoriteRepository {
-        FavoriteRepositoryImpl(
-            storage: dependencies.favoriteStorage
-        )
-    }
-
-    func makeToggleFavortieUseCase(_ repo: FavoriteRepository) -> ToggleFavoriteUseCase {
-        ToggleFavoriteUseCase(favoriteRepository: repo)
-    }
-
-    func makeLoadPrerequisiteDataUseCase() -> LoadPrerequisiteDataUseCase {
-        LoadPrerequisiteDataUseCase(metadataRepository: makeMetaDataRepository())
-    }
-
-    func makeMetaDataRepository() -> MetadataRepository {
-        MetadataRepositoryImpl(service: dependencies.apiService)
+    func resolveFactory<T, P>(_ type: T.Type, parameter: P) -> T? {
+        let key = String(describing: type)
+        guard let factory = factories[key] as? (P) -> T else {
+            return nil
+        }
+        return factory(parameter)
     }
 }

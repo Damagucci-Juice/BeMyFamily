@@ -6,11 +6,13 @@
 //
 
 import Foundation
+import Observation
 
-final class FavoriteButtonViewModel: ObservableObject {
+@Observable
+final class FavoriteButtonViewModel {
     private var animal: AnimalEntity
     private let toggleUseCase: ToggleFavoriteUseCase
-    @Published var isFavorite: Bool
+    var isFavorite: Bool
 
     init(animal: AnimalEntity, toggleUseCase: ToggleFavoriteUseCase) {
         self.animal = animal
@@ -25,7 +27,6 @@ final class FavoriteButtonViewModel: ObservableObject {
             animal.updateFavoriteStatus(result)
         case .failure:
             print("Heart Enroll Error")
-            break
         }
     }
 }

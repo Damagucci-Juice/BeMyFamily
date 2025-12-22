@@ -92,6 +92,7 @@ struct FeedView: View {
     @Previewable
     var diContainer = DIContainer.shared
 
-    FeedView(viewModel: diContainer.makeFeedListViewModel())
-        .preferredColorScheme(.dark)
+    if let feedViewModel = diContainer.resolveFactory(FeedViewModel.self) {
+        FeedView(viewModel: feedViewModel)
+    }
 }
