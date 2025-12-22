@@ -45,6 +45,9 @@ final class FavoriteRepositoryImpl: FavoriteRepository {
                 updatedEntity.updateFavoriteStatus(true)
                 return updatedEntity
             }
+            .sorted {
+                $0.noticeEndDate < $1.noticeEndDate
+            }
     }
 
     func getIds() -> Set<String> {
