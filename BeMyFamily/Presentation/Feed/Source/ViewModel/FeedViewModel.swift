@@ -8,7 +8,6 @@ import SwiftUI
 import Observation
 import Combine
 
-// TODO: - 이거를 UseCase 기준으로 개편
 @Observable
 final class FeedViewModel {
     private let fetchAnimalsUseCase: FetchAnimalsUseCase
@@ -27,7 +26,7 @@ final class FeedViewModel {
     init(fetchAnimalsUseCase: FetchAnimalsUseCase, favorRepo: FavoriteRepository) {
         self.fetchAnimalsUseCase = fetchAnimalsUseCase
         self.favoriteRepository = favorRepo
-        
+
         self.setupBind()
     }
 
