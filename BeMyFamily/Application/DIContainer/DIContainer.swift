@@ -38,8 +38,19 @@ final class DIContainer {
 
         // enroll usecage
         if let metaRepo = resolveSingleton(MetadataRepositoryImpl.self) {
+            let loadInfoUsecase = LoadPrerequisiteDataUseCase(metadataRepository: metaRepo)
             registerSingleton(LoadPrerequisiteDataUseCase.self,
-                              instance: LoadPrerequisiteDataUseCase(metadataRepository: metaRepo))
+                              instance: loadInfoUsecase)
+            // 선결 필요 정보를 미리 로드
+            Task {
+                let result = await loadInfoUsecase.execute()
+                switch result {
+                case .success(let data):
+                    registerSingleton(ProvinceMetadata.self, instance: data)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
         }
 
         if let favoriteRepo = resolveSingleton(FavoriteRepositoryImpl.self),

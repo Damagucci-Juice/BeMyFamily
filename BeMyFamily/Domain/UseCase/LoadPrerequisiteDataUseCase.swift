@@ -13,14 +13,14 @@ final class LoadPrerequisiteDataUseCase {
         self.metadataRepository = metadataRepository
     }
 
-    func execute() async -> Result<PrerequisiteData, Error> {
+    func execute() async -> Result<ProvinceMetadata, Error> {
         do {
             let kind        = try await metadataRepository.fetchKinds()
             let sido        = try await metadataRepository.fetchSidos()
             let province    = try await metadataRepository.fetchProvinces(sido)
             let shelter     = try await metadataRepository.fetchShelters(province)
 
-            let data = PrerequisiteData(
+            let data = ProvinceMetadata(
                 kind: kind,
                 sido: sido,
                 province: province,

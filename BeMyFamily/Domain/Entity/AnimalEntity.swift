@@ -41,7 +41,7 @@ struct AnimalEntity: Identifiable {
     let careRegisterNumber: String
     let careOwnerName: String
 
-    let disease: String?            // dto: HealthChk, ex) 홍역, 심장사사충
+    let disease: String?            // dto: HealthChk, ex) 홍역, 심장사상충
     let vaccinationStatus: String?  // 코로나, 독감
     let socialization: String?      // sfeSocial
     let healthStatus: String?       // sfeHealth

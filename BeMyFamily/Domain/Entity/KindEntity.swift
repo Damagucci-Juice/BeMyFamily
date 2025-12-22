@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct KindEntity {
+struct KindEntity: Hashable {
     let id: String
     let name: String
 }

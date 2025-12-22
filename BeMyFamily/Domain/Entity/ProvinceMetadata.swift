@@ -6,7 +6,7 @@
 //
 import Foundation
 
-struct PrerequisiteData {
+struct ProvinceMetadata {
     let kind: [Upkind: [KindEntity]]
     let sido: [SidoEntity]
     let province: Province

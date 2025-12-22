@@ -16,10 +16,10 @@ final class FilterViewModel {
     var beginDate = Date.now.addingTimeInterval(UIConstants.Date.aDayBefore*10) // 10일 전
     var endDate = Date()
     var upkind: Upkind?
-    var kinds: Set<KindDTO>
-    var sido: SidoDTO?
-    var sigungu: SigunguDTO?
-    var shelter: ShelterDTO?
+    var kinds: Set<KindEntity>
+    var sido: SidoEntity?
+    var sigungu: SigunguEntity?
+    var shelter: ShelterEntity?
     var state = ProcessState.all
     var neutral: Neutralization?
 
@@ -44,7 +44,7 @@ final class FilterViewModel {
         } else {
             return kinds.map { kind in
                 var filter = baseFilter
-                filter.kind = kind
+                filter.kind = kind.id
                 return filter
             }
         }

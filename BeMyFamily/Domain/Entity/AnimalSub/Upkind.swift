@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum Upkind: String, CaseIterable {
+enum Upkind: String, CaseIterable, Hashable {
     case dog = "417000"
     case cat = "422400"
     case other = "429900"

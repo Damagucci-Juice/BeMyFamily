@@ -5,7 +5,7 @@
 //  Created by Gucci on 12/21/25.
 //
 
-struct ShelterEntity {
+struct ShelterEntity: Hashable {
     let id: String      // "311322200900001"
     let name: String    // "한국동물구조관리협회"
 }
