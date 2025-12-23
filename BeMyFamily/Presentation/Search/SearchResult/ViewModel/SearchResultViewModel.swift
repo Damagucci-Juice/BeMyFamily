@@ -29,8 +29,9 @@ final class SearchResultViewModel {
         !isLoading && animals.isEmpty && tasks.allSatisfy { $0.isCompleted }
     }
 
-    init(useCase: FetchAnimalsUseCase) {
+    init(useCase: FetchAnimalsUseCase, filters: [AnimalSearchFilter]) {
         self.useCase = useCase
+        self.setupFilters(filters)
     }
 
     private var fetchTask: Task<Void, Never>?

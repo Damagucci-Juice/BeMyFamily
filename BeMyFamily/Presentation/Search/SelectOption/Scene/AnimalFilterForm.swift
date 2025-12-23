@@ -56,14 +56,22 @@ struct AnimalFilterForm: View {
         .navigationTitle(UIConstants.FilterForm.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            // 검색 버튼
             ToolbarItem(placement: .confirmationAction) {
-                Button {
-                    viewModel.didTapSearchButton()
+                NavigationLink {
+                    if let viewModel = diContainer.resolveFactory(
+                        SearchResultViewModel.self,
+                        parameter: viewModel.makeFilters()
+                    ) {
+                        SearchResultView(viewModel: viewModel)
+                    }
                 } label: {
-                    Text("검색")
+                    Image(systemName: "magnifyingglass")
                 }
                 .disabled(viewModel.metadata == nil)
             }
+
+            // 초기화 버튼
             ToolbarItem(placement: .cancellationAction) {
                 resetButton()
             }

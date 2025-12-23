@@ -101,9 +101,7 @@ final class DIContainer {
             guard let self, let useCase = self.resolveSingleton(FetchAnimalsUseCase.self) else {
                 fatalError("...")
             }
-            let vm = SearchResultViewModel(useCase: useCase)
-            vm.setupFilters(filters) // 생성 시점에 초기화 완료
-            return vm
+            return SearchResultViewModel(useCase: useCase, filters: filters)
         }
     }
 

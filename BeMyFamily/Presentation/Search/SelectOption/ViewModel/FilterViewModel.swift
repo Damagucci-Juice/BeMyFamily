@@ -88,12 +88,12 @@ final class FilterViewModel {
         neutral = nil
     }
 
-    func didTapSearchButton() {
-        let filters = makeFilters()
-        print("🔍 생성된 필터 개수: \(filters.count)")
-    }
+//    func didTapSearchButton() {
+//        let filters = makeFilters()
+//        print("🔍 생성된 필터 개수: \(filters.count)")
+//    }
 
-    private func makeFilters() -> [AnimalSearchFilter] {
+    func makeFilters() -> [AnimalSearchFilter] {
         // ✅ kinds가 비어있으면 하나의 기본 필터 생성
         if kinds.isEmpty {
             let filter = AnimalSearchFilter(
