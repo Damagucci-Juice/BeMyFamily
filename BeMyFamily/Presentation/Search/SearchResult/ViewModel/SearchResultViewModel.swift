@@ -52,10 +52,12 @@ final class SearchResultViewModel {
     }
 
     func setupFilters(_ filters: [AnimalSearchFilter]) {
-        clearAll() // 시작 전 초기화
-        self.tasks = filters.map { FilterTask(filter: $0) }
+        // 초기화
+        cancelAllRequests()
+        self.animals = []
 
-        // ✅ 태스크를 변수에 저장하여 관리
+        // 필터별로 요청
+        self.tasks = filters.map { FilterTask(filter: $0) }
         fetchTask = Task {
             await fetchAllNextPages()
         }
