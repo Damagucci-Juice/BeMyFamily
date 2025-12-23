@@ -8,12 +8,23 @@
 import Foundation
 
 enum ProcessState: String, CaseIterable {
-    case inProtect = "protect"
-    case notice = "notice"
-    case all = ""
+    case inProtect
+    case notice
+    case all
 
     var id: String {
         return self.rawValue
+    }
+
+    var param: String? {
+        switch self {
+        case .inProtect:
+            return "protect"
+        case .notice:
+            return "notice"
+        case .all:
+            return nil
+        }
     }
 
     var text: String {

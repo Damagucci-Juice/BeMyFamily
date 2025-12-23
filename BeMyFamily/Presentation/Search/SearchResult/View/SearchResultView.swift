@@ -25,6 +25,14 @@ struct SearchResultView: View {
                         ForEach(viewModel.animals) { animal in
                             NavigationLink(value: SearchRoute.detail(entity: animal)) {
                                 FeedItemView(animal: animal)
+                                    .onAppear {
+                                        // 무한 스크롤
+                                        if animal == viewModel.animals.last {
+                                            Task {
+                                                await viewModel.fetchAllNextPages()
+                                            }
+                                        }
+                                    }
                             }
                             .tint(.primary)
                         }

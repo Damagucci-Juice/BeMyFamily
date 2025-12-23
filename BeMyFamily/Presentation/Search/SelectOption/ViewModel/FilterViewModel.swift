@@ -38,7 +38,7 @@ final class FilterViewModel {
         }
     }
     var shelter: ShelterEntity?
-    var state: ProcessState = .notice
+    var state: ProcessState = .all
     var neutral: Neutralization?
 
     init(useCase: LoadMetaDataUseCase, metadata: ProvinceMetadata) {
@@ -63,14 +63,14 @@ final class FilterViewModel {
     }
 
     func reset() {
-        beginDate = Calendar.current.date(byAdding: .month, value: -1, to: Date()) ?? Date()
-        endDate = Date()
+        beginDate = beginDate
+        endDate = endDate
         upkind = nil
         kinds.removeAll()
         sido = nil
         sigungu = nil
         shelter = nil
-        state = .notice
+        state = .all
         neutral = nil
     }
 
@@ -85,7 +85,7 @@ final class FilterViewModel {
                 sido: sido?.id,
                 sigungu: sigungu?.id,
                 shelterNumber: shelter?.id,
-                processState: state.id,
+                processState: state.param,
                 neutralizationState: neutral?.id
             )
             return [filter]
@@ -101,7 +101,7 @@ final class FilterViewModel {
                 sido: sido?.id,
                 sigungu: sigungu?.id,
                 shelterNumber: shelter?.id,
-                processState: state.id,
+                processState: state.param,
                 neutralizationState: neutral?.id
             )
         }

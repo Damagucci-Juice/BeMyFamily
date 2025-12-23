@@ -23,7 +23,7 @@ struct Paging {
                   totalItems: Int(apiResponse.totalCount) ?? 0)
     }
 
-    var hasMore : Bool {
-        return (currentPage * itemsPerPage) < totalItems
+    var hasMore: Bool {
+        return currentPage * itemsPerPage < totalItems
     }
 }
