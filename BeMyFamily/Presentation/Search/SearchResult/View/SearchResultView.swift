@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SearchResultView: View {
-    @Environment(Coordinator.self) var coordinator
     @Bindable var viewModel: SearchResultViewModel
 
     init(viewModel: SearchResultViewModel) {

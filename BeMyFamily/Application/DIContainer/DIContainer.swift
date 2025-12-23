@@ -26,9 +26,6 @@ final class DIContainer {
         registerSingleton(FamilyService.self, instance: FamilyService.shared)
         registerSingleton(UserDefaultsFavoriteStorage.self, instance: UserDefaultsFavoriteStorage.shared)
 
-        let coordinator = Coordinator(container: self)
-        registerSingleton(Coordinator.self, instance: coordinator)
-
         // enroll repository
         if let storage = resolveSingleton(UserDefaultsFavoriteStorage.self) {
             registerSingleton(FavoriteRepositoryImpl.self, instance: FavoriteRepositoryImpl(storage: storage))
@@ -92,11 +89,11 @@ final class DIContainer {
         }
 
         // FilterViewModel 등록 (화면 전환 클로저를 파라미터로 받음)
-        registerFactory(FilterViewModel.self) { [weak self] (onSearch: @escaping ([AnimalSearchFilter]) -> Void) in
+        registerFactory(FilterViewModel.self) { [weak self] in
             guard let self, let useCase = self.resolveSingleton(LoadMetaDataUseCase.self) else {
                 fatalError("...")
             }
-            return FilterViewModel(useCase: useCase, onSearchCompleted: onSearch)
+            return FilterViewModel(useCase: useCase)
         }
 
         // SearchResultViewModel 등록 (필터 배열을 파라미터로 받음)

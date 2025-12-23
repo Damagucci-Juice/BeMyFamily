@@ -11,7 +11,7 @@ import SwiftUI
 struct AnimalFilterForm: View {
     @Environment(\.dismiss) var dismiss
     @Environment(DIContainer.self) var diContainer
-    @Bindable var viewModel: FilterViewModel  // ← @State 대신 @Bindable
+    @Bindable var viewModel: FilterViewModel
 
     init(viewModel: FilterViewModel) {
         self.viewModel = viewModel

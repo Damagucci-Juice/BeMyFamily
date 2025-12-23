@@ -11,7 +11,6 @@ import Observation
 @Observable
 final class FilterViewModel {
     private let useCase: LoadMetaDataUseCase
-    let onSearchCompleted: ([AnimalSearchFilter]) -> Void
 
     // MARK: - Metadata
     var metadata: ProvinceMetadata?
@@ -42,9 +41,8 @@ final class FilterViewModel {
     var state: ProcessState = .notice
     var neutral: Neutralization?
 
-    init(useCase: LoadMetaDataUseCase, onSearchCompleted: @escaping ([AnimalSearchFilter]) -> Void) {
+    init(useCase: LoadMetaDataUseCase) {
         self.useCase = useCase
-        self.onSearchCompleted = onSearchCompleted
     }
 
     func loadMetadataIfNeeded() async {
@@ -93,7 +91,6 @@ final class FilterViewModel {
     func didTapSearchButton() {
         let filters = makeFilters()
         print("🔍 생성된 필터 개수: \(filters.count)")
-        onSearchCompleted(filters)
     }
 
     private func makeFilters() -> [AnimalSearchFilter] {
