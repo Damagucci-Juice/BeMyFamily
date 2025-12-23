@@ -11,8 +11,7 @@ import Observation
 @Observable
 final class FilterViewModel {
     private let useCase: LoadMetaDataUseCase
-
-    var onSearchCompleted: (([AnimalSearchFilter]) -> Void)?
+    let onSearchCompleted: ([AnimalSearchFilter]) -> Void
 
     // MARK: - Metadata
     var metadata: ProvinceMetadata?
@@ -26,16 +25,12 @@ final class FilterViewModel {
     // MARK: - Filter Properties
     var beginDate: Date = Calendar.current.date(byAdding: .month, value: -1, to: Date()) ?? Date()
     var endDate: Date = Date()
-
     var upkind: Upkind?
     var kinds: Set<KindEntity> = []
-
     var sido: SidoEntity?
     var sigungu: SigunguEntity? {
         didSet {
-            shelter = nil // 시군구 변경 시 shelter 초기화
-
-            // 시군구 선택 시 해당 shelter 로드
+            shelter = nil
             if let sigungu = sigungu, let sido = sido {
                 Task {
                     await loadSheltersIfNeeded(sido: sido.id, sigungu: sigungu)
@@ -44,18 +39,16 @@ final class FilterViewModel {
         }
     }
     var shelter: ShelterEntity?
-
     var state: ProcessState = .notice
     var neutral: Neutralization?
 
-    init(useCase: LoadMetaDataUseCase) {
+    init(useCase: LoadMetaDataUseCase, onSearchCompleted: @escaping ([AnimalSearchFilter]) -> Void) {
         self.useCase = useCase
+        self.onSearchCompleted = onSearchCompleted
     }
 
-    // 초기 메타데이터 로드 (kind, sido, province만)
     func loadMetadataIfNeeded() async {
         guard metadata == nil, !isLoading else { return }
-
         isLoading = true
         let result = await useCase.execute()
         isLoading = false
@@ -69,11 +62,8 @@ final class FilterViewModel {
         }
     }
 
-    // 특정 시군구의 shelter만 로드 (지연 로딩)
     private func loadSheltersIfNeeded(sido: String, sigungu: SigunguEntity) async {
-        // 이미 캐시에 있으면 스킵
         guard shelterCache[sigungu] == nil else { return }
-
         isLoadingShelters = true
         let result = await useCase.fetchSheltersForSigungu(sido: sido, sigungu: sigungu.id)
         isLoadingShelters = false
@@ -83,7 +73,6 @@ final class FilterViewModel {
         }
     }
 
-    // 현재 시군구의 shelter 반환
     func getSheltersForCurrentSigungu() -> [ShelterEntity] {
         guard let sigungu = sigungu else { return [] }
         return shelterCache[sigungu] ?? []
@@ -102,13 +91,31 @@ final class FilterViewModel {
     }
 
     func didTapSearchButton() {
-        onSearchCompleted?(makeFilters())
+        let filters = makeFilters()
+        print("🔍 생성된 필터 개수: \(filters.count)")
+        onSearchCompleted(filters)
     }
 
     private func makeFilters() -> [AnimalSearchFilter] {
-        var result: [AnimalSearchFilter] = []
-        for kind in kinds {
-            let aFilter = AnimalSearchFilter(
+        // ✅ kinds가 비어있으면 하나의 기본 필터 생성
+        if kinds.isEmpty {
+            let filter = AnimalSearchFilter(
+                beginDate: beginDate,
+                endDate: endDate,
+                upkind: upkind?.id,  // 축종만 선택한 경우
+                kind: nil,            // 품종 미선택
+                sido: sido?.id,
+                sigungu: sigungu?.id,
+                shelterNumber: shelter?.id,
+                processState: state.id,
+                neutralizationState: neutral?.id
+            )
+            return [filter]
+        }
+
+        // ✅ kinds가 있으면 각 품종별 필터 생성
+        return kinds.map { kind in
+            AnimalSearchFilter(
                 beginDate: beginDate,
                 endDate: endDate,
                 upkind: upkind?.id,
@@ -119,8 +126,6 @@ final class FilterViewModel {
                 processState: state.id,
                 neutralizationState: neutral?.id
             )
-            result.append(aFilter)
         }
-        return result
     }
 }

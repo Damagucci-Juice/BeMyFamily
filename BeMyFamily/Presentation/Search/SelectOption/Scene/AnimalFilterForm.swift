@@ -11,70 +11,66 @@ import SwiftUI
 struct AnimalFilterForm: View {
     @Environment(\.dismiss) var dismiss
     @Environment(DIContainer.self) var diContainer
-    @Environment(Coordinator.self) var coordinator
-    @Bindable var viewModel: FilterViewModel
+    @Bindable var viewModel: FilterViewModel  // ← @State 대신 @Bindable
 
     init(viewModel: FilterViewModel) {
         self.viewModel = viewModel
     }
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if viewModel.isLoading {
-                    // 로딩 중 UI
-                    VStack(spacing: 16) {
-                        ProgressView()
-                        Text("필터 정보를 불러오는 중...")
-                            .foregroundStyle(.secondary)
-                    }
-                } else if let error = viewModel.error {
-                    // 에러 UI
-                    VStack(spacing: 16) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.largeTitle)
-                            .foregroundStyle(.red)
-                        Text("필터 정보를 불러올 수 없습니다")
-                            .font(.headline)
-                        Text(error.localizedDescription)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Button("다시 시도") {
-                            Task {
-                                await viewModel.loadMetadataIfNeeded()
-                            }
-                        }
-                        .buttonStyle(.bordered)
-                    }
-                    .padding()
-                } else if viewModel.metadata != nil {
-                    // 정상 UI
-                    filterFormContent
-                } else {
-                    // 초기 상태 (거의 발생하지 않음)
+        Group {
+            if viewModel.isLoading {
+                // 로딩 중 UI
+                VStack(spacing: 16) {
                     ProgressView()
+                    Text("필터 정보를 불러오는 중...")
+                        .foregroundStyle(.secondary)
                 }
-            }
-            .navigationTitle(UIConstants.FilterForm.title)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        viewModel.didTapSearchButton()
-                    } label: {
-                        Text("찾기")
+            } else if let error = viewModel.error {
+                // 에러 UI
+                VStack(spacing: 16) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.largeTitle)
+                        .foregroundStyle(.red)
+                    Text("필터 정보를 불러올 수 없습니다")
+                        .font(.headline)
+                    Text(error.localizedDescription)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Button("다시 시도") {
+                        Task {
+                            await viewModel.loadMetadataIfNeeded()
+                        }
                     }
-                    .disabled(viewModel.metadata == nil)
+                    .buttonStyle(.bordered)
                 }
-
-                ToolbarItem(placement: .cancellationAction) {
-                    resetButton()
-                }
+                .padding()
+            } else if viewModel.metadata != nil {
+                // 정상 UI
+                filterFormContent
+            } else {
+                // 초기 상태 (거의 발생하지 않음)
+                ProgressView()
             }
-            .onAppear {
-                Task {
-                    await viewModel.loadMetadataIfNeeded()
+        }
+        .navigationTitle(UIConstants.FilterForm.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button {
+                    viewModel.didTapSearchButton()
+                } label: {
+                    Text("검색")
                 }
+                .disabled(viewModel.metadata == nil)
+            }
+            ToolbarItem(placement: .cancellationAction) {
+                resetButton()
+            }
+        }
+        .onAppear {
+            Task {
+                await viewModel.loadMetadataIfNeeded()
             }
         }
     }

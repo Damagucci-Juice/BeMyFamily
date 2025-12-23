@@ -52,12 +52,14 @@ final class SearchResultViewModel {
     }
 
     func setupFilters(_ filters: [AnimalSearchFilter]) {
-        // 초기화
+        print("📊 SearchResultViewModel - 받은 필터 개수: \(filters.count)")
+
         cancelAllRequests()
         self.animals = []
-
-        // 필터별로 요청
         self.tasks = filters.map { FilterTask(filter: $0) }
+
+        print("📊 생성된 task 개수: \(tasks.count)")
+
         fetchTask = Task {
             await fetchAllNextPages()
         }

@@ -25,7 +25,9 @@ final class DIContainer {
         // enroll service
         registerSingleton(FamilyService.self, instance: FamilyService.shared)
         registerSingleton(UserDefaultsFavoriteStorage.self, instance: UserDefaultsFavoriteStorage.shared)
-        registerSingleton(Coordinator.self, instance: Coordinator(container: self))
+
+        let coordinator = Coordinator(container: self)
+        registerSingleton(Coordinator.self, instance: coordinator)
 
         // enroll repository
         if let storage = resolveSingleton(UserDefaultsFavoriteStorage.self) {
@@ -89,31 +91,22 @@ final class DIContainer {
             return FavoriteTabViewModel(repository: repo)
         }
 
-        // FilterViewModel
-        registerFactory(FilterViewModel.self) { [weak self] in
-            guard let self,
-                  let useCase = self.resolveSingleton(LoadMetaDataUseCase.self)
-            else {
-                fatalError("Failed to resolve LoadMetaDataUseCase")
+        // FilterViewModel 등록 (화면 전환 클로저를 파라미터로 받음)
+        registerFactory(FilterViewModel.self) { [weak self] (onSearch: @escaping ([AnimalSearchFilter]) -> Void) in
+            guard let self, let useCase = self.resolveSingleton(LoadMetaDataUseCase.self) else {
+                fatalError("...")
             }
-            let viewModel = FilterViewModel(useCase: useCase)
-
-            if let cached = self.resolveSingleton(ProvinceMetadata.self) {
-                viewModel.metadata = cached
-            }
-
-            return viewModel
+            return FilterViewModel(useCase: useCase, onSearchCompleted: onSearch)
         }
 
-        // Search Result View Model
-        registerFactory(SearchResultViewModel.self) { [weak self] in
-            guard let self = self,
-                  let useCase = resolveSingleton(FetchAnimalsUseCase.self)
-            else {
-                fatalError("Failed to resolve self")
+        // SearchResultViewModel 등록 (필터 배열을 파라미터로 받음)
+        registerFactory(SearchResultViewModel.self) { [weak self] (filters: [AnimalSearchFilter]) in
+            guard let self, let useCase = self.resolveSingleton(FetchAnimalsUseCase.self) else {
+                fatalError("...")
             }
-            
-            return SearchResultViewModel(useCase: useCase)
+            let vm = SearchResultViewModel(useCase: useCase)
+            vm.setupFilters(filters) // 생성 시점에 초기화 완료
+            return vm
         }
     }
 

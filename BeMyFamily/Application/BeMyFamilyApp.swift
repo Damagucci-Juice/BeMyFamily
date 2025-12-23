@@ -9,16 +9,10 @@ import SwiftUI
 
 @main
 struct BeMyFamilyApp: App {
-    @State private var diContainer: DIContainer
-
-    init() {
-        _diContainer = State(wrappedValue: .shared)
-    }
-
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(diContainer)
+            TabControlView()
+                .environment(DIContainer.shared)
                 .preferredColorScheme(.dark)
         }
     }
