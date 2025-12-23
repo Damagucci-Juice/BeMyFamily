@@ -23,7 +23,9 @@ struct SearchResultView: View {
                 ScrollView {
                     LazyVStack {
                         ForEach(viewModel.animals) { animal in
-                            FeedItemView(animal: animal)
+                            NavigationLink(value: SearchRoute.detail(entity: animal)) {
+                                FeedItemView(animal: animal)
+                            }
                         }
 
                         // 데이터가 더 남았을 때만 하단 로딩바 노출 (allSatisfy 활용)

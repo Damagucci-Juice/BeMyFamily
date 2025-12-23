@@ -18,23 +18,21 @@ struct FeedView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .bottom) {
-                ScrollView {
-                    feedList
+        ZStack(alignment: .bottom) {
+            ScrollView {
+                feedList
+            }
+
+            if viewModel.isLoading {
+                ProgressView()
+            }
+
+            if !viewModel.hasMore {
+                VStack {
+                    Spacer()
+                    toggleMessage
                 }
 
-                if viewModel.isLoading {
-                    ProgressView()
-                }
-
-                if !viewModel.hasMore {
-                    VStack {
-                        Spacer()
-                        toggleMessage
-                    }
-
-                }
             }
         }
     }
@@ -43,12 +41,9 @@ struct FeedView: View {
     private var feedList: some View {
         LazyVStack(spacing: UIConstants.Spacing.interFeedItem) {
             ForEach(viewModel.animals) { animal in
-                NavigationLink {
-                    AnimalDetailView(animal: animal)
-                } label: {
+                NavigationLink(value: FeedRoute.detail(entity: animal)) {
                     FeedItemView(animal: animal)
                 }
-                .tint(.primary)
             }
         }
         // MARK: - 스크롤의 밑 부분에 도달하면 새로운 동물 데이터를 팻치해오는 로직

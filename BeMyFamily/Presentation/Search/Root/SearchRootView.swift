@@ -9,6 +9,7 @@ import SwiftUI
 
 enum SearchRoute: Hashable {
     case searchResult(filters: [AnimalSearchFilter])
+    case detail(entity: AnimalEntity)
 }
 
 @Observable
@@ -27,8 +28,13 @@ struct SearchRootView: View {
                     .navigationDestination(for: SearchRoute.self) { route in
                         switch route {
                         case .searchResult(let filters):
-//                            SearchResultView(filters: filters))
-                            Text("Search TEMP VIEW \(filters.count)개")
+                            if let viewModel = diContainer.resolveFactory(
+                                SearchResultViewModel.self, parameter: filters
+                            ) {
+                                SearchResultView(viewModel: viewModel)
+                            }
+                        case .detail(let entity):
+                            AnimalDetailView(animal: entity)
                         }
                     }
             }

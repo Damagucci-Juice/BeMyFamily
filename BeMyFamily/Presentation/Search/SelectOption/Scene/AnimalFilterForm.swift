@@ -58,16 +58,8 @@ struct AnimalFilterForm: View {
         .toolbar {
             // 검색 버튼
             ToolbarItem(placement: .confirmationAction) {
-                NavigationLink {
-                    if let viewModel = diContainer.resolveFactory(
-                        SearchResultViewModel.self,
-                        parameter: viewModel.makeFilters()
-                    ) {
-                        SearchResultView(viewModel: viewModel)
-                    }
-                } label: {
-                    Image(systemName: "magnifyingglass")
-                }
+                NavigationLink("Search",
+                               value: SearchRoute.searchResult(filters: viewModel.makeFilters()))
                 .disabled(viewModel.metadata == nil)
             }
 

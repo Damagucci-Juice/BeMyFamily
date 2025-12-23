@@ -17,22 +17,17 @@ struct FavoriteView: View {
         ]
 
     var body: some View {
-        NavigationStack {
-            ScrollView(.vertical) {
-                LazyVGrid(columns: columns, spacing: 0.0) {
-                    ForEach(viewModel.favorites) { animal in
-                        NavigationLink {
-                            AnimalDetailView(animal: animal)
-                        } label: {
-                            AnimalThumbnailView(animal: animal)
-                        }
-                        .tint(.primary)
+        ScrollView(.vertical) {
+            LazyVGrid(columns: columns, spacing: 0.0) {
+                ForEach(viewModel.favorites) { animal in
+                    NavigationLink(value: FavoriteRoute.detail(entity: animal)) {
+                        AnimalThumbnailView(animal: animal)
                     }
                 }
             }
-            .onAppear(perform: viewModel.didOnAppear)
-            .navigationTitle(UIConstants.App.favorite)
         }
+        .onAppear(perform: viewModel.didOnAppear)
+        .navigationTitle(UIConstants.App.favorite)
     }
 }
 
