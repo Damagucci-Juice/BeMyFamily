@@ -1,5 +1,5 @@
 //
-//  AnimalFilterForm.swift
+//  FilterView.swift
 //  BeMyFamily
 //
 //  Created by Gucci on 4/13/24.
@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct AnimalFilterForm: View {
+struct FilterView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(DIContainer.self) var diContainer
     @Bindable var viewModel: FilterViewModel

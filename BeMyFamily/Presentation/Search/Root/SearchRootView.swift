@@ -24,7 +24,7 @@ struct SearchRootView: View {
     var body: some View {
         NavigationStack(path: $router.path) {
             if let viewModel = diContainer.resolveFactory(FilterViewModel.self) {
-                AnimalFilterForm(viewModel: viewModel)
+                FilterView(viewModel: viewModel)
                     .navigationDestination(for: SearchRoute.self) { route in
                         switch route {
                         case .searchResult(let filters):
