@@ -44,6 +44,7 @@ struct FeedView: View {
                 NavigationLink(value: FeedRoute.detail(entity: animal)) {
                     FeedItemView(animal: animal)
                 }
+                .tint(.primary)
             }
         }
         // MARK: - 스크롤의 밑 부분에 도달하면 새로운 동물 데이터를 팻치해오는 로직

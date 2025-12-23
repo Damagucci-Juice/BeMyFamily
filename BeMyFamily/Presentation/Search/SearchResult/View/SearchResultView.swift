@@ -26,6 +26,7 @@ struct SearchResultView: View {
                             NavigationLink(value: SearchRoute.detail(entity: animal)) {
                                 FeedItemView(animal: animal)
                             }
+                            .tint(.primary)
                         }
 
                         // 데이터가 더 남았을 때만 하단 로딩바 노출 (allSatisfy 활용)
