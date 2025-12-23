@@ -13,7 +13,7 @@ final class FilterViewModel {
     private let useCase: LoadMetaDataUseCase
 
     // MARK: - Metadata
-    var metadata: ProvinceMetadata?
+    let metadata: ProvinceMetadata
     var isLoading: Bool = false
     var error: Error?
 
@@ -41,23 +41,9 @@ final class FilterViewModel {
     var state: ProcessState = .notice
     var neutral: Neutralization?
 
-    init(useCase: LoadMetaDataUseCase) {
+    init(useCase: LoadMetaDataUseCase, metadata: ProvinceMetadata) {
         self.useCase = useCase
-    }
-
-    func loadMetadataIfNeeded() async {
-        guard metadata == nil, !isLoading else { return }
-        isLoading = true
-        let result = await useCase.execute()
-        isLoading = false
-
-        switch result {
-        case .success(let data):
-            self.metadata = data
-        case .failure(let error):
-            self.error = error
-            print("Failed to load metadata: \(error)")
-        }
+        self.metadata = metadata
     }
 
     private func loadSheltersIfNeeded(sido: String, sigungu: SigunguEntity) async {
@@ -87,11 +73,6 @@ final class FilterViewModel {
         state = .notice
         neutral = nil
     }
-
-//    func didTapSearchButton() {
-//        let filters = makeFilters()
-//        print("🔍 생성된 필터 개수: \(filters.count)")
-//    }
 
     func makeFilters() -> [AnimalSearchFilter] {
         // ✅ kinds가 비어있으면 하나의 기본 필터 생성
@@ -124,5 +105,21 @@ final class FilterViewModel {
                 neutralizationState: neutral?.id
             )
         }
+    }
+
+    func kinds(_ upKind: Upkind) -> [KindEntity] {
+        metadata.kind[upKind, default: []]
+    }
+
+    func toggleKind(_ kind: KindEntity) {
+        if isSelected(kind) {
+            kinds.remove(kind)
+        } else {
+            kinds.insert(kind)
+        }
+    }
+
+    func isSelected(_ kind: KindEntity) -> Bool {
+        kinds.contains(kind)
     }
 }

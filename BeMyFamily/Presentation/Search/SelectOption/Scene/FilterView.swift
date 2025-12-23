@@ -26,31 +26,8 @@ struct FilterView: View {
                     Text("필터 정보를 불러오는 중...")
                         .foregroundStyle(.secondary)
                 }
-            } else if let error = viewModel.error {
-                // 에러 UI
-                VStack(spacing: 16) {
-                    Image(systemName: "exclamationmark.triangle")
-                        .font(.largeTitle)
-                        .foregroundStyle(.red)
-                    Text("필터 정보를 불러올 수 없습니다")
-                        .font(.headline)
-                    Text(error.localizedDescription)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Button("다시 시도") {
-                        Task {
-                            await viewModel.loadMetadataIfNeeded()
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                }
-                .padding()
-            } else if viewModel.metadata != nil {
-                // 정상 UI
-                filterFormContent
             } else {
-                // 초기 상태 (거의 발생하지 않음)
-                ProgressView()
+                filterFormContent
             }
         }
         .navigationTitle(UIConstants.FilterForm.title)
@@ -60,17 +37,11 @@ struct FilterView: View {
             ToolbarItem(placement: .confirmationAction) {
                 NavigationLink("Search",
                                value: SearchRoute.searchResult(filters: viewModel.makeFilters()))
-                .disabled(viewModel.metadata == nil)
             }
 
             // 초기화 버튼
             ToolbarItem(placement: .cancellationAction) {
                 resetButton()
-            }
-        }
-        .onAppear {
-            Task {
-                await viewModel.loadMetadataIfNeeded()
             }
         }
     }
@@ -82,31 +53,29 @@ struct FilterView: View {
 
             Section(header: Text("검색 일자")) {
                 DatePicker("시작일", selection: $viewModel.beginDate,
-                          in: ...viewModel.endDate.addingTimeInterval(-86400),
-                          displayedComponents: .date)
+                           in: ...viewModel.endDate.addingTimeInterval(-86400),
+                           displayedComponents: .date)
                 DatePicker("종료일", selection: $viewModel.endDate,
-                          in: ...Date(),
-                          displayedComponents: .date)
+                           in: ...Date(),
+                           displayedComponents: .date)
             }
 
             Section("지역을 골라주세요") {
                 Picker("시도", selection: $viewModel.sido) {
                     Text(UIConstants.FilterForm.showAll)
                         .tag(nil as SidoEntity?)
-                    if let sidos = viewModel.metadata?.sido {
-                        ForEach(sidos, id: \.self) { aSido in
-                            Text(aSido.name)
-                                .tag(aSido as SidoEntity?)
-                        }
+                    ForEach(viewModel.metadata.sido, id: \.self) { aSido in
+                        Text(aSido.name)
+                            .tag(aSido as SidoEntity?)
                     }
                 }
                 .onChange(of: viewModel.sido) { _, _ in
                     viewModel.sigungu = nil
                 }
 
-                if let sido = viewModel.sido, let metaData = viewModel.metadata {
+                if let sido = viewModel.sido {
                     Picker("시군구", selection: $viewModel.sigungu) {
-                        let sigungus = metaData.province[sido, default: []]
+                        let sigungus = viewModel.metadata.province[sido, default: []]
                         Text(UIConstants.FilterForm.showAll)
                             .tag(nil as SigunguEntity?)
 
@@ -181,19 +150,12 @@ struct FilterView: View {
                 viewModel.kinds.removeAll()
             }
 
-            if let upkind = viewModel.upkind,
-               let kinds = viewModel.metadata?.kind[upkind] {
-                ForEach(kinds, id: \.id) { kind in
-                    let isSelected = viewModel.kinds.contains(kind)
-
+            if let upkind = viewModel.upkind {
+                ForEach(viewModel.kinds(upkind), id: \.id) { kind in
                     Button {
-                        if isSelected {
-                            viewModel.kinds.remove(kind)
-                        } else {
-                            viewModel.kinds.insert(kind)
-                        }
+                        viewModel.toggleKind(kind)
                     } label: {
-                        togglingCheckbox(kind, isSelected)
+                        togglingCheckbox(kind, viewModel.isSelected(kind))
                     }
                     .buttonStyle(.plain)
                 }

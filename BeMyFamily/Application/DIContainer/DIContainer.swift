@@ -90,10 +90,13 @@ final class DIContainer {
 
         // FilterViewModel 등록 (화면 전환 클로저를 파라미터로 받음)
         registerFactory(FilterViewModel.self) { [weak self] in
-            guard let self, let useCase = self.resolveSingleton(LoadMetaDataUseCase.self) else {
+            guard let self,
+                  let useCase = self.resolveSingleton(LoadMetaDataUseCase.self),
+                  let metadata = self.resolveSingleton(ProvinceMetadata.self)
+            else {
                 fatalError("...")
             }
-            return FilterViewModel(useCase: useCase)
+            return FilterViewModel(useCase: useCase, metadata: metadata)
         }
 
         // SearchResultViewModel 등록 (필터 배열을 파라미터로 받음)
