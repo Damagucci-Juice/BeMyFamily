@@ -10,7 +10,6 @@ import SwiftUI
 // MARK: - 일반 Feed와 Filter Tab을 보여줌
 struct FeedView: View {
     @State private var viewModel: FeedViewModel
-    @State private var showfilter = false
     @State private var isReachedToBottom = false
 
     init(viewModel: FeedViewModel) {
@@ -32,7 +31,6 @@ struct FeedView: View {
                     Spacer()
                     toggleMessage
                 }
-
             }
         }
     }
@@ -60,15 +58,6 @@ struct FeedView: View {
                     }
                 }
                 return Color.clear
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    showfilter.toggle()
-                } label: {
-                    Image(systemName: UIConstants.Image.filter)
-                }
             }
         }
     }

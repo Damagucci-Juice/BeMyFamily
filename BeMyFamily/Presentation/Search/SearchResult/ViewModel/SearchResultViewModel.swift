@@ -61,54 +61,40 @@ final class SearchResultViewModel {
             await fetchAllNextPages()
         }
     }
-
     func fetchAllNextPages() async {
-        guard !Task.isCancelled else { return }
         guard !isLoading else { return }
-
         let activeTasks = tasks.filter { !$0.isCompleted }
         guard !activeTasks.isEmpty else { return }
 
         isLoading = true
 
-        await withTaskGroup(of: (Int, (animals: [AnimalEntity], pagingInfo: Paging)?).self) { group in
-            for index in 0..<activeTasks.count {
-                if Task.isCancelled { break }
-
-                let task = activeTasks[index]
+        await withTaskGroup(of: (FilterTask, (animals: [AnimalEntity], pagingInfo: Paging)?).self) { group in
+            for task in activeTasks {
                 group.addTask {
-                    let result = await self.useCase.execute(
-                        filter: task.filter,
-                        pageNo: task.currentPage
-                    )
-                    if Task.isCancelled { return (index, nil) }
-
-                    switch result {
-                    case .success(let response): return (index, response)
-                    case .failure: return (index, nil)
-                    }
+                    let result = await self.useCase.execute(filter: task.filter, pageNo: task.currentPage)
+                    return (task, try? result.get()) // 인덱스 대신 객체를 직접 넘기면 더 안전합니다.
                 }
             }
 
-            for await (index, response) in group {
-                if Task.isCancelled { break }
-
-                let task = activeTasks[index]
-                guard let response = response else { continue }
-
-                if !response.animals.isEmpty {
+            for await (task, response) in group {
+                if let response = response {
                     self.animals.append(contentsOf: response.animals)
-                }
 
-                let paging = response.pagingInfo
-                if !paging.hasMore || response.animals.isEmpty {
-                    task.isCompleted = true
+                    // 데이터가 비었거나 다음 페이지가 없으면 완료 처리
+                    if !response.pagingInfo.hasMore || response.animals.isEmpty {
+                        task.isCompleted = true
+                    } else {
+                        task.currentPage += 1
+                    }
                 } else {
-                    task.currentPage += 1
+                    // 에러 발생 시 일단 완료 처리하거나 재시도 로직 필요
+                    task.isCompleted = true
                 }
             }
         }
 
+        // 강제로 로딩 상태 해제
         isLoading = false
     }
 }
+

@@ -31,10 +31,18 @@ struct SearchResultView: View {
 
                         // 데이터가 더 남았을 때만 하단 로딩바 노출 (allSatisfy 활용)
                         if !viewModel.tasks.allSatisfy({ $0.isCompleted }) {
-                            ProgressView()
-                                .onAppear {
-                                    Task { await viewModel.fetchAllNextPages() }
+                            HStack {
+                                Spacer()
+                                ProgressView()
+                                    .id(UUID()) // 재렌더링 강제 유도 (선택 사항)
+                                Spacer()
+                            }
+                            .padding()
+                            .onAppear {
+                                Task {
+                                    await viewModel.fetchAllNextPages()
                                 }
+                            }
                         }
                     }
                 }

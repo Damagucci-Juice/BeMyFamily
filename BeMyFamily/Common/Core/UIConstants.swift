@@ -62,7 +62,7 @@ struct UIConstants {
     }
 
     struct FilterForm {
-        static let showAll = "전체보기"
-        static let title = "조건 설정"
+        static let showAll = "전체 보기"
+        static let title = "공고 찾기"
     }
 }

@@ -9,7 +9,6 @@
 import SwiftUI
 
 struct FilterView: View {
-    @Environment(\.dismiss) var dismiss
     @Environment(DIContainer.self) var diContainer
     @Bindable var viewModel: FilterViewModel
 
