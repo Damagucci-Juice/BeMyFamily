@@ -12,6 +12,8 @@ import Observation
 final class FilterViewModel {
     private let useCase: LoadMetaDataUseCase
 
+    var onSearchCompleted: (([AnimalSearchFilter]) -> Void)?
+
     // MARK: - Metadata
     var metadata: ProvinceMetadata?
     var isLoading: Bool = false
@@ -97,5 +99,28 @@ final class FilterViewModel {
         shelter = nil
         state = .notice
         neutral = nil
+    }
+
+    func didTapSearchButton() {
+        onSearchCompleted?(makeFilters())
+    }
+
+    private func makeFilters() -> [AnimalSearchFilter] {
+        var result: [AnimalSearchFilter] = []
+        for kind in kinds {
+            let aFilter = AnimalSearchFilter(
+                beginDate: beginDate,
+                endDate: endDate,
+                upkind: upkind?.id,
+                kind: kind.id,
+                sido: sido?.id,
+                sigungu: sigungu?.id,
+                shelterNumber: shelter?.id,
+                processState: state.id,
+                neutralizationState: neutral?.id
+            )
+            result.append(aFilter)
+        }
+        return result
     }
 }

@@ -8,8 +8,12 @@ import Combine
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(DIContainer.self) private var diContainer
+
     var body: some View {
-        TabControlView()
+        if let coordi = diContainer.resolveSingleton(Coordinator.self) {
+            TabControlView(coordinator: coordi)
+        }
     }
 }
 

@@ -11,6 +11,7 @@ import SwiftUI
 struct AnimalFilterForm: View {
     @Environment(\.dismiss) var dismiss
     @Environment(DIContainer.self) var diContainer
+    @Environment(Coordinator.self) var coordinator
     @Bindable var viewModel: FilterViewModel
 
     init(viewModel: FilterViewModel) {
@@ -59,8 +60,7 @@ struct AnimalFilterForm: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
-                        // 새로운 뷰로 가면 된다.
-                        
+                        viewModel.didTapSearchButton()
                     } label: {
                         Text("찾기")
                     }

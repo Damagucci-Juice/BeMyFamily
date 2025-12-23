@@ -25,6 +25,7 @@ final class DIContainer {
         // enroll service
         registerSingleton(FamilyService.self, instance: FamilyService.shared)
         registerSingleton(UserDefaultsFavoriteStorage.self, instance: UserDefaultsFavoriteStorage.shared)
+        registerSingleton(Coordinator.self, instance: Coordinator(container: self))
 
         // enroll repository
         if let storage = resolveSingleton(UserDefaultsFavoriteStorage.self) {
@@ -102,6 +103,17 @@ final class DIContainer {
             }
 
             return viewModel
+        }
+
+        // Search Result View Model
+        registerFactory(SearchResultViewModel.self) { [weak self] in
+            guard let self = self,
+                  let useCase = resolveSingleton(FetchAnimalsUseCase.self)
+            else {
+                fatalError("Failed to resolve self")
+            }
+            
+            return SearchResultViewModel(useCase: useCase)
         }
     }
 

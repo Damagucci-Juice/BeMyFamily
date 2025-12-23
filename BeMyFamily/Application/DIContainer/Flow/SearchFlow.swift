@@ -6,7 +6,7 @@
 //
 import Foundation
 
-enum SearchFlow {
-    case selectOptions
-    case searchResult
+enum SearchFlow: Hashable {
+    case filter
+    case searchResult([AnimalSearchFilter])
 }

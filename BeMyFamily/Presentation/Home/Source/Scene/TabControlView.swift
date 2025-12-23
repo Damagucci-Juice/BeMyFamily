@@ -9,6 +9,11 @@ import SwiftUI
 
 struct TabControlView: View {
     @Environment(DIContainer.self) private var diContainer
+    @State private var coordinator: Coordinator
+
+    init(coordinator: Coordinator) {
+        self._coordinator = State(wrappedValue: coordinator)
+    }
 
     var body: some View {
         @Bindable var container = diContainer
@@ -22,9 +27,13 @@ struct TabControlView: View {
                             FeedView(viewModel: feedVM)
                         }
                     case .filter:
-                        if let viewModel = diContainer.resolveFactory(FilterViewModel.self) {
-                            AnimalFilterForm(viewModel: viewModel)
+                        NavigationStack(path: $coordinator.path) {
+                            coordinator.build(.filter)
+                                .navigationDestination(for: SearchFlow.self) { flow in
+                                    coordinator.build(flow)
+                                }
                         }
+
                     case .favorite:
                         if let favTabVM = diContainer.resolveFactory(FavoriteTabViewModel.self) {
                             FavoriteTabView(viewModel: favTabVM)
@@ -43,7 +52,7 @@ struct TabControlView: View {
 #Preview {
     @Previewable var diContainer = DIContainer.shared
 
-    TabControlView()
+    TabControlView(coordinator: diContainer.resolveSingleton(Coordinator.self)!)
         .environment(diContainer)
         .preferredColorScheme(.dark)
 }
