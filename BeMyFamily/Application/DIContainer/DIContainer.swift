@@ -80,12 +80,12 @@ final class DIContainer {
             return FavoriteButtonViewModel(animal: animal, repository: repository)
         }
 
-        registerFactory(FavoriteTabViewModel.self) { [weak self] in
+        registerFactory(FavoriteViewModel.self) { [weak self] in
             guard let self = self,
                   let repo = self.resolveSingleton(FavoriteRepositoryImpl.self) else {
                 fatalError("Failed to resolve GetFavoriteAnimalsUseCase")
             }
-            return FavoriteTabViewModel(repository: repo)
+            return FavoriteViewModel(repository: repo)
         }
 
         // FilterViewModel 등록 (화면 전환 클로저를 파라미터로 받음)

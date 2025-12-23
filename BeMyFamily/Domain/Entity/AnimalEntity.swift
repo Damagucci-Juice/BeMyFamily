@@ -5,7 +5,7 @@
 //  Created by Gucci on 12/21/25.
 //
 
-struct AnimalEntity: Identifiable {
+struct AnimalEntity: Identifiable, Hashable {
     var id: String { noticeNumber }
     private(set) var isFavorite: Bool
     let desertionNo: String

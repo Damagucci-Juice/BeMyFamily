@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct FavoriteTabView: View {
-    @State var viewModel: FavoriteTabViewModel
+struct FavoriteView: View {
+    @State var viewModel: FavoriteViewModel
 
     private let columns = [
         GridItem(.adaptive(minimum: 100, maximum: .infinity)),
@@ -38,7 +38,7 @@ struct FavoriteTabView: View {
 
 #Preview {
     let diContainer = DIContainer.shared
-    if let favTabVM = diContainer.resolveFactory(FavoriteTabViewModel.self) {
-        FavoriteTabView(viewModel: favTabVM)
+    if let favoriteVM = diContainer.resolveFactory(FavoriteViewModel.self) {
+        FavoriteView(viewModel: favoriteVM)
     }
 }
