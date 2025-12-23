@@ -9,15 +9,105 @@ import Observation
 
 @Observable
 final class SearchResultViewModel {
+    // 필터별 상태를 관리하기 위한 내부 구조체
+    class FilterTask {
+        let filter: AnimalSearchFilter
+        var currentPage: Int = 1
+        var isCompleted: Bool = false
+
+        init(filter: AnimalSearchFilter) {
+            self.filter = filter
+        }
+    }
+
     private let useCase: FetchAnimalsUseCase
-    private let animals: [AnimalEntity] = []
-    private var filters: [AnimalSearchFilter] = []
+    private(set) var tasks: [FilterTask] = []
+
+    var animals: [AnimalEntity] = []
+    var isLoading: Bool = false
+    var isNoResult: Bool {
+        !isLoading && animals.isEmpty && tasks.allSatisfy { $0.isCompleted }
+    }
 
     init(useCase: FetchAnimalsUseCase) {
         self.useCase = useCase
     }
 
+    private var fetchTask: Task<Void, Never>?
+
+    deinit {
+        cancelAllRequests()
+    }
+
+    func clearAll() {
+        cancelAllRequests()
+        self.tasks = []
+        self.animals = []
+        self.isLoading = false
+    }
+
+    private func cancelAllRequests() {
+        fetchTask?.cancel()
+        fetchTask = nil
+    }
+
     func setupFilters(_ filters: [AnimalSearchFilter]) {
-        self.filters = filters
+        clearAll() // 시작 전 초기화
+        self.tasks = filters.map { FilterTask(filter: $0) }
+
+        // ✅ 태스크를 변수에 저장하여 관리
+        fetchTask = Task {
+            await fetchAllNextPages()
+        }
+    }
+
+    func fetchAllNextPages() async {
+        guard !Task.isCancelled else { return }
+        guard !isLoading else { return }
+
+        let activeTasks = tasks.filter { !$0.isCompleted }
+        guard !activeTasks.isEmpty else { return }
+
+        isLoading = true
+
+        await withTaskGroup(of: (Int, (animals: [AnimalEntity], pagingInfo: Paging)?).self) { group in
+            for index in 0..<activeTasks.count {
+                if Task.isCancelled { break }
+
+                let task = activeTasks[index]
+                group.addTask {
+                    let result = await self.useCase.execute(
+                        filter: task.filter,
+                        pageNo: task.currentPage
+                    )
+                    if Task.isCancelled { return (index, nil) }
+
+                    switch result {
+                    case .success(let response): return (index, response)
+                    case .failure: return (index, nil)
+                    }
+                }
+            }
+
+            for await (index, response) in group {
+                if Task.isCancelled { break }
+
+                let task = activeTasks[index]
+                guard let response = response else { continue }
+
+                if !response.animals.isEmpty {
+                    self.animals.append(contentsOf: response.animals)
+                }
+
+                let paging = response.pagingInfo
+                if !paging.hasMore || response.animals.isEmpty {
+                    task.isCompleted = true
+                } else {
+                    task.currentPage += 1
+                }
+            }
+        }
+
+        isLoading = false
     }
 }

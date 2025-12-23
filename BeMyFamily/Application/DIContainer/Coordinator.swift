@@ -42,7 +42,6 @@ final class Coordinator {
         if let viewModel = container.resolveFactory(FilterViewModel.self) {
             AnimalFilterForm(viewModel: viewModel)
                 .onAppear {
-                    // ✅ 할당문은 뷰가 나타날 때 연결해주면 @ViewBuilder 에러를 피할 수 있습니다.
                     viewModel.onSearchCompleted = { [weak self] filters in
                         self?.push(.searchResult(filters))
                     }
@@ -57,6 +56,9 @@ final class Coordinator {
             SearchResultView(viewModel: viewModel)
                 .onAppear {
                     viewModel.setupFilters(filters)
+                }
+                .onDisappear {
+                    viewModel.clearAll()
                 }
                 .environment(self)
         }
