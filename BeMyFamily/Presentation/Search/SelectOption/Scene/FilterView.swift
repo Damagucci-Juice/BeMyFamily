@@ -34,8 +34,15 @@ struct FilterView: View {
         .toolbar {
             // 검색 버튼
             ToolbarItem(placement: .confirmationAction) {
-                NavigationLink("Search",
-                               value: SearchRoute.searchResult(filters: viewModel.makeFilters()))
+                NavigationLink(destination: {
+                    if let searchViewModel = diContainer.resolveFactory(SearchResultViewModel.self) {
+                        let _ = { searchViewModel.setupFilters(viewModel.makeFilters()) }()
+
+                        SearchResultView(viewModel: searchViewModel)
+                    }
+                }, label: {
+                    Text("검색")
+                })
             }
 
             // 초기화 버튼

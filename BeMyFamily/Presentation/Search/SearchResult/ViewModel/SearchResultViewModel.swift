@@ -36,23 +36,18 @@ final class SearchResultViewModel {
     private var fetchTask: Task<Void, Never>?
 
     deinit {
-        cancelAllRequests()
+        clearAll()
     }
 
     func clearAll() {
-        cancelAllRequests()
+        fetchTask?.cancel()
+        fetchTask = nil
         self.tasks = []
-        self.animals = []
         self.isLoading = false
     }
 
-    private func cancelAllRequests() {
-        fetchTask?.cancel()
-        fetchTask = nil
-    }
-
     func setupFilters(_ filters: [AnimalSearchFilter]) {
-        cancelAllRequests()
+        clearAll()
         self.animals = []
         self.tasks = filters.map { FilterTask(filter: $0) }
 

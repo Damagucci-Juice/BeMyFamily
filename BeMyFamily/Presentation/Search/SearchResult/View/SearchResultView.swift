@@ -21,15 +21,17 @@ struct SearchResultView: View {
                     .padding(.top, 100)
                 } else {
                     ForEach(viewModel.animals) { animal in
-                        NavigationLink(value: SearchRoute.detail(entity: animal)) {
+                        NavigationLink(destination: {
+                            AnimalDetailView(animal: animal)
+                        }, label: {
                             FeedItemView(animal: animal)
-                                .onAppear {
-                                    if animal == viewModel.animals.last {
-                                        Task { await viewModel.fetchAllNextPages() }
-                                    }
-                                }
-                        }
+                        })
                         .buttonStyle(.plain)
+                        .onAppear {
+                            if animal == viewModel.animals.last {
+                                Task { await viewModel.fetchAllNextPages() }
+                            }
+                        }
                         .simultaneousGesture(TapGesture().onEnded {
                             // 화면 전환 전에 요청 제거
                             viewModel.clearAll()
@@ -37,7 +39,7 @@ struct SearchResultView: View {
 
                     }
 
-                    if !viewModel.tasks.allSatisfy({ $0.isCompleted }) {
+                    if viewModel.isNoResult {
                         ProgressView()
                             .padding()
                             .onAppear {
