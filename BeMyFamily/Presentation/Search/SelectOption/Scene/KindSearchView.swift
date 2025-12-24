@@ -123,28 +123,21 @@ struct UpkindChipView: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 4) {
-                Text(kind.text)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(isSelected ? (colorScheme == .dark ? Color.black : Color.white) : .white)
-                    .lineLimit(1) // 한 줄로 제한
-                    .minimumScaleFactor(0.8) // 글자가 길면 자동 축소
-
-                Text(kind.id)
-                    .font(.system(size: 10, design: .monospaced))
-                    .foregroundStyle(isSelected ? (colorScheme == .dark ? Color.black : Color.white) : .white)
-                    .opacity(0.6)
-            }
-            .frame(maxWidth: .infinity) // 3열 그리드 칸을 꽉 채움
-            .padding(.vertical, 12)
-            .padding(.horizontal, 4)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? (colorScheme == .dark ? Color.white : Color.black) : Color(.systemGray6))
-            )
-            .foregroundColor(isSelected ? .white : .primary)
+            Text(kind.text)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(isSelected ? (colorScheme == .dark ? Color.black : Color.white) : .white)
+                .lineLimit(1) // 한 줄로 제한
+                .minimumScaleFactor(0.8) // 글자가 길면 자동 축소
+                .frame(maxWidth: .infinity) // 3열 그리드 칸을 꽉 채움
+                .padding(.vertical, 12)
+                .padding(.horizontal, 4)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(isSelected ? (colorScheme == .dark ? Color.white : Color.black) : Color(.systemGray6))
+                )
+                .foregroundColor(isSelected ? .white : .primary)
             // 선택 시 살짝 떠오르는 듯한 효과
-            .shadow(color: isSelected ? Color.blue.opacity(0.3) : Color.clear, radius: 4, x: 0, y: 2)
+                .shadow(color: isSelected ? Color.blue.opacity(0.3) : Color.clear, radius: 4, x: 0, y: 2)
         }
         .buttonStyle(.plain)
     }
@@ -159,26 +152,20 @@ struct KindChipView: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 4) {
-                Text(kind.name)
-                    .font(.system(size: 13, weight: .semibold))
-                    .lineLimit(1) // 한 줄로 제한
-                    .minimumScaleFactor(0.8) // 글자가 길면 자동 축소
-
-                Text(kind.id)
-                    .font(.system(size: 10, design: .monospaced))
-                    .opacity(0.6)
-            }
-            .frame(maxWidth: .infinity) // 3열 그리드 칸을 꽉 채움
-            .padding(.vertical, 12)
-            .padding(.horizontal, 4)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? (colorScheme == .dark ? Color.blue : Color.black) : Color(.systemGray6))
-            )
-            .foregroundColor(isSelected ? .white : .primary)
+            Text(kind.name)
+                .font(.system(size: 13, weight: .semibold))
+                .lineLimit(1) // 한 줄로 제한
+                .minimumScaleFactor(0.8) // 글자가 길면 자동 축소
+                .frame(maxWidth: .infinity) // 3열 그리드 칸을 꽉 채움
+                .padding(.vertical, 12)
+                .padding(.horizontal, 4)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(isSelected ? (colorScheme == .dark ? Color.blue : Color.black) : Color(.systemGray6))
+                )
+                .foregroundColor(isSelected ? .white : .primary)
             // 선택 시 살짝 떠오르는 듯한 효과
-            .shadow(color: isSelected ? Color.blue.opacity(0.3) : Color.clear, radius: 4, x: 0, y: 2)
+                .shadow(color: isSelected ? Color.blue.opacity(0.3) : Color.clear, radius: 4, x: 0, y: 2)
         }
         .buttonStyle(.plain)
     }
