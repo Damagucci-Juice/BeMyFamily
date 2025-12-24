@@ -7,7 +7,6 @@
 import NukeUI
 import SwiftUI
 
-// MARK: - 일반 Feed와 Filter Tab을 보여줌
 struct FeedView: View {
     @State private var viewModel: FeedViewModel
     @State private var isReachedToBottom = false

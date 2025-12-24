@@ -54,7 +54,10 @@ struct FilterView: View {
             }
         }
         .onAppear {
-            searchViewModel?.clearAll()
+            if searchViewModel?.animals.isEmpty == false {
+                searchViewModel?.clearAll()
+            }
+
         }
     }
 
