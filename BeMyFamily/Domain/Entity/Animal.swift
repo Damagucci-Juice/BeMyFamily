@@ -7,8 +7,7 @@
 
 import Foundation
 
-@Observable
-final class Animal: Codable, Equatable, Identifiable {
+struct AnimalDTO: Codable, Equatable, Identifiable {
     // 1. 기본 식별자 및 상태
     let id: String
     var isFavorite = false
@@ -64,8 +63,8 @@ final class Animal: Codable, Equatable, Identifiable {
     }
 }
 
-extension Animal: Hashable {
-    static func == (lhs: Animal, rhs: Animal) -> Bool {
+extension AnimalDTO: Hashable {
+    static func == (lhs: AnimalDTO, rhs: AnimalDTO) -> Bool {
         lhs.id == rhs.id
     }
 

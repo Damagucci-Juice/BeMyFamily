@@ -47,7 +47,9 @@ final class FamilyService: SearchService {
     private let session: URLSession
     private let friendCache: NSCache<NSString, CacheEntryObject> = NSCache()
 
-    public init(session: URLSession = .shared) {
+    static let shared = FamilyService()
+
+    private init(session: URLSession = .shared) {
         self.session = session
     }
 

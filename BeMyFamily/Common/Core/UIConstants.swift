@@ -33,7 +33,7 @@ struct UIConstants {
         static let heartWithStroke = "heart"
         static let share = "square.and.arrow.up.circle.fill"
         static let filter = "line.3.horizontal.decrease.circle"
-        static let reset = "arrow.uturn.backward"
+        static let reset = "arrow.counterclockwise"
     }
 
     struct Radius {
@@ -62,7 +62,7 @@ struct UIConstants {
     }
 
     struct FilterForm {
-        static let showAll = "전체보기"
-        static let title = "조건 설정"
+        static let showAll = "전체 보기"
+        static let title = "공고 찾기"
     }
 }

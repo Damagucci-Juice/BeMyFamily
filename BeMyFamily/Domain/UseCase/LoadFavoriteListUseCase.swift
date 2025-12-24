@@ -7,14 +7,14 @@
 
 import Foundation
 
-class LoadFavoriteListUseCase {
-    let favoriteRepository: FavoriteAnimalRepository
+final class GetFavoriteAnimalsUseCase {
+    let favoriteRepository: FavoriteRepository
 
-    init(favoriteRepository: FavoriteAnimalRepository) {
+    init(favoriteRepository: FavoriteRepository) {
         self.favoriteRepository = favoriteRepository
     }
 
     func excute() -> [Animal] {
-        favoriteRepository.loadFavoriteAnimlaList()
+        favoriteRepository.fetchAll()
     }
 }

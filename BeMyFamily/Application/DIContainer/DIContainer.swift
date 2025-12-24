@@ -6,55 +6,145 @@
 //
 
 import Foundation
+import Observation
 
-class DIContainer: ObservableObject {
-    struct Dependencies {
-        // TODO: - 이미지 서비스 여기에 둬야함
-        let apiService: SearchService
+@Observable
+final class DIContainer {
+    static let shared = DIContainer()
+
+    private var singletons: [String: Any] = [:]
+    private var factories: [String: Any] = [:]
+    var currentTap: FriendMenu = .feed
+
+    private init() {
+        setupDependencies()
     }
 
-    private let dependencies: Dependencies
+    private func setupDependencies() {
+        // MARK: - Singleton
+        // enroll service
+        registerSingleton(FamilyService.self, instance: FamilyService.shared)
+        registerSingleton(UserDefaultsFavoriteStorage.self, instance: UserDefaultsFavoriteStorage.shared)
 
-    init(dependencies: Dependencies) {
-        self.dependencies = dependencies
+        // enroll repository
+        if let storage = resolveSingleton(UserDefaultsFavoriteStorage.self) {
+            registerSingleton(FavoriteRepositoryImpl.self, instance: FavoriteRepositoryImpl(storage: storage))
+        }
+
+        if let service = resolveSingleton(FamilyService.self) {
+            registerSingleton(AnimalRepositoryImpl.self, instance: AnimalRepositoryImpl(service: service))
+            registerSingleton(MetadataRepositoryImpl.self, instance: MetadataRepositoryImpl(service: service))
+        }
+
+        // enroll usecage
+        if let metaRepo = resolveSingleton(MetadataRepositoryImpl.self) {
+            let loadInfoUsecase = LoadMetaDataUseCase(metadataRepository: metaRepo)
+            registerSingleton(LoadMetaDataUseCase.self,
+                              instance: loadInfoUsecase)
+
+            Task.detached(priority: .userInitiated) {
+                let result = await loadInfoUsecase.execute()
+                if case .success(let data) = result {
+                    await MainActor.run {
+                        self.registerSingleton(ProvinceMetadata.self, instance: data)
+                    }
+                }
+            }
+        }
+
+        if let favoriteRepo = resolveSingleton(FavoriteRepositoryImpl.self),
+           let animalRepo = resolveSingleton(AnimalRepositoryImpl.self) {
+            registerSingleton(FetchAnimalsUseCase.self,
+                              instance: FetchAnimalsUseCase(
+                                animalRepository: animalRepo,
+                                favoriteRepository: favoriteRepo
+                              ))
+        }
+
+        // MARK: - ViewModels(Factory)
+        registerFactory(FeedViewModel.self) { [weak self] in
+            guard let self = self,
+                  let useCase = self.resolveSingleton(FetchAnimalsUseCase.self),
+                  let repo = self.resolveSingleton(FavoriteRepositoryImpl.self)
+            else {
+                fatalError("Failed to resolve FetchAnimalsUseCase")
+            }
+            return FeedViewModel(fetchAnimalsUseCase: useCase, favorRepo: repo)
+        }
+
+        registerFactory(FavoriteButtonViewModel.self) { [weak self] animal in
+            guard let self = self,
+                  let repository = self.resolveSingleton(FavoriteRepositoryImpl.self) else {
+                fatalError("Failed to resolve ToggleFavoriteUseCase")
+            }
+            return FavoriteButtonViewModel(animal: animal, repository: repository)
+        }
+
+        registerFactory(FavoriteViewModel.self) { [weak self] in
+            guard let self = self,
+                  let repo = self.resolveSingleton(FavoriteRepositoryImpl.self) else {
+                fatalError("Failed to resolve GetFavoriteAnimalsUseCase")
+            }
+            return FavoriteViewModel(repository: repo)
+        }
+
+        // FilterViewModel 등록 (화면 전환 클로저를 파라미터로 받음)
+        registerFactory(FilterViewModel.self) { [weak self] in
+            guard let useCase = self?.resolveSingleton(LoadMetaDataUseCase.self)
+            else {
+                fatalError("너무 빨리 탭이 전환되면 발생함")
+            }
+            return FilterViewModel(useCase: useCase)
+        }
+
+        // SearchResultViewModel 등록 (필터 배열을 파라미터로 받음)
+        Task { @MainActor in
+            registerFactory(SearchResultViewModel.self) { [weak self]  in
+                guard let self, let useCase = self.resolveSingleton(FetchAnimalsUseCase.self) else {
+                    fatalError("...")
+                }
+                
+                return SearchResultViewModel(useCase: useCase)
+            }
+        }
     }
 
-    // TODO: - Cache 여기에 둬야함
-    lazy var favoriteAnimalStorage: FavoriteStorage = UserDefaultsFavoriteStorage()
-
-    // TODO: - static 걷어내기
-    static func makeFeedListViewModel(_ viewModel: FilterViewModel, service: SearchService = FamilyService()) -> FeedViewModel {
-        return FeedViewModel(service: service, viewModel: viewModel)
+    // MARK: - Singleton 관리
+    private func registerSingleton<T>(_ type: T.Type, instance: T) {
+        let key = String(describing: type)
+        singletons[key] = instance
     }
 
-    static func makeFilterViewModel() -> FilterViewModel {
-        return FilterViewModel()
+    func resolveSingleton<T>(_ type: T.Type) -> T? {
+        let key = String(describing: type)
+        return singletons[key] as? T
     }
 
-    static func makeProvinceViewModel(service: SearchService = FamilyService()) -> ProvinceViewModel {
-        return ProvinceViewModel(service: service)
+    // MARK: - Factory (파라미터 없음)
+    private func registerFactory<T>(_ type: T.Type, factory: @escaping () -> T) {
+        let key = String(describing: type)
+        factories[key] = factory
     }
 
-    // MARK: - Favorites
-
-    func makeFavoriteTabViewModel() -> FavoriteTabViewModel {
-        FavoriteTabViewModel(loadFavoriteListUseCase: makeLoadFavoriteUseCase())
+    func resolveFactory<T>(_ type: T.Type) -> T? {
+        let key = String(describing: type)
+        guard let factory = factories[key] as? () -> T else {
+            return nil
+        }
+        return factory()
     }
 
-    func makeLoadFavoriteUseCase() -> LoadFavoriteListUseCase {
-        LoadFavoriteListUseCase(favoriteRepository: makeFavoriteRepository())
+    // MARK: - Factory 관리 (파라미터 1개)
+    private func registerFactory<T, P>(_ type: T.Type, factory: @escaping (P) -> T) {
+        let key = String(describing: type)
+        factories[key] = factory
     }
 
-    func makeFavoriteButtonViewModel(with animal: Animal) -> FavoriteButtonViewModel {
-        FavoriteButtonViewModel(
-            animal: animal,
-            repository: makeFavoriteRepository()
-        )
-    }
-
-    func makeFavoriteRepository() -> FavoriteAnimalRepository {
-        FavoriteAnimalRepositoryImpl(
-            storage: favoriteAnimalStorage
-        )
+    func resolveFactory<T, P>(_ type: T.Type, parameter: P) -> T? {
+        let key = String(describing: type)
+        guard let factory = factories[key] as? (P) -> T else {
+            return nil
+        }
+        return factory(parameter)
     }
 }

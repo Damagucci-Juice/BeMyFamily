@@ -22,6 +22,7 @@ struct NetworkConstants {
     struct Params {
         static let totalSidoCount = "17"
         static let kindPayload = "999"  // max: 1000
+        static let pageSize = "20"
     }
 
     struct Translations {
