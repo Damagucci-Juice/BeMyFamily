@@ -33,6 +33,13 @@ struct FeedView: View {
                 }
             }
         }
+        .onAppear {
+            if viewModel.animals.isEmpty {
+                Task {
+                    await viewModel.fetchAnimalsIfCan()
+                }
+            }
+        }
     }
 
     @ViewBuilder
@@ -41,23 +48,16 @@ struct FeedView: View {
             ForEach(viewModel.animals) { animal in
                 NavigationLink(value: FeedRoute.detail(entity: animal)) {
                     FeedItemView(animal: animal)
+                        .onAppear {
+                            if let last = viewModel.animals.last, animal.id == last.id {
+                                isReachedToBottom = true
+                                Task {
+                                    await viewModel.fetchAnimalsIfCan()
+                                }
+                            }
+                        }
                 }
                 .tint(.primary)
-            }
-        }
-        // MARK: - 스크롤의 밑 부분에 도달하면 새로운 동물 데이터를 팻치해오는 로직
-        .background {
-            GeometryReader { proxy -> Color in
-                let maxY = proxy.frame(in: .global).maxY
-                let throttle = 150.0
-                let reachedToBottom = maxY < UIConstants.Frame.screenHeight + throttle
-                self.isReachedToBottom = reachedToBottom
-                if reachedToBottom {
-                    Task {
-                        await viewModel.fetchAnimalsIfCan()
-                    }
-                }
-                return Color.clear
             }
         }
     }
