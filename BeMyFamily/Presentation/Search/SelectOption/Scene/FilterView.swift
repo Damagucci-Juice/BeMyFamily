@@ -9,8 +9,9 @@
 import SwiftUI
 
 struct FilterView: View {
-    @Environment(DIContainer.self) var diContainer
     @Bindable var viewModel: FilterViewModel
+    @State private var searchViewModel = DIContainer.shared.resolveFactory(SearchResultViewModel.self)
+    @State private var isSearchActive = false
 
     init(viewModel: FilterViewModel) {
         self.viewModel = viewModel
@@ -34,21 +35,26 @@ struct FilterView: View {
         .toolbar {
             // 검색 버튼
             ToolbarItem(placement: .confirmationAction) {
-                NavigationLink(destination: {
-                    if let searchViewModel = diContainer.resolveFactory(SearchResultViewModel.self) {
-                        let _ = { searchViewModel.setupFilters(viewModel.makeFilters()) }()
-
-                        SearchResultView(viewModel: searchViewModel)
-                    }
-                }, label: {
+                Button {
+                    searchButtonDidTapped()
+                } label: {
                     Text("검색")
-                })
+                }
+                .disabled(viewModel.isLoading)
             }
 
             // 초기화 버튼
             ToolbarItem(placement: .cancellationAction) {
                 resetButton()
             }
+        }
+        .navigationDestination(isPresented: $isSearchActive) {
+            if let searchViewModel {
+                SearchResultView(viewModel: searchViewModel)
+            }
+        }
+        .onAppear {
+            searchViewModel?.clearAll()
         }
     }
 
@@ -79,19 +85,21 @@ struct FilterView: View {
                     viewModel.sigungu = nil
                 }
 
-                Picker("시군구", selection: $viewModel.sigungu) {
-                    Text(UIConstants.FilterForm.showAll)
-                        .tag(nil as SigunguEntity?)
+                if viewModel.sido != nil {
+                    Picker("시군구", selection: $viewModel.sigungu) {
+                        Text(UIConstants.FilterForm.showAll)
+                            .tag(nil as SigunguEntity?)
 
-                    ForEach(viewModel.sigungus(), id: \.self) { eachSigungu in
-                        if let sigunguName = eachSigungu.name {
-                            Text(sigunguName)
-                                .tag(eachSigungu as SigunguEntity?)
+                        ForEach(viewModel.sigungus(), id: \.self) { eachSigungu in
+                            if let sigunguName = eachSigungu.name {
+                                Text(sigunguName)
+                                    .tag(eachSigungu as SigunguEntity?)
+                            }
                         }
                     }
-                }
-                .onChange(of: viewModel.sigungu) { _, _ in
-                    viewModel.shelter = nil
+                    .onChange(of: viewModel.sigungu) { _, _ in
+                        viewModel.shelter = nil
+                    }
                 }
             }
 
@@ -187,5 +195,12 @@ struct FilterView: View {
                 Image(systemName: UIConstants.Image.reset)
             }
         }
+    }
+
+    private func searchButtonDidTapped() {
+        guard let searchViewModel else { return }
+        let filters = viewModel.makeFilters()
+        searchViewModel.setupFilters(filters)
+        isSearchActive.toggle()
     }
 }

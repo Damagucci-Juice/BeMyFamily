@@ -8,6 +8,7 @@ import Foundation
 import Observation
 
 @Observable
+@MainActor
 final class SearchResultViewModel {
     // 필터별 상태를 관리하기 위한 내부 구조체
     final class FilterTask {
@@ -35,20 +36,16 @@ final class SearchResultViewModel {
 
     private var fetchTask: Task<Void, Never>?
 
-    deinit {
-        clearAll()
-    }
-
     func clearAll() {
         fetchTask?.cancel()
         fetchTask = nil
+        animals.removeAll()
         self.tasks = []
         self.isLoading = false
     }
 
     func setupFilters(_ filters: [AnimalSearchFilter]) {
         clearAll()
-        self.animals = []
         self.tasks = filters.map { FilterTask(filter: $0) }
 
         fetchTask = Task {
