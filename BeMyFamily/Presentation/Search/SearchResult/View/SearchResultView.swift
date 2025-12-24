@@ -34,17 +34,10 @@ struct SearchResultView: View {
                         }
                         .simultaneousGesture(TapGesture().onEnded {
                             // 화면 전환 전에 요청 제거
-                            viewModel.clearAll()
-                        })
-
-                    }
-
-                    if viewModel.isNoResult {
-                        ProgressView()
-                            .padding()
-                            .onAppear {
-                                Task { await viewModel.fetchAllNextPages() }
+                            if viewModel.isLoading {
+                                viewModel.clearAll()
                             }
+                        })
                     }
                 }
             }
