@@ -13,7 +13,7 @@ final class FilterViewModel {
     private let useCase: LoadMetaDataUseCase
 
     // MARK: - Metadata
-    let metadata: ProvinceMetadata
+    private(set) var metadata: ProvinceMetadata?
     var isLoading: Bool = false
     var error: Error?
 
@@ -41,9 +41,33 @@ final class FilterViewModel {
     var state: ProcessState = .all
     var neutral: Neutralization?
 
-    init(useCase: LoadMetaDataUseCase, metadata: ProvinceMetadata) {
+    init(useCase: LoadMetaDataUseCase) {
         self.useCase = useCase
-        self.metadata = metadata
+
+
+        Task.detached(priority: .userInitiated) { [weak self] in
+            guard let self = self else { return }
+            self.isLoading = true
+            if let metadata = await self.loadMetadataIfNeeded() {
+                self.metadata = metadata
+            } else {
+                self.error = NSError(domain: "Failed to load metadata", code: 0, userInfo: nil)
+            }
+            self.isLoading = false
+        }
+
+    }
+
+    private func loadMetadataIfNeeded() async -> ProvinceMetadata? {
+        if let cachedMeta = DIContainer.shared.resolveSingleton(ProvinceMetadata.self) {
+            return cachedMeta
+        }
+
+        if let fetchedMeta = try? await useCase.execute().get() {
+            return fetchedMeta
+        }
+
+        return nil
     }
 
     private func loadSheltersIfNeeded(sido: String, sigungu: SigunguEntity) async {
@@ -108,7 +132,26 @@ final class FilterViewModel {
     }
 
     func kinds(_ upKind: Upkind) -> [KindEntity] {
-        metadata.kind[upKind, default: []]
+        if let kinds = metadata?.kind[upKind, default: []] {
+            return kinds
+        }
+        return []
+    }
+
+    func sidos() -> [SidoEntity] {
+        if let sidos = metadata?.sido {
+            return sidos
+        }
+        return []
+    }
+
+    func sigungus() -> [SigunguEntity] {
+        if let sido = sido,
+           let sigungus = metadata?.province[sido, default: []] {
+            return sigungus
+        }
+        
+        return []
     }
 
     func toggleKind(_ kind: KindEntity) {

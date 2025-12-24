@@ -70,7 +70,7 @@ struct FilterView: View {
                 Picker("시도", selection: $viewModel.sido) {
                     Text(UIConstants.FilterForm.showAll)
                         .tag(nil as SidoEntity?)
-                    ForEach(viewModel.metadata.sido, id: \.self) { aSido in
+                    ForEach(viewModel.sidos(), id: \.self) { aSido in
                         Text(aSido.name)
                             .tag(aSido as SidoEntity?)
                     }
@@ -79,22 +79,19 @@ struct FilterView: View {
                     viewModel.sigungu = nil
                 }
 
-                if let sido = viewModel.sido {
-                    Picker("시군구", selection: $viewModel.sigungu) {
-                        let sigungus = viewModel.metadata.province[sido, default: []]
-                        Text(UIConstants.FilterForm.showAll)
-                            .tag(nil as SigunguEntity?)
+                Picker("시군구", selection: $viewModel.sigungu) {
+                    Text(UIConstants.FilterForm.showAll)
+                        .tag(nil as SigunguEntity?)
 
-                        ForEach(sigungus, id: \.self) { eachSigungu in
-                            if let sigunguName = eachSigungu.name {
-                                Text(sigunguName)
-                                    .tag(eachSigungu as SigunguEntity?)
-                            }
+                    ForEach(viewModel.sigungus(), id: \.self) { eachSigungu in
+                        if let sigunguName = eachSigungu.name {
+                            Text(sigunguName)
+                                .tag(eachSigungu as SigunguEntity?)
                         }
                     }
-                    .onChange(of: viewModel.sigungu) { _, _ in
-                        viewModel.shelter = nil
-                    }
+                }
+                .onChange(of: viewModel.sigungu) { _, _ in
+                    viewModel.shelter = nil
                 }
             }
 
