@@ -10,55 +10,47 @@ import SwiftUI
 struct SearchResultView: View {
     @Bindable var viewModel: SearchResultViewModel
 
-    init(viewModel: SearchResultViewModel) {
-        self.viewModel = viewModel
-    }
-
     var body: some View {
-        ZStack {
-            if viewModel.isNoResult {
-                // 결과가 아예 없을 때 (isNoResult 활용)
-                ContentUnavailableView("검색 결과가 없어요", systemImage: "magnifyingglass")
-            } else {
-                ScrollView {
-                    LazyVStack {
-                        ForEach(viewModel.animals) { animal in
-                            NavigationLink(value: SearchRoute.detail(entity: animal)) {
-                                FeedItemView(animal: animal)
-                                    .onAppear {
-                                        // 무한 스크롤
-                                        if animal == viewModel.animals.last {
-                                            Task {
-                                                await viewModel.fetchAllNextPages()
-                                            }
-                                        }
+        ScrollView {
+            LazyVStack(spacing: 0) {
+                if viewModel.animals.isEmpty && !viewModel.isLoading {
+                    ContentUnavailableView(
+                        "검색 결과가 없어요",
+                        systemImage: "magnifyingglass"
+                    )
+                    .padding(.top, 100)
+                } else {
+                    ForEach(viewModel.animals) { animal in
+                        NavigationLink(value: SearchRoute.detail(entity: animal)) {
+                            FeedItemView(animal: animal)
+                                .onAppear {
+                                    if animal == viewModel.animals.last {
+                                        Task { await viewModel.fetchAllNextPages() }
                                     }
-                            }
-                            .tint(.primary)
+                                }
                         }
+                        .buttonStyle(.plain)
+                        .simultaneousGesture(TapGesture().onEnded {
+                            // 화면 전환 전에 요청 제거
+                            viewModel.clearAll()
+                        })
 
-                        // 데이터가 더 남았을 때만 하단 로딩바 노출 (allSatisfy 활용)
-                        if !viewModel.tasks.allSatisfy({ $0.isCompleted }) {
-                            HStack {
-                                Spacer()
-                                ProgressView()
-                                    .id(UUID()) // 재렌더링 강제 유도 (선택 사항)
-                                Spacer()
-                            }
+                    }
+
+                    if !viewModel.tasks.allSatisfy({ $0.isCompleted }) {
+                        ProgressView()
                             .padding()
                             .onAppear {
-                                Task {
-                                    await viewModel.fetchAllNextPages()
-                                }
+                                Task { await viewModel.fetchAllNextPages() }
                             }
-                        }
                     }
                 }
             }
-
-            // 처음 진입 시 전체 로딩 (선택 사항)
+        }
+        .overlay {
             if viewModel.isLoading && viewModel.animals.isEmpty {
                 ProgressView("데이터를 불러오는 중...")
+                    .background(Color(.systemBackground))
             }
         }
     }

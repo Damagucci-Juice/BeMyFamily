@@ -90,21 +90,23 @@ final class DIContainer {
 
         // FilterViewModel 등록 (화면 전환 클로저를 파라미터로 받음)
         registerFactory(FilterViewModel.self) { [weak self] in
-            guard let self,
-                  let useCase = self.resolveSingleton(LoadMetaDataUseCase.self),
-                  let metadata = self.resolveSingleton(ProvinceMetadata.self)
+            guard let useCase = self?.resolveSingleton(LoadMetaDataUseCase.self),
+                  let metadata = self?.resolveSingleton(ProvinceMetadata.self)
             else {
-                fatalError("...")
+                fatalError("너무 빨리 탭이 전환되면 발생함")
             }
             return FilterViewModel(useCase: useCase, metadata: metadata)
         }
 
         // SearchResultViewModel 등록 (필터 배열을 파라미터로 받음)
-        registerFactory(SearchResultViewModel.self) { [weak self] (filters: [AnimalSearchFilter]) in
-            guard let self, let useCase = self.resolveSingleton(FetchAnimalsUseCase.self) else {
-                fatalError("...")
+        Task { @MainActor in
+            registerFactory(SearchResultViewModel.self) { [weak self]  in
+                guard let self, let useCase = self.resolveSingleton(FetchAnimalsUseCase.self) else {
+                    fatalError("...")
+                }
+                
+                return SearchResultViewModel(useCase: useCase)
             }
-            return SearchResultViewModel(useCase: useCase, filters: filters)
         }
     }
 

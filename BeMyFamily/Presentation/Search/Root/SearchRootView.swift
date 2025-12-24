@@ -21,6 +21,7 @@ struct SearchRootView: View {
     @Bindable var router: SearchRouter
     @Environment(DIContainer.self) var diContainer
 
+
     var body: some View {
         NavigationStack(path: $router.path) {
             if let viewModel = diContainer.resolveFactory(FilterViewModel.self) {
@@ -28,10 +29,10 @@ struct SearchRootView: View {
                     .navigationDestination(for: SearchRoute.self) { route in
                         switch route {
                         case .searchResult(let filters):
-                            if let viewModel = diContainer.resolveFactory(
-                                SearchResultViewModel.self, parameter: filters
-                            ) {
-                                SearchResultView(viewModel: viewModel)
+                            if let searchViewModel = diContainer.resolveFactory(SearchResultViewModel.self) {
+                                let _ = { searchViewModel.setupFilters(filters) }()
+
+                                SearchResultView(viewModel: searchViewModel)
                             }
                         case .detail(let entity):
                             AnimalDetailView(animal: entity)
