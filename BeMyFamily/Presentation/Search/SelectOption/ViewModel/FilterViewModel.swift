@@ -165,4 +165,14 @@ final class FilterViewModel {
     func isSelected(_ kind: KindEntity) -> Bool {
         kinds.contains(kind)
     }
+
+    func allKinds() -> [KindEntity] {
+        var result: [KindEntity] = []
+        if let kinds = metadata?.kind {
+            for (_, value) in kinds {
+                result.append(contentsOf: value)
+            }
+        }
+        return result
+    }
 }

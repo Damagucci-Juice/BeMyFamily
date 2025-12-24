@@ -12,6 +12,7 @@ struct FilterView: View {
     @Bindable var viewModel: FilterViewModel
     @State private var searchViewModel = DIContainer.shared.resolveFactory(SearchResultViewModel.self)
     @State private var isSearchActive = false
+    @State private var isKindSearchActive = false
 
     init(viewModel: FilterViewModel) {
         self.viewModel = viewModel
@@ -27,7 +28,7 @@ struct FilterView: View {
                         .foregroundStyle(.secondary)
                 }
             } else {
-                filterFormContent
+                optionSelectionContentView
             }
         }
         .navigationTitle(UIConstants.FilterForm.title)
@@ -53,6 +54,11 @@ struct FilterView: View {
                 SearchResultView(viewModel: searchViewModel)
             }
         }
+        .navigationDestination(isPresented: $isKindSearchActive) {
+            if !viewModel.isLoading {
+                KindSearchView(allKinds: viewModel.allKinds(), selectedKinds: $viewModel.kinds)
+            }
+        }
         .onAppear {
             if searchViewModel?.animals.isEmpty == false {
                 searchViewModel?.clearAll()
@@ -62,9 +68,20 @@ struct FilterView: View {
     }
 
     @ViewBuilder
-    private var filterFormContent: some View {
-        Form {
-            kindSection
+    private var optionSelectionContentView: some View {
+        List {
+            Section {
+                kindSelectionButton
+                    .listRowSeparator(.hidden)
+            }
+
+            if viewModel.kinds.isEmpty == false {
+                VStack {
+                    selectedChipKinds
+                }
+                .background(.clear)
+                .listRowSeparator(.hidden)
+            }
 
             Section(header: Text("검색 일자")) {
                 DatePicker("시작일", selection: $viewModel.beginDate,
@@ -74,6 +91,7 @@ struct FilterView: View {
                            in: ...Date(),
                            displayedComponents: .date)
             }
+            .listRowSeparator(.hidden)
 
             Section("지역을 골라주세요") {
                 Picker("시도", selection: $viewModel.sido) {
@@ -105,6 +123,7 @@ struct FilterView: View {
                     }
                 }
             }
+            .listRowSeparator(.hidden)
 
             if viewModel.sigungu != nil {
                 Section("보호소를 선택하세요.") {
@@ -127,6 +146,7 @@ struct FilterView: View {
                         }
                     }
                 }
+                .listRowSeparator(.hidden)
             }
 
             Section("현재 어떤 상태인가요?") {
@@ -136,6 +156,7 @@ struct FilterView: View {
                     }
                 }
             }
+            .listRowSeparator(.hidden)
 
             Section("중성화 여부") {
                 Picker("중성화 여부", selection: $viewModel.neutral) {
@@ -148,33 +169,46 @@ struct FilterView: View {
                     }
                 }
             }
+            .listRowSeparator(.hidden)
         }
+        .listStyle(.plain)
     }
 
     @ViewBuilder
-    private var kindSection: some View {
-        Section(header: Text("어떤 종을 보고 싶으신가요?")) {
-            Picker("축종", selection: $viewModel.upkind) {
-                Text(UIConstants.FilterForm.showAll).tag(nil as Upkind?)
-                ForEach(Upkind.allCases, id: \.self) { upkind in
-                    Text(upkind.text).tag(upkind as Upkind?)
-                }
-            }
-            .onChange(of: viewModel.upkind) { _, _ in
-                viewModel.kinds.removeAll()
-            }
+    private var kindSelectionButton: some View {
+        Button {
+            isKindSearchActive.toggle()
+        } label: {
+            HStack {
+                Text("어떤 품종을 보고 싶으신가요?")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.primary)
 
-            if let upkind = viewModel.upkind {
-                ForEach(viewModel.kinds(upkind), id: \.id) { kind in
-                    Button {
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.gray)
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+
+    }
+
+    @ViewBuilder
+    private var selectedChipKinds: some View {
+        ScrollView(.horizontal) {
+            HStack {
+                ForEach(Array(viewModel.kinds)) { kind in
+                    KindChipView(kind: kind, isSelected: true, action: {
                         viewModel.toggleKind(kind)
-                    } label: {
-                        togglingCheckbox(kind, viewModel.isSelected(kind))
-                    }
-                    .buttonStyle(.plain)
+                    })
                 }
             }
         }
+        .scrollIndicators(.never)
     }
 
     @ViewBuilder
