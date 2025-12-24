@@ -44,7 +44,6 @@ final class FilterViewModel {
     init(useCase: LoadMetaDataUseCase) {
         self.useCase = useCase
 
-
         Task.detached(priority: .userInitiated) { [weak self] in
             guard let self = self else { return }
             self.isLoading = true
@@ -164,5 +163,12 @@ final class FilterViewModel {
 
     func isSelected(_ kind: KindEntity) -> Bool {
         kinds.contains(kind)
+    }
+
+    func allKinds() -> [Upkind: [KindEntity]] {
+        if let kinds = metadata?.kind {
+            return kinds
+        }
+        return [:]
     }
 }
