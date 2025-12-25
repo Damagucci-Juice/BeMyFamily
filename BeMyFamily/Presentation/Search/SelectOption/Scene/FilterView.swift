@@ -56,7 +56,7 @@ struct FilterView: View {
         }
         .navigationDestination(isPresented: $isKindSearchActive) {
             if !viewModel.isLoading {
-                KindSearchView(allKinds: viewModel.allKinds(), selectedKinds: $viewModel.kinds)
+                KindSearchView(selectedKinds: $viewModel.kinds, allKinds: viewModel.allKinds())
             }
         }
         .onAppear {

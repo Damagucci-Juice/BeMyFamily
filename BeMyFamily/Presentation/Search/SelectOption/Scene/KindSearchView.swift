@@ -7,17 +7,20 @@
 import SwiftUI
 
 struct KindSearchView: View {
-    let allKinds: [Upkind: [KindEntity]]
+
     @State private var searchText: String = ""
     @Binding var selectedKinds: Set<KindEntity>
     @State private var upkind: Upkind? = Upkind.dog
+    @Environment(\.dismiss) var dismiss
 
+    let allKinds: [Upkind: [KindEntity]]
     private let columns = [
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible(), spacing: 12)
     ]
 
+    private var showCompleteButton: Bool { !selectedKinds.isEmpty }
     private var filteredKinds: [KindEntity] {
         let baseKinds: [KindEntity]
 
@@ -67,21 +70,32 @@ struct KindSearchView: View {
             .padding(.bottom, 16)
 
             // 2. 수직 그리드 영역 (스크롤 가능)
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(filteredKinds) { kind in
-                        KindChipView(
-                            kind: kind,
-                            isSelected: selectedKinds.contains(kind)
-                        ) {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                toggleSelection(kind)
+            ZStack {
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: 16) {
+                        ForEach(filteredKinds) { kind in
+                            KindChipView(
+                                kind: kind,
+                                isSelected: selectedKinds.contains(kind)
+                            ) {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    toggleSelection(kind)
+                                }
                             }
                         }
                     }
+                    .padding(.horizontal)
+                    .padding(.top, 8)
                 }
-                .padding(.horizontal)
-                .padding(.top, 8)
+
+                if showCompleteButton {
+                    VStack {
+                        Spacer()
+
+                        completeButton()
+                            .padding(.bottom)
+                    }
+                }
             }
 
             // 하단 상태 표시
@@ -111,6 +125,20 @@ struct KindSearchView: View {
                 self.upkind = upkind
             }
         }
+    }
+
+    @ViewBuilder
+    private func completeButton() -> some View {
+        Button {
+            dismiss()
+        } label: {
+            Text("완료")
+                .font(.title3)
+                .frame(maxWidth: .infinity)
+                .padding(8)
+        }
+        .buttonStyle(.borderedProminent)
+        .padding(.horizontal)
     }
 }
 
