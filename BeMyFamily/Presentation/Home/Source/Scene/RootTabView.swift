@@ -12,18 +12,18 @@ struct RootTabView: View {
     @State private var feedRouter = FeedRouter()
     @State private var searchRouter = SearchRouter()
     @State private var favoriteRouter = FavoriteRouter()
-    @StateObject private var networkMonitor: NetworkMonitor
+    @State private var networkMonitor: NetworkMonitor
 
     init(diContainer: DIContainer = .shared) {
         self._diContainer = State(wrappedValue: diContainer)
-        self._networkMonitor = StateObject(wrappedValue: diContainer
+        self._networkMonitor = State(wrappedValue: diContainer
                                             .resolveSingleton(NetworkMonitor.self) ?? .shared)
     }
 
     var body: some View {
 
         TabView {
-            if networkMonitor.isConnected == true {
+            if networkMonitor.isConnected {
                 FeedRootView(router: feedRouter)
                     .tabItem { Label("Home", systemImage: "house") }
 
@@ -34,7 +34,7 @@ struct RootTabView: View {
                     .tabItem { Label("Heart", systemImage: "heart") }
             } else {
                 NetworkDisconnectView()
-                    .tabItem { Label("connect", systemImage: "network.slash") }
+                    .tabItem { Label("Offline", systemImage: "network.slash") }
             }
         }
         .environment(diContainer)

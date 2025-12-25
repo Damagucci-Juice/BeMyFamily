@@ -10,9 +10,10 @@ import Combine
 import Observation
 
 // Data 계층의 구현체
+@Observable
 final class NetworkMonitor: NetworkMonitoring {
     // @Published를 써야 SwiftUI가 변화를 감지함
-    @Published var isConnected: Bool = false
+    var isConnected: Bool = false
 
     private let monitor = NWPathMonitor()
 

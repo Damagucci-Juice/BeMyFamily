@@ -6,6 +6,6 @@
 //
 import Combine
 
-protocol NetworkMonitoring: ObservableObject {
+protocol NetworkMonitoring {
     var isConnected: Bool { get }
 }
