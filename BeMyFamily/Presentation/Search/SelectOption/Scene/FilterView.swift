@@ -56,7 +56,7 @@ struct FilterView: View {
         }
         .navigationDestination(isPresented: $isKindSearchActive) {
             if !viewModel.isLoading {
-                KindSearchView(allKinds: viewModel.allKinds(), selectedKinds: $viewModel.kinds)
+                KindSearchView(selectedKinds: $viewModel.kinds, allKinds: viewModel.allKinds())
             }
         }
         .onAppear {
@@ -75,7 +75,7 @@ struct FilterView: View {
                     .listRowSeparator(.hidden)
             }
 
-            if viewModel.kinds.isEmpty == false {
+            if !viewModel.kinds.isEmpty {
                 VStack {
                     selectedChipKinds
                 }
@@ -199,16 +199,30 @@ struct FilterView: View {
 
     @ViewBuilder
     private var selectedChipKinds: some View {
-        ScrollView(.horizontal) {
-            HStack {
-                ForEach(Array(viewModel.kinds)) { kind in
-                    KindChipView(kind: kind, isSelected: true, action: {
-                        viewModel.toggleKind(kind)
-                    })
+        ZStack {
+            ScrollView(.horizontal) {
+                HStack {
+                    ForEach(Array(viewModel.kinds)) { kind in
+                        KindChipView(kind: kind, isSelected: true, action: {
+                            viewModel.toggleKind(kind)
+                        })
+                    }
                 }
             }
+            .scrollIndicators(.never)
+
+            HStack {
+                Spacer()
+
+                Button {
+                    viewModel.clearKinds()
+                } label: {
+                    Text("X")
+                        .foregroundStyle(.gray.opacity(0.85))
+                }
+                .buttonStyle(.glass) // 커스텀 스타일 대신 기본 스타일 사용 시
+            }
         }
-        .scrollIndicators(.never)
     }
 
     @ViewBuilder
