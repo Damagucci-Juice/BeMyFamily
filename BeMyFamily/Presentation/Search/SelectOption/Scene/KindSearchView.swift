@@ -137,7 +137,7 @@ struct KindSearchView: View {
                 .frame(maxWidth: .infinity)
                 .padding(8)
         }
-        .buttonStyle(.borderedProminent)
+        .buttonStyle(.glass)
         .padding(.horizontal)
     }
 }
@@ -149,25 +149,25 @@ struct UpkindChipView: View {
 
     @Environment(\.colorScheme) var colorScheme
 
+    private var font: Font {
+        isSelected ? .system(size: 13, weight: .bold) : .system(size: 13, weight: .regular  )
+    }
+    private var color: Color {
+        isSelected ? (colorScheme == .dark ? Color.white : Color.black) : .gray
+    }
+
     var body: some View {
         Button(action: action) {
             Text(kind.text)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(isSelected ? (colorScheme == .dark ? Color.black : Color.white) : .gray)
-                .lineLimit(1) // 한 줄로 제한
-                .minimumScaleFactor(0.8) // 글자가 길면 자동 축소
-                .frame(maxWidth: .infinity) // 3열 그리드 칸을 꽉 채움
+                .font(font)
+                .foregroundStyle(color)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
                 .padding(.horizontal, 4)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(isSelected ? (colorScheme == .dark ? Color.white : Color.black) : Color(.systemGray6))
-                )
-                .foregroundColor(isSelected ? .white : .primary)
-            // 선택 시 살짝 떠오르는 듯한 효과
-                .shadow(color: isSelected ? Color.blue.opacity(0.3) : Color.clear, radius: 4, x: 0, y: 2)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.glass)
     }
 }
 

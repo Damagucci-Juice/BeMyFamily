@@ -171,4 +171,8 @@ final class FilterViewModel {
         }
         return [:]
     }
+
+    func clearKinds() {
+        kinds.removeAll()
+    }
 }
