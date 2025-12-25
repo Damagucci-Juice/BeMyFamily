@@ -25,6 +25,7 @@ final class DIContainer {
         // enroll service
         registerSingleton(FamilyService.self, instance: FamilyService.shared)
         registerSingleton(UserDefaultsFavoriteStorage.self, instance: UserDefaultsFavoriteStorage.shared)
+        registerSingleton(NetworkMonitor.self, instance: NetworkMonitor.shared)
 
         // enroll repository
         if let storage = resolveSingleton(UserDefaultsFavoriteStorage.self) {
@@ -103,7 +104,6 @@ final class DIContainer {
                 guard let self, let useCase = self.resolveSingleton(FetchAnimalsUseCase.self) else {
                     fatalError("...")
                 }
-                
                 return SearchResultViewModel(useCase: useCase)
             }
         }

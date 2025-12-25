@@ -7,24 +7,38 @@
 import SwiftUI
 
 struct RootTabView: View {
-    @State private var diContainer = DIContainer.shared
+    @State private var diContainer: DIContainer
+
     @State private var feedRouter = FeedRouter()
     @State private var searchRouter = SearchRouter()
     @State private var favoriteRouter = FavoriteRouter()
+    @State private var networkMonitor: NetworkMonitor
+
+    init(diContainer: DIContainer = .shared) {
+        self._diContainer = State(wrappedValue: diContainer)
+        self._networkMonitor = State(wrappedValue: diContainer
+                                            .resolveSingleton(NetworkMonitor.self) ?? .shared)
+    }
 
     var body: some View {
 
         TabView {
-            FeedRootView(router: feedRouter)
-                .tabItem { Label("Home", systemImage: "house") }
+            if networkMonitor.isConnected {
+                FeedRootView(router: feedRouter)
+                    .tabItem { Label("Home", systemImage: "house") }
 
-            SearchRootView(router: searchRouter)
-                .tabItem { Label("Search", systemImage: "magnifyingglass") }
+                SearchRootView(router: searchRouter)
+                    .tabItem { Label("Search", systemImage: "magnifyingglass") }
 
-            FavoriteRootView(router: favoriteRouter)
-                .tabItem { Label("Heart", systemImage: "heart") }
+                FavoriteRootView(router: favoriteRouter)
+                    .tabItem { Label("Heart", systemImage: "heart") }
+            } else {
+                NetworkDisconnectView()
+                    .tabItem { Label("Offline", systemImage: "network.slash") }
+            }
         }
         .environment(diContainer)
+        .animation(.easeInOut, value: networkMonitor.isConnected)
     }
 }
 

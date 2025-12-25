@@ -8,6 +8,3 @@
 import Foundation
 import Combine
 
-protocol NetworkRepository {
-    func observeNetworkStatus() -> AnyPublisher<NetworkStatus, Never>
-}

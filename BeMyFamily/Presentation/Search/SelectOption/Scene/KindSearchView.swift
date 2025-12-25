@@ -125,7 +125,7 @@ struct UpkindChipView: View {
         Button(action: action) {
             Text(kind.text)
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(isSelected ? (colorScheme == .dark ? Color.black : Color.white) : .white)
+                .foregroundStyle(isSelected ? (colorScheme == .dark ? Color.black : Color.white) : .gray)
                 .lineLimit(1) // 한 줄로 제한
                 .minimumScaleFactor(0.8) // 글자가 길면 자동 축소
                 .frame(maxWidth: .infinity) // 3열 그리드 칸을 꽉 채움
