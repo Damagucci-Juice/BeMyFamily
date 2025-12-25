@@ -23,30 +23,21 @@ struct KindSearchView: View {
 
     private var showCompleteButton: Bool { !selectedKinds.isEmpty }
     private var filteredKinds: [KindEntity] {
-        let baseKinds: [KindEntity]
+        // 1. 기본 대상(Base) 결정
+        let baseKinds = upkind.flatMap { allKinds[$0] } ?? allKinds.values.flatMap { $0 }
 
-        if let upkind {
-            // 특정 카테고리가 선택된 경우 해당 카테고리만 대상으로 함
-            baseKinds = allKinds[upkind, default: []]
-        } else {
-            // 카테고리가 없는 경우 전체를 대상으로 함
-            baseKinds = allKinds.values.flatMap { $0 }
-        }
+        // 2. 필터링 로직 통합
+        return baseKinds.filter { kind in
+            // 이미 선택된 항목은 무조건 제외
+            guard !selectedKinds.contains(kind) else { return false }
 
-        if isKeyboardFocused {
-            // 검색어가 있다면 대상 범위(baseKinds) 내에서 필터링합니다.
-
-            if searchText.isEmpty {
-                return baseKinds.filter { !selectedKinds.contains($0) }
-            } else {
-                return baseKinds
-                    .filter { kind in
-                        (kind.name.contains(searchText) || kind.id.contains(searchText))
-                    }
-                    .filter { !selectedKinds.contains($0) }
+            // 키보드 포커스 상태이고 검색어가 있다면 검색 조건 추가
+            if isKeyboardFocused && !searchText.isEmpty {
+                return kind.name.contains(searchText) || kind.id.contains(searchText)
             }
-        } else {
-            return baseKinds.filter { !selectedKinds.contains($0) }
+
+            // 그 외 상황(검색어 없음 또는 포커스 아님)은 모두 포함
+            return true
         }
     }
 
