@@ -13,7 +13,7 @@ import Observation
 @Observable
 final class NetworkMonitor: NetworkMonitoring {
     // @Published를 써야 SwiftUI가 변화를 감지함
-    var isConnected: Bool = false
+    var isConnected = true
 
     private let monitor = NWPathMonitor()
 
