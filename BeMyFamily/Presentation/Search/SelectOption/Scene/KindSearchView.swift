@@ -9,6 +9,7 @@ import SwiftUI
 struct KindSearchView: View {
 
     @State private var searchText: String = ""
+    @FocusState private var isKeyboardFocused
     @Binding var selectedKinds: Set<KindEntity>
     @State private var upkind: Upkind? = Upkind.dog
     @Environment(\.dismiss) var dismiss
@@ -32,42 +33,37 @@ struct KindSearchView: View {
             baseKinds = allKinds.values.flatMap { $0 }
         }
 
-        // 검색어가 비어있다면 필터링 없이 반환합니다.
-        guard !searchText.isEmpty else {
-            return baseKinds
-        }
+        if isKeyboardFocused {
+            // 검색어가 있다면 대상 범위(baseKinds) 내에서 필터링합니다.
 
-        // 검색어가 있다면 대상 범위(baseKinds) 내에서 필터링합니다.
-        return baseKinds.filter { kind in
-            kind.name.contains(searchText) || kind.id.contains(searchText)
+            if searchText.isEmpty {
+                return baseKinds.filter { !selectedKinds.contains($0) }
+            } else {
+                return baseKinds
+                    .filter { kind in
+                        (kind.name.contains(searchText) || kind.id.contains(searchText))
+                    }
+                    .filter { !selectedKinds.contains($0) }
+            }
+        } else {
+            return baseKinds.filter { !selectedKinds.contains($0) }
         }
     }
 
     var body: some View {
         VStack(spacing: 0) {
-
-            VStack(spacing: 20) {
-                // 축종 선택
-                HStack {
-                    ForEach(Upkind.allCases, id: \.self) {
-                        upkindChipView($0)
-                    }
-                }
-
-                // 헤더 및 검색바 영역 (고정)
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.secondary)
-                    TextField("코드 또는 이름 검색", text: $searchText)
-                        .font(.system(size: 15))
-                }
-                .padding(12)
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
-
+            // 헤더 및 검색바 영역 (고정)
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(.secondary)
+                TextField("차우차우, 골든 리트리버", text: $searchText)
+                    .focused($isKeyboardFocused)
+                    .font(.system(size: 15))
             }
+            .padding(12)
+            .background(Color(.systemGray6))
+            .cornerRadius(12)
             .padding(.horizontal)
-            .padding(.bottom, 16)
 
             // 2. 수직 그리드 영역 (스크롤 가능)
             ZStack {
@@ -85,13 +81,50 @@ struct KindSearchView: View {
                         }
                     }
                     .padding(.horizontal)
-                    .padding(.top, 8)
+                    .padding(.top, 32)
                 }
+                .scrollIndicators(.never)
 
-                if showCompleteButton {
-                    VStack {
+                VStack {
+                    // 축종 선택 뷰
+                    HStack {
+                        ForEach(Upkind.allCases, id: \.self) {
+                            upkindChipView($0)
+                        }
+
                         Spacer()
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 12)
+                    .onChange(of: isKeyboardFocused) { _, newValue in
+                        if newValue {
+                            upkind = nil
+                        } else {
+                            upkind = .dog
+                        }
+                    }
 
+                    Spacer()
+
+                    // 선택된 품종 뷰
+                    ScrollView(.horizontal) {
+                        HStack {
+                            if !selectedKinds.isEmpty {
+                                ForEach(Array(selectedKinds)) { kind in
+                                    KindChipView(kind: kind, isSelected: selectedKinds.contains(kind), action: {
+                                        if selectedKinds.contains(kind) {
+                                            selectedKinds.remove(kind)
+                                        }
+                                    })
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    .scrollIndicators(.never)
+
+                    // 완료 버튼
+                    if showCompleteButton {
                         completeButton()
                             .padding(.bottom)
                     }
@@ -150,7 +183,7 @@ struct UpkindChipView: View {
     @Environment(\.colorScheme) var colorScheme
 
     private var font: Font {
-        isSelected ? .system(size: 13, weight: .bold) : .system(size: 13, weight: .regular  )
+        isSelected ? .system(size: 16, weight: .bold) : .system(size: 16, weight: .regular)
     }
     private var color: Color {
         isSelected ? (colorScheme == .dark ? Color.white : Color.black) : .gray
@@ -161,11 +194,6 @@ struct UpkindChipView: View {
             Text(kind.text)
                 .font(font)
                 .foregroundStyle(color)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .padding(.horizontal, 4)
         }
         .buttonStyle(.glass)
     }
@@ -177,11 +205,14 @@ struct KindChipView: View {
     let action: () -> Void
 
     @Environment(\.colorScheme) var colorScheme
+    private var font: Font {
+        isSelected ? .system(size: 13, weight: .bold) : .system(size: 13, weight: .light)
+    }
 
     var body: some View {
         Button(action: action) {
             Text(kind.name)
-                .font(.system(size: 13, weight: .semibold))
+                .font(font)
                 .lineLimit(1) // 한 줄로 제한
                 .minimumScaleFactor(0.8) // 글자가 길면 자동 축소
                 .frame(maxWidth: .infinity) // 3열 그리드 칸을 꽉 채움
