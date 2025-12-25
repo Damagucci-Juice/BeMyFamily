@@ -15,7 +15,6 @@ struct KindSearchView: View {
 
     @State private var searchText: String = ""
     @State private var upkind: Upkind? = .dog
-    @FocusState private var isKeyboardFocused: Bool
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 12), count: 3)
 
@@ -25,7 +24,7 @@ struct KindSearchView: View {
 
         return baseKinds.filter { kind in
             let isNotSelected = !selectedKinds.contains(kind)
-            let matchesSearch = isKeyboardFocused && !searchText.isEmpty
+            let matchesSearch = !searchText.isEmpty
             ? (kind.name.contains(searchText) || kind.id.contains(searchText))
             : true
             return isNotSelected && matchesSearch
@@ -35,13 +34,11 @@ struct KindSearchView: View {
     // MARK: - Body
     var body: some View {
         VStack(spacing: 0) {
-            searchBar
-
             ZStack {
                 mainContentArea
 
                 VStack {
-                    filterCategoryBar
+//                    filterCategoryBar
 
                     Spacer()
 
@@ -51,35 +48,21 @@ struct KindSearchView: View {
                 }
             }
         }
-        .navigationTitle("품종 고르기")
+        .navigationTitle("") // 타이틀이 필요 없으면 ""로 설정
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: isKeyboardFocused) { _, focused in
-            withAnimation(.snappy) { upkind = focused ? nil : .dog }
+        .searchable(text: $searchText,
+                    placement: .navigationBarDrawer(displayMode: .always),
+                    prompt: "차우차우, 골든 리트리버")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                filterCategoryBar
+            }
         }
     }
 }
 
 // MARK: - Subviews
 private extension KindSearchView {
-
-    var searchBar: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(.secondary)
-            TextField("차우차우, 골든 리트리버", text: $searchText)
-                .focused($isKeyboardFocused)
-                .font(.system(size: 15))
-            if !searchText.isEmpty {
-                Button { searchText = "" } label: {
-                    Image(systemName: "xmark.circle.fill").foregroundColor(.gray)
-                }
-            }
-        }
-        .padding(12)
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
-        .padding()
-    }
 
     var filterCategoryBar: some View {
         HStack {
@@ -88,9 +71,7 @@ private extension KindSearchView {
                     self.upkind = (self.upkind == kind) ? nil : kind
                 }
             }
-            Spacer()
         }
-        .padding(.horizontal)
     }
 
     var mainContentArea: some View {
@@ -102,9 +83,9 @@ private extension KindSearchView {
                     }
                 }
             }
-            .padding(.top, 60)
         }
         .scrollIndicators(.never)
+        .padding(.horizontal, 16)
     }
 
     var selectionSummaryBar: some View {
