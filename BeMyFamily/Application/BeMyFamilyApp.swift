@@ -12,7 +12,7 @@ struct BeMyFamilyApp: App {
     var body: some Scene {
         WindowGroup {
             RootTabView()
-                .preferredColorScheme(.dark)
+                .preferredColorScheme(.light)
         }
     }
 }
