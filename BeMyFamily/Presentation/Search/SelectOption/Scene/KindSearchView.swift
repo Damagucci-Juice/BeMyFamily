@@ -38,8 +38,6 @@ struct KindSearchView: View {
                 mainContentArea
 
                 VStack {
-//                    filterCategoryBar
-
                     Spacer()
 
                     if !selectedKinds.isEmpty {
@@ -58,6 +56,7 @@ struct KindSearchView: View {
                 filterCategoryBar
             }
         }
+        .toolbar(.hidden, for: .tabBar)
     }
 }
 
