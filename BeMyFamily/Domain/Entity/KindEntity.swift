@@ -19,4 +19,8 @@ struct KindEntity: Hashable, Identifiable {
 
         return "\(id)"
     }
+
+    var limittedName: String {
+        name.limitText(to: 12)
+    }
 }

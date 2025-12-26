@@ -23,7 +23,7 @@ struct KindChipView: View {
                     .aspectRatio(1, contentMode: .fill)
                     .clipShape(RoundedRectangle(cornerRadius: 8.0))
 
-                Text(kind.name)
+                Text(kind.limittedName)
                     .font(.system(size: 16, weight: isSelected ? .bold : .bold))
                     .lineLimit(1)
             }
