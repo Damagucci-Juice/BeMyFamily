@@ -18,19 +18,14 @@ struct KindChipView: View {
             VStack(spacing: 4) {
                 Image(kind.image)
                     .resizable()
-                    .scaledToFit()
-                    .frame(width: 200, height: 200)
+                    .scaledToFill()
+                    .frame(minWidth: 0, maxWidth: .infinity, maxHeight: 150)
+                    .aspectRatio(1, contentMode: .fill)
+                    .clipShape(RoundedRectangle(cornerRadius: 8.0))
 
                 Text(kind.name)
                     .font(.system(size: 16, weight: isSelected ? .bold : .bold))
                     .lineLimit(1)
-//                    .minimumScaleFactor(0.8)
-//                    .padding(.vertical, 12)
-//                    .padding(.horizontal, 4)
-//                    .frame(maxWidth: .infinity) // 그리드 칸을 꽉 채우는 핵심
-//                    .background(backgroundView)
-//                    .foregroundColor(isSelected ? .white : .primary)
-//                    .shadow(color: isSelected ? Color.blue.opacity(0.3) : .clear, radius: 4, x: 0, y: 2)
             }
         }
         .buttonStyle(.plain)
