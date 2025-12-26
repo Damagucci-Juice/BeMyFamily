@@ -10,4 +10,8 @@ import Foundation
 struct KindEntity: Hashable, Identifiable {
     let id: String
     let name: String
+
+    var image: String {
+        "\(id)"
+    }
 }

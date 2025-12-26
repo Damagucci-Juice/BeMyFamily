@@ -138,7 +138,7 @@ struct Mapper {
     }
 
     static func sigunguDto2Entity(_ dto: SigunguDTO) -> SigunguEntity {
-        return SigunguEntity(id: dto.id, name: dto.name , sidoCode: dto.sidoId)
+        return SigunguEntity(id: dto.id, name: dto.name, sidoCode: dto.sidoId)
     }
 
     static func sigunguEntity2Dto(_ entity: SigunguEntity) -> SigunguDTO {
@@ -146,11 +146,20 @@ struct Mapper {
     }
 
     static func kindDto2Entity(_ dto: KindDTO) -> KindEntity {
-        return KindEntity(id: dto.id, name: dto.name)
+        return KindEntity(
+            id: String(Int(dto.id) ?? 0),
+            name: dto.name
+        )
     }
 
     static func kindEntity2Dto(_ entity: KindEntity) -> KindDTO {
-        return KindDTO(id: entity.id, name: entity.name)
+        let intId = Int(entity.id) ?? 0
+        let paddedId = String(format: "%06d", intId)
+
+        return KindDTO(
+            id: paddedId,
+            name: entity.name
+        )
     }
 
 }
