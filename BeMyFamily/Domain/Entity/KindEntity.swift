@@ -10,6 +10,7 @@ import Foundation
 struct KindEntity: Hashable, Identifiable {
     let id: String
     let name: String
+    let upKind: Upkind
 
     var image: String {
         "\(id)"

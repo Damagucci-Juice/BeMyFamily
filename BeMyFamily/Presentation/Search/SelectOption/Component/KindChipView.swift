@@ -44,7 +44,9 @@ struct KindChipView: View {
 }
 
 #Preview {
-    KindChipView(kind: .init(id: "35", name: "차우차우"),
+    KindChipView(kind: .init(id: "35",
+                             name: "차우차우",
+                             upKind: .dog),
                  isSelected: false,
                  action: {})
 }

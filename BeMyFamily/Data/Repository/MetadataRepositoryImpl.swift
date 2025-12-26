@@ -99,12 +99,14 @@ private extension MetadataRepositoryImpl {
 
     func fetchKind(_ upKindId: String) async throws -> [KindEntity] {
         let fetched = try await service.search(.kind(upkind: upKindId))
-        return try setKind(fetched)
+        return try setKind(fetched, upKindId)
     }
 
-    func setKind(_ data: Data) throws -> [KindEntity] {
+    func setKind(_ data: Data, _ upKindId: String) throws -> [KindEntity] {
         let apiResponse: APIResponse<KindDTO> = try JSONDecoder()
             .decode(APIResponse<KindDTO>.self, from: data)
-        return apiResponse.items.map(Mapper.kindDto2Entity)
+        return apiResponse.items.map { dto in
+            Mapper.kindDto2Entity(dto, upKindId)
+        }
     }
 }

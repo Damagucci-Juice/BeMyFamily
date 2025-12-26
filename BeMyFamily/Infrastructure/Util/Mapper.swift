@@ -145,16 +145,33 @@ struct Mapper {
         return SigunguDTO(id: entity.id, name: entity.name, sidoId: entity.sidoCode)
     }
 
-    static func kindDto2Entity(_ dto: KindDTO) -> KindEntity {
+    static func kindDto2Entity(_ dto: KindDTO, _ upKindId: String) -> KindEntity {
+        let upKind = Upkind(rawValue: upKindId) ?? .other
         return KindEntity(
             id: String(Int(dto.id) ?? 0),
-            name: dto.name
+            name: dto.name,
+            upKind: upKind
         )
     }
 
     static func kindEntity2Dto(_ entity: KindEntity) -> KindDTO {
         let intId = Int(entity.id) ?? 0
-        let paddedId = String(format: "%06d", intId)
+        var paddedId = String(format: "%06d", intId)
+
+        // 특이 케이스
+        /// 강아지: "00216", "215"
+        /// 고양이: "000216", "00214"
+        if entity.upKind == .dog {
+            if intId == 216 {
+                paddedId = "00216"
+            } else if intId == 215 {
+                paddedId = "215"
+            }
+        } else if entity.upKind == .cat {
+            if intId == 214 {
+                paddedId = "00214"
+            }
+        }
 
         return KindDTO(
             id: paddedId,
