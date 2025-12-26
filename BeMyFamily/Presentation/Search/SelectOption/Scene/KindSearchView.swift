@@ -16,7 +16,7 @@ struct KindSearchView: View {
     @State private var searchText: String = ""
     @State private var upkind: Upkind? = .dog
 
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 12), count: 3)
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 12), count: 2)
 
     // MARK: - Computed Properties
     private var filteredKinds: [KindEntity] {

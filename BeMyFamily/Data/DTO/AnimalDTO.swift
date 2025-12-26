@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Foundation
 
 struct AnimalDTO: Codable, Equatable, Identifiable {
     var id: String { noticeNo }

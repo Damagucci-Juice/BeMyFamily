@@ -120,7 +120,7 @@ final class FilterViewModel {
                 beginDate: beginDate,
                 endDate: endDate,
                 upkind: upkind?.id,
-                kind: kind.id,
+                kind: Mapper.kindEntity2Dto(kind).id,
                 sido: sido?.id,
                 sigungu: sigungu?.id,
                 shelterNumber: shelter?.id,

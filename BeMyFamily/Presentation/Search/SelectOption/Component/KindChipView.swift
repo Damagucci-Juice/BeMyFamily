@@ -15,16 +15,18 @@ struct KindChipView: View {
 
     var body: some View {
         Button(action: action) {
-            Text(kind.name)
-                .font(.system(size: 13, weight: isSelected ? .bold : .light))
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .padding(.vertical, 12)
-                .padding(.horizontal, 4)
-                .frame(maxWidth: .infinity) // 그리드 칸을 꽉 채우는 핵심
-                .background(backgroundView)
-                .foregroundColor(isSelected ? .white : .primary)
-                .shadow(color: isSelected ? Color.blue.opacity(0.3) : .clear, radius: 4, x: 0, y: 2)
+            VStack(spacing: 4) {
+                Image(kind.image)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(minWidth: 0, maxWidth: .infinity, maxHeight: 150)
+                    .aspectRatio(1, contentMode: .fill)
+                    .clipShape(RoundedRectangle(cornerRadius: 8.0))
+
+                Text(kind.name)
+                    .font(.system(size: 16, weight: isSelected ? .bold : .bold))
+                    .lineLimit(1)
+            }
         }
         .buttonStyle(.plain)
     }
@@ -34,4 +36,12 @@ struct KindChipView: View {
         RoundedRectangle(cornerRadius: 12)
             .fill(isSelected ? (colorScheme == .dark ? Color.blue : Color.black) : Color(.systemGray6))
     }
+}
+
+#Preview {
+    KindChipView(kind: .init(id: "35",
+                             name: "차우차우",
+                             upKind: .dog),
+                 isSelected: false,
+                 action: {})
 }

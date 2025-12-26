@@ -138,19 +138,45 @@ struct Mapper {
     }
 
     static func sigunguDto2Entity(_ dto: SigunguDTO) -> SigunguEntity {
-        return SigunguEntity(id: dto.id, name: dto.name , sidoCode: dto.sidoId)
+        return SigunguEntity(id: dto.id, name: dto.name, sidoCode: dto.sidoId)
     }
 
     static func sigunguEntity2Dto(_ entity: SigunguEntity) -> SigunguDTO {
         return SigunguDTO(id: entity.id, name: entity.name, sidoId: entity.sidoCode)
     }
 
-    static func kindDto2Entity(_ dto: KindDTO) -> KindEntity {
-        return KindEntity(id: dto.id, name: dto.name)
+    static func kindDto2Entity(_ dto: KindDTO, _ upKindId: String) -> KindEntity {
+        let upKind = Upkind(rawValue: upKindId) ?? .other
+        return KindEntity(
+            id: String(Int(dto.id) ?? 0),
+            name: dto.name,
+            upKind: upKind
+        )
     }
 
     static func kindEntity2Dto(_ entity: KindEntity) -> KindDTO {
-        return KindDTO(id: entity.id, name: entity.name)
+        let intId = Int(entity.id) ?? 0
+        var paddedId = String(format: "%06d", intId)
+
+        // 특이 케이스
+        /// 강아지: "00216", "215"
+        /// 고양이: "000216", "00214"
+        if entity.upKind == .dog {
+            if intId == 216 {
+                paddedId = "00216"
+            } else if intId == 215 {
+                paddedId = "215"
+            }
+        } else if entity.upKind == .cat {
+            if intId == 214 {
+                paddedId = "00214"
+            }
+        }
+
+        return KindDTO(
+            id: paddedId,
+            name: entity.name
+        )
     }
 
 }
