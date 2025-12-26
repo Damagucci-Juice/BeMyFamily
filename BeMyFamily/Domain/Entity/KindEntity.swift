@@ -13,6 +13,10 @@ struct KindEntity: Hashable, Identifiable {
     let upKind: Upkind
 
     var image: String {
-        "\(id)"
+        if id == "216" && upKind == .cat {
+            return id + "_cat"
+        }
+
+        return "\(id)"
     }
 }
