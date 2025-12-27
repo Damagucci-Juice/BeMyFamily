@@ -20,6 +20,7 @@ struct FeedView: View {
             ScrollView {
                 feedList
             }
+            .scrollIndicators(.never)
 
             if viewModel.isLoading {
                 ProgressView()
