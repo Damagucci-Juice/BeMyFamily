@@ -9,7 +9,7 @@ import UIKit
 
 struct UIConstants {
     struct Frame {
-        static let heartHeight = 28.0
+        static let heartHeight = 16.0
         static let heartBorderHeight = 32.0
         static let shareHeight = 32.0
         static let feedImageHeight = 500.0

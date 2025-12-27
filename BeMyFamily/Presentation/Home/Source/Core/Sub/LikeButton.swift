@@ -14,20 +14,30 @@ struct FavoriteButtonView: View {
         Button {
             viewModel.heartButtonTapped()
         } label: {
-            Image(systemName: UIConstants.Image.heart)
+            ZStack {
+                Image(systemName: viewModel.isFavorite ?
+                      UIConstants.Image.heart :
+                        UIConstants.Image.heartWithStroke)
                 .resizable()
                 .scaledToFill()
-                .foregroundStyle(viewModel.isFavorite ? .red.opacity(UIConstants.Opacity.border) : .secondary)
+                .foregroundStyle(viewModel.isFavorite ?
+                    .red.opacity(UIConstants.Opacity.border) :
+                        .secondary)
                 .frame(width: UIConstants.Frame.heartHeight,
                        height: UIConstants.Frame.heartHeight)
-                .overlay {
-                    Image(systemName: UIConstants.Image.heartWithStroke)
-                        .resizable()
-                        .scaledToFill()
-                        .foregroundStyle(viewModel.isFavorite ? .pink : .white.opacity(UIConstants.Opacity.border))
-                        .frame(width: UIConstants.Frame.heartBorderHeight,
-                               height: UIConstants.Frame.heartBorderHeight)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)   
+                .background {
+                    // 캡슐 배경 추가
+                    Capsule()
+                        .fill(.clear)
                 }
+                .overlay {
+                    // 캡슐 테두리
+                    Capsule()
+                        .stroke(Color.secondary.opacity(0.4), lineWidth: 0.8)
+                }
+            }
         }
     }
 }
