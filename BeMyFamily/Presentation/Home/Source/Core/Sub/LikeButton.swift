@@ -25,18 +25,7 @@ struct FavoriteButtonView: View {
                         .secondary)
                 .frame(width: UIConstants.Frame.heartHeight,
                        height: UIConstants.Frame.heartHeight)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)   
-                .background {
-                    // 캡슐 배경 추가
-                    Capsule()
-                        .fill(.clear)
-                }
-                .overlay {
-                    // 캡슐 테두리
-                    Capsule()
-                        .stroke(Color.secondary.opacity(0.4), lineWidth: 0.8)
-                }
+                .capsuleBorder()
             }
         }
     }

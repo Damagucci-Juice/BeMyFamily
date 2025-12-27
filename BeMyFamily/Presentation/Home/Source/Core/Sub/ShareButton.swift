@@ -12,14 +12,18 @@ struct ShareButton: View {
     var hasImage: Bool
 
     var body: some View {
-        ShareLink(item: renderedImage ?? Image(.bemyfamilyIconTrans),
-                  preview: SharePreview(Text(UIConstants.App.shareMessage),
-                                        image: Image(.bemyfamilyIconTrans)))
-        .labelStyle(.iconOnly)
-        .imageScale(.large)
-        .symbolVariant(.fill)
-        .tint(.secondary)
-        .disabled(hasImage)
+        ShareLink(
+            item: renderedImage ?? Image(.bemyfamilyIconTrans),
+            preview: SharePreview(Text(UIConstants.App.shareMessage),
+                                  image: Image(.bemyfamilyIconTrans))
+        ) {
+            Image(systemName: "paperplane")
+                .resizable()
+                .foregroundColor(.gray)
+                .frame(width: UIConstants.Frame.heartHeight,
+                       height: UIConstants.Frame.heartHeight)
+                .capsuleBorder()
+        }
     }
 }
 
