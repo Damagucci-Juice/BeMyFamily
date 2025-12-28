@@ -44,7 +44,8 @@ struct RootTabView: View {
             handleDeepLink(newID)
         }
         .sheet(item: $animalToDisplay) { animal in
-            AnimalDetailSheet(animal: animal)
+            AnimalDetailView(animal)
+                .environment(diContainer)
         }
     }
 

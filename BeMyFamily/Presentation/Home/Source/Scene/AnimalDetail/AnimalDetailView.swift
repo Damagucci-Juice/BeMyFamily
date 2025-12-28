@@ -14,7 +14,7 @@ struct AnimalDetailView: View {
     @Environment(DIContainer.self) var diContainer: DIContainer
 
     // MARK: - State
-    @State private var viewModel = AnimalDetailViewModel()
+    @State private var viewModel: AnimalDetailViewModel
     @State private var loadedImage: Image?
     @State private var renderedImage: Image?
 

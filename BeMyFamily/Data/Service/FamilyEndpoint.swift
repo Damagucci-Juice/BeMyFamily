@@ -71,7 +71,7 @@ extension FamilyEndpoint {
             }
             dict.updateValue("\(page)", forKey: "pageNo")
         case .anAnimal(let id):
-            dict.updateValue(id, forKey: "notice_no")
+            dict.updateValue(id, forKey: "desertion_no")
         }
         return dict
     }

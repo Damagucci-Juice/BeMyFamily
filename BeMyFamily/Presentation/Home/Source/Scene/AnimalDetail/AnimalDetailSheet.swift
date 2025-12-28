@@ -245,9 +245,8 @@ private extension AnimalDetailSheet {
 
     func shareAnimal() {
         let baseURL = "https://damagucci-juice.github.io/BeMyFamily"
-//        let universalLink = "\(baseURL)/detail?id=\(animal.desertionNo)"
-        guard let url = URL(string: baseURL) else { return }
-
+        let universalLink = "\(baseURL)/detail?id=\(animal.desertionNo)"
+        guard let url = URL(string: universalLink) else { return }
 
         let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
 
