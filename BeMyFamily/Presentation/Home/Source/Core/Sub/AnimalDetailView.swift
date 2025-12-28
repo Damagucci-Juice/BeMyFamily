@@ -34,10 +34,14 @@ struct AnimalDetailView: View {
 
             GeometryReader { proxy in
                 imageSection
+                    // 1. 시각적 효과 먼저 적용
                     .scaleEffect(scale)
                     .offset(x: offset.width + dragOffset.width, y: offset.height + dragOffset.height)
+                    // 2. 전체 프레임 잡기
                     .frame(width: proxy.size.width, height: proxy.size.height)
-                    .gesture(combinedGesture(screenSize: proxy.size))
+                    // 3. 제스처를 각각 등록 (순서대로 인식됨)
+                    .gesture(doubleTapGesture(screenSize: proxy.size)) // 더블 탭
+                    .gesture(combinedGesture(screenSize: proxy.size))  // 핀치 & 드래그
                     .drawingGroup()
             }
             .ignoresSafeArea()
@@ -139,17 +143,26 @@ struct AnimalDetailView: View {
             }
     }
 
-    // MARK: - 더블 탭 제스처 (초기화 로직 보강)
-    private var doubleTapGesture: some Gesture {
-        TapGesture(count: 2)
-            .onEnded {
+    private func doubleTapGesture(screenSize: CGSize) -> some Gesture {
+        SpatialTapGesture(count: 2)
+            .onEnded { value in
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                    if scale > 1.0 {
-                        scale = 1.0
-                        offset = .zero // 드래그 위치 초기화
-                        isZooming = false
+                    if scale > 1.1 {
+                        // 이미 확대되어 있다면 초기화
+                        resetZoom()
                     } else {
+                        // 1. 새로운 스케일 설정
                         scale = 3.0
+
+                        // 2. 터치한 지점을 중앙으로 옮기기 위한 오프셋 계산
+                        // 터치 지점(value.location)에서 화면 중앙(screenSize/2)을 뺀 거리의 '반대 방향'으로 이동
+                        let targetX = (screenSize.width / 2 - value.location.x) * 2
+                        let targetY = (screenSize.height / 2 - value.location.y) * 2
+
+                        offset = CGSize(width: targetX, height: targetY)
+
+                        // 3. 이동 후 경계값 밖으로 나가지 않게 보정
+                        updateOffsetInRange(screenSize: screenSize)
                         isZooming = true
                     }
                 }
@@ -234,15 +247,20 @@ struct AnimalDetailView: View {
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                // ⚠️ 핵심: 이미지의 프레임을 '화면 전체'로 선언합니다.
-                // 이렇게 해야 확대했을 때 중앙 틀에 갇히지 않고 화면 끝까지 나갑니다.
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                    .onAppear { self.loadedImage = image }
+                    .frame(width: UIScreen.main.bounds.width,
+                           height: UIScreen.main.bounds.height)
+                    .onAppear {
+                        self.loadedImage = image
+                        // 실제 이미지의 원본 사이즈를 추출하여 비율 계산에 활용
+                        if let uiImage = try? state.result?.get().image {
+                            self.imageSize = uiImage.size
+                        }
+                    }
+            } else {
+                Rectangle().fill(Color.black) // 로딩 중에도 검은 배경 유지
             }
         }
-        // 여기서 .clipped() 가 있다면 반드시 제거하세요!
     }
-
     @ViewBuilder
     private var briefInfoSection: some View {
         VStack {
