@@ -175,15 +175,21 @@ private extension AnimalDetailSheet {
 
             if canShowAdoptionInfo {
                 Menu {
-                    Button(action: { makePhoneCall(phoneNumber: animal.careTel) }) {
+                    Button {
+                        makePhoneCall(phoneNumber: animal.careTel)
+                    } label: {
                         Label("전화 문의하기", systemImage: "phone")
                     }
 
-                    Button(action: { openMapApp(type: .naver, address: animal.careAddress) }) {
+                    Button {
+                        openMapApp(type: .naver, address: animal.careAddress)
+                    } label: {
                         Label("네이버 지도로 보기", systemImage: "map")
                     }
 
-                    Button(action: { openMapApp(type: .kakao, address: animal.careAddress) }) {
+                    Button {
+                        openMapApp(type: .kakao, address: animal.careAddress)
+                    } label: {
                         Label("카카오맵으로 보기", systemImage: "mappin.and.ellipse")
                     }
                 } label: {
@@ -196,7 +202,6 @@ private extension AnimalDetailSheet {
                         .foregroundColor(.white)
                 }
             }
-
         }
         .padding(.top, 10)
         .padding(.bottom, 30)
@@ -240,23 +245,11 @@ private extension AnimalDetailSheet {
 
     func shareAnimal() {
         let baseURL = "https://damagucci-juice.github.io/BeMyFamily"
+//        let universalLink = "\(baseURL)/detail?id=\(animal.desertionNo)"
+        guard let url = URL(string: baseURL) else { return }
 
-        let universalLink = "\(baseURL)/detail?id=\(animal.desertionNo)"
 
-        guard let url = URL(string: universalLink) else { return }
-
-        let message = """
-            [BeMyFamily] 가족을 기다리는 유기동물 친구가 있어요!
-            
-            🐶 종류: \(animal.kind.name)
-            🆔 공고번호: \(animal.noticeNumber)
-            📍 발견장소: \(animal.happenPlace)
-            
-            이 아이의 자세한 정보를 확인해보세요:
-            \(universalLink)
-            """
-
-        let activityVC = UIActivityViewController(activityItems: [message, url], applicationActivities: nil)
+        let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
 
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController else { return }
@@ -340,4 +333,3 @@ private struct IconLabelRow: View {
         }
     }
 }
-

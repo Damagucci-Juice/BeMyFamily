@@ -5,6 +5,7 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:damagucci-juice.github.io</string>
+		<string>webcredentials:example.com</string>
 	</array>
 </dict>
 </plist>
