@@ -2,7 +2,6 @@ import SwiftUI
 
 struct AnimalDetailSheet: View {
     let animal: AnimalEntity
-    @State private var isShowingActionSheet = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -23,21 +22,6 @@ struct AnimalDetailSheet: View {
         .presentationContentInteraction(.scrolls)
         .presentationDragIndicator(.visible)
         .presentationBackground(.ultraThinMaterial)
-        .confirmationDialog("입양 문의", isPresented: $isShowingActionSheet, titleVisibility: .visible) {
-            Button("전화 문의하기") {
-                makePhoneCall(phoneNumber: animal.careTel)
-            }
-
-            Button("네이버 지도로 주소 보기") {
-                openMapApp(type: .naver, address: animal.careAddress)
-            }
-
-            Button("카카오맵으로 주소 보기") {
-                openMapApp(type: .kakao, address: animal.careAddress)
-            }
-
-            Button("취소", role: .cancel) {}
-        }
     }
 }
 
@@ -172,7 +156,7 @@ private extension AnimalDetailSheet {
         .foregroundColor(.white)
     }
 
-    
+
 }
 
 private extension AnimalDetailSheet {
@@ -182,9 +166,29 @@ private extension AnimalDetailSheet {
             secondaryButton(title: "공유하기") {
                 // 공유 액션
             }
-            primaryButton(title: "입양 문의") {
-                isShowingActionSheet = true
+
+            Menu {
+                Button(action: { makePhoneCall(phoneNumber: animal.careTel) }) {
+                    Label("전화 문의하기", systemImage: "phone")
+                }
+
+                Button(action: { openMapApp(type: .naver, address: animal.careAddress) }) {
+                    Label("네이버 지도로 보기", systemImage: "map")
+                }
+
+                Button(action: { openMapApp(type: .kakao, address: animal.careAddress) }) {
+                    Label("카카오맵으로 보기", systemImage: "mappin.and.ellipse")
+                }
+            } label: {
+                // 기존 primaryButton 스타일 유지
+                Text("입양 문의")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color(white: 0.2))
+                    .cornerRadius(12)
+                    .foregroundColor(.white)
             }
+
         }
         .padding(.top, 10)
         .padding(.bottom, 30)
