@@ -5,7 +5,7 @@
         "appIDs": [ "D7F6ZDDCV9.com.gucci.BeMyFamily" ],
         "components": [
           {
-            "/": "/detail*",
+            "/": "/BeMyFamily/detail*",
             "comment": "상세 페이지 연결 경로 설정"
           }
         ]
