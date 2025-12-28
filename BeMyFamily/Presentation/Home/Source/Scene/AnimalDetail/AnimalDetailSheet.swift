@@ -235,6 +235,44 @@ private extension AnimalDetailSheet {
             UIApplication.shared.open(webUrl)
         }
     }
+
+    func shareAnimal() {
+        let baseURL = "https://damagucci-juice.github.io/BeMyFamily"
+
+        let universalLink = "\(baseURL)/detail?id=\(animal.desertionNo)"
+
+        guard let url = URL(string: universalLink) else { return }
+
+        let message = """
+            [BeMyFamily] 가족을 기다리는 유기동물 친구가 있어요!
+            
+            🐶 종류: \(animal.kind.name)
+            🆔 공고번호: \(animal.noticeNumber)
+            📍 발견장소: \(animal.happenPlace)
+            
+            이 아이의 자세한 정보를 확인해보세요:
+            \(universalLink)
+            """
+
+        let activityVC = UIActivityViewController(activityItems: [message, url], applicationActivities: nil)
+
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController else { return }
+
+        var topVC = rootVC
+        while let presentedVC = topVC.presentedViewController {
+            topVC = presentedVC
+        }
+
+        // iPad 크래시 방지
+        if let popover = activityVC.popoverPresentationController {
+            popover.sourceView = topVC.view
+            popover.sourceRect = CGRect(x: UIScreen.main.bounds.midX, y: UIScreen.main.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+        }
+
+        topVC.present(activityVC, animated: true)
+    }
 }
 
 private struct InfoCard: View {

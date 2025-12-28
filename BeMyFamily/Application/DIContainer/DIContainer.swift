@@ -60,6 +60,11 @@ final class DIContainer {
                                 animalRepository: animalRepo,
                                 favoriteRepository: favoriteRepo
                               ))
+
+            registerSingleton(FetchAnAnimalUseCase.self, instance: FetchAnAnimalUseCase(
+                animalRepository: animalRepo,
+                favoriteRepository: favoriteRepo
+            ))
         }
 
         // MARK: - ViewModels(Factory)

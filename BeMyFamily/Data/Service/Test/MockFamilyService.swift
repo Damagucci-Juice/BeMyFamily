@@ -27,8 +27,11 @@ final class MockFamilyService: SearchService {
             fileName = NetworkConstants.TestFile.kind
         case .shelter:
             fileName = isEmptyResultTest ? NetworkConstants.TestFile.emptyShelter : NetworkConstants.TestFile.shelter
-        case .animal:
+        case .animals:
             fileName = isEmptyResultTest ? NetworkConstants.TestFile.emptyAnimal : NetworkConstants.TestFile.animal
+        // TODO: - 목데이터 업
+        case .anAnimal(_):
+            fileName = ""
         }
 
         return loadData(fileName)
