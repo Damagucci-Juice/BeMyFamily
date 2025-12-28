@@ -2,7 +2,7 @@
   "applinks": {
     "details": [
       {
-        "appIDs": [ "6499305197.com.gucci.BeMyFamily" ],
+        "appIDs": [ "D7F6ZDDCV9.com.gucci.BeMyFamily" ],
         "components": [
           {
             "/": "/BeMyFamily/detail*",
@@ -17,6 +17,6 @@
     ]
   },
    "webcredentials": {
-      "apps": [ "6499305197.com.gucci.BeMyFamily" ]
+      "apps": [ "D7F6ZDDCV9.com.gucci.BeMyFamily" ]
    }
 }
