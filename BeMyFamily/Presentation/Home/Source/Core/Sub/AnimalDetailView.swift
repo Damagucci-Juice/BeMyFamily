@@ -15,10 +15,13 @@ struct AnimalDetailView: View {
     @State private var loadedImage: Image?
     @State private var renderedImage: Image?
 
-    // MARK: - 줌 관련 상태 프로퍼티
+    // MARK: - 줌 및 이동 관련 상태 프로퍼티
     @State private var scale: CGFloat = 1.0
     @State private var lastScale: CGFloat = 1.0
+    @State private var offset: CGSize = .zero        // 현재 이동 위치
+    @State private var lastOffset: CGSize = .zero    // 직전 이동 위치
     @State private var isZooming: Bool = false
+    @GestureState private var dragOffset: CGSize = .zero
 
     let animal: AnimalEntity
     private var hasImage: Bool { loadedImage != nil ? false : true }
@@ -28,20 +31,116 @@ struct AnimalDetailView: View {
             Color.black.ignoresSafeArea()
 
             imageSection
-                .scaleEffect(scale) // 이미지 확대 적용
-                .gesture(magnificationGesture) // 제스처 연결
+                .offset(x: offset.width + dragOffset.width, y: offset.height + dragOffset.height)
+                .scaleEffect(scale)
+                // MARK: 렌더링 최적화 - 복잡한 뷰 계층을 하나의 비트맵으로 렌더링하여 성능을 끌어올립니다.
+                .drawingGroup()
+                // 개별 제스처 대신 결합된 제스처 하나만 사용
+                .gesture(combinedGesture)
 
-            // MARK: - 줌 상태가 아닐 때만 노출
             if !isZooming {
                 bottomGradientLayer
-                    .transition(.opacity.animation(.easeInOut)) // 부드러운 전환 효과
-
+                    .transition(.opacity.animation(.easeInOut))
                 briefInfoSection
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .toolbar(.hidden, for: .tabBar)
         .toolbar(isZooming ? .hidden : .visible, for: .navigationBar)
+    }
+
+    // 중복 로직 분리
+    private func handleZoomEnded() {
+        if scale <= 1.05 {
+            withAnimation(.spring()) {
+                scale = 1.0
+                offset = .zero
+                isZooming = false
+            }
+        }
+    }
+
+    private var combinedGesture: some Gesture {
+        // 줌과 드래그를 동시에 인식하도록 결합
+        MagnificationGesture()
+            .onChanged { value in
+                let delta = value / lastScale
+                lastScale = value
+                scale = max(1.0, scale * delta)
+                if scale > 1.01 { isZooming = true }
+            }
+            .onEnded { _ in
+                lastScale = 1.0
+                handleZoomEnded()
+            }
+        .simultaneously(with: DragGesture(minimumDistance: 0) // 반응성 향상을 위해 거리 0 설정
+            .updating($dragOffset) { value, state, _ in
+                guard isZooming else { return }
+                state = value.translation
+            }
+            .onEnded { value in
+                guard isZooming else { return }
+                offset.width += value.translation.width
+                offset.height += value.translation.height
+            })
+    }
+
+    // MARK: - 최적화된 드래그 제스처
+    private var dragGesture: some Gesture {
+        DragGesture()
+        // updating을 사용하면 시스템이 하드웨어 가속을 이용해 실시간 위치를 뷰에 직접 전달합니다.
+            .updating($dragOffset) { value, state, _ in
+                guard isZooming else { return }
+                state = value.translation
+            }
+            .onEnded { value in
+                guard isZooming else { return }
+                // 드래그가 끝나면 최종 위치를 누적 저장합니다.
+                offset.width += value.translation.width
+                offset.height += value.translation.height
+            }
+    }
+
+    // MARK: - 더블 탭 제스처 (초기화 로직 보강)
+    private var doubleTapGesture: some Gesture {
+        TapGesture(count: 2)
+            .onEnded {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                    if scale > 1.0 {
+                        scale = 1.0
+                        offset = .zero // 드래그 위치 초기화
+                        isZooming = false
+                    } else {
+                        scale = 3.0
+                        isZooming = true
+                    }
+                }
+            }
+    }
+
+    // 핀치 줌 제스처 (기존 코드 보강)
+    private var zoomGesture: some Gesture {
+        MagnificationGesture()
+            .onChanged { value in
+                let delta = value / lastScale
+                lastScale = value
+                scale = max(1.0, scale * delta)
+
+                if scale > 1.01 {
+                    isZooming = true
+                }
+            }
+            .onEnded { _ in
+                lastScale = 1.0
+                if scale <= 1.05 {
+                    withAnimation(.spring()) {
+                        scale = 1.0
+                        offset = .zero
+                        lastOffset = .zero
+                        isZooming = false
+                    }
+                }
+            }
     }
 
     // MARK: - Magnification Gesture 구현
@@ -89,7 +188,6 @@ struct AnimalDetailView: View {
         .allowsHitTesting(false) // 이 레이어가 터치 이벤트를 방해하지 않도록 설정
     }
 
-    // 가로 세로 풍경에 대해서 대응
     @MainActor
     @ViewBuilder
     private var imageSection: some View {
@@ -98,7 +196,10 @@ struct AnimalDetailView: View {
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: UIScreen.main.bounds.width, maxHeight: UIScreen.main.bounds.height)
+                    .offset(x: offset.width + dragOffset.width, y: offset.height + dragOffset.height)
+                    .scaleEffect(scale)
+                    .drawingGroup() // 성능 최적화
                     .onAppear { self.loadedImage = image }
             }
         }
