@@ -274,25 +274,6 @@ private struct BottomOverlayView: View {
     }
 }
 
-// MARK: - Animal Detail Sheet
-private struct AnimalDetailSheet: View {
-    let animal: AnimalEntity
-
-    var body: some View {
-        VStack {
-            Text(animal.kind.name)
-                .font(.animalName)
-                .bold()
-                .foregroundStyle(.primary)
-            Spacer()
-        }
-        .padding()
-        .presentationDetents([.fraction(0.75), .large])
-        .presentationBackground(.ultraThinMaterial)
-        .presentationBackgroundInteraction(.enabled(upThrough: .fraction(0.75)))
-        .presentationDragIndicator(.visible)
-    }
-}
 
 // MARK: - Sharable Conformance
 extension AnimalDetailView: @MainActor Sharable { }
