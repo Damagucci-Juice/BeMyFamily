@@ -296,7 +296,10 @@ private struct BottomOverlayView: View {
                 WhiteFavoriteButtonView(viewModel: favoriteVM)
                     .padding(.trailing, 16)
             }
-            WhiteShareButton(renderedImage: $renderedImage, hasImage: hasImage)
+            
+            WhiteShareButton(renderedImage: $renderedImage,
+                             hasImage: hasImage,
+                             desertionNo: animal.desertionNo)
         }
         .padding(.vertical)
     }

@@ -71,7 +71,9 @@ struct FeedItemView: View {
                     BlackFavoriteButtonView(viewModel: favoriteViweModel)
                 }
 
-                BlackShareButton(renderedImage: $renderedImage, hasImage: hasImage)
+                BlackShareButton(renderedImage: $renderedImage,
+                                 hasImage: hasImage,
+                                 desertionNo: animal.desertionNo)
             }
         }
         .padding(.horizontal, UIConstants.Padding.feedImemViewHorizontal)

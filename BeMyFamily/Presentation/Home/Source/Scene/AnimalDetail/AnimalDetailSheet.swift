@@ -170,7 +170,7 @@ private extension AnimalDetailSheet {
     var actionButtonsSection: some View {
         HStack(spacing: 12) {
             secondaryButton(title: "공유하기") {
-                shareAnimal()
+                DIContainer.shared.shareAnimal(animal.desertionNo)
             }
 
             if canShowAdoptionInfo {
@@ -243,30 +243,30 @@ private extension AnimalDetailSheet {
         }
     }
 
-    func shareAnimal() {
-        let baseURL = "https://damagucci-juice.github.io/BeMyFamily"
-        let universalLink = "\(baseURL)/detail?id=\(animal.desertionNo)"
-        guard let url = URL(string: universalLink) else { return }
-
-        let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController else { return }
-
-        var topVC = rootVC
-        while let presentedVC = topVC.presentedViewController {
-            topVC = presentedVC
-        }
-
-        // iPad 크래시 방지
-        if let popover = activityVC.popoverPresentationController {
-            popover.sourceView = topVC.view
-            popover.sourceRect = CGRect(x: UIScreen.main.bounds.midX, y: UIScreen.main.bounds.midY, width: 0, height: 0)
-            popover.permittedArrowDirections = []
-        }
-
-        topVC.present(activityVC, animated: true)
-    }
+//    func shareAnimal(_ desertionNo: String) {
+//        let baseURL = "https://damagucci-juice.github.io/BeMyFamily"
+//        let universalLink = "\(baseURL)/detail?id=\(desertionNo)"
+//        guard let url = URL(string: universalLink) else { return }
+//
+//        let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+//
+//        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+//              let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController else { return }
+//
+//        var topVC = rootVC
+//        while let presentedVC = topVC.presentedViewController {
+//            topVC = presentedVC
+//        }
+//
+//        // iPad 크래시 방지
+//        if let popover = activityVC.popoverPresentationController {
+//            popover.sourceView = topVC.view
+//            popover.sourceRect = CGRect(x: UIScreen.main.bounds.midX, y: UIScreen.main.bounds.midY, width: 0, height: 0)
+//            popover.permittedArrowDirections = []
+//        }
+//
+//        topVC.present(activityVC, animated: true)
+//    }
 }
 
 private struct InfoCard: View {

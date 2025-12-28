@@ -12,13 +12,12 @@ import SwiftUI
 struct WhiteShareButton: View {
     @Binding var renderedImage: Image?
     var hasImage: Bool
+    let desertionNo: String
 
     var body: some View {
-        ShareLink(
-            item: renderedImage ?? Image(.bemyfamilyIconTrans),
-            preview: SharePreview(Text(UIConstants.App.shareMessage),
-                                  image: Image(.bemyfamilyIconTrans))
-        ) {
+        Button {
+            DIContainer.shared.shareAnimal(desertionNo)
+        } label: {
             Image(systemName: "paperplane")
                 .resizable()
                 .foregroundColor(.white)
@@ -32,5 +31,5 @@ struct WhiteShareButton: View {
 #Preview {
     @State var image: Image? = Image(.bemyfamilyIconTrans)
 
-    return BlackShareButton(renderedImage: $image, hasImage: true)
+    return WhiteShareButton(renderedImage: $image, hasImage: true, desertionNo: "447502202502153")
 }

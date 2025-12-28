@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import UIKit
 
 @Observable
 final class DIContainer {
@@ -156,5 +157,30 @@ final class DIContainer {
             return nil
         }
         return factory(parameter)
+    }
+
+    func shareAnimal(_ desertionNo: String) {
+        let baseURL = "https://damagucci-juice.github.io/BeMyFamily"
+        let universalLink = "\(baseURL)/detail?id=\(desertionNo)"
+        guard let url = URL(string: universalLink) else { return }
+
+        let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController else { return }
+
+        var topVC = rootVC
+        while let presentedVC = topVC.presentedViewController {
+            topVC = presentedVC
+        }
+
+        // iPad 크래시 방지
+        if let popover = activityVC.popoverPresentationController {
+            popover.sourceView = topVC.view
+            popover.sourceRect = CGRect(x: UIScreen.main.bounds.midX, y: UIScreen.main.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+        }
+
+        topVC.present(activityVC, animated: true)
     }
 }
