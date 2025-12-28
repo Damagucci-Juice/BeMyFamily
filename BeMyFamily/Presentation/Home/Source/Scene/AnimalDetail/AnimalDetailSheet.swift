@@ -13,7 +13,9 @@ struct AnimalDetailSheet: View {
                 locationAndDateSection
                 healthInfoSection
                 careCenterSection
-                adoptionInfoSection
+                if canShowAdoptionInfo {
+                    adoptionInfoSection
+                }
                 actionButtonsSection
             }
             .padding(.horizontal)
@@ -47,7 +49,7 @@ private extension AnimalDetailSheet {
 
             Spacer()
 
-            Text(animal.processState)
+            Text(animal.processState.rawValue)
                 .font(.system(size: 14, weight: .medium))
                 .padding(.horizontal, 12)
                 .padding(.vertical, 4)
@@ -129,6 +131,10 @@ private extension AnimalDetailSheet {
             .font(.system(size: 15))
         }
     }
+
+    var canShowAdoptionInfo: Bool {
+        animal.processState == .inProtect
+    }
 }
 
 // MARK: - Reusable UI Components
@@ -155,8 +161,6 @@ private extension AnimalDetailSheet {
         }
         .foregroundColor(.white)
     }
-
-
 }
 
 private extension AnimalDetailSheet {
@@ -167,26 +171,28 @@ private extension AnimalDetailSheet {
                 // 공유 액션
             }
 
-            Menu {
-                Button(action: { makePhoneCall(phoneNumber: animal.careTel) }) {
-                    Label("전화 문의하기", systemImage: "phone")
-                }
+            if canShowAdoptionInfo {
+                Menu {
+                    Button(action: { makePhoneCall(phoneNumber: animal.careTel) }) {
+                        Label("전화 문의하기", systemImage: "phone")
+                    }
 
-                Button(action: { openMapApp(type: .naver, address: animal.careAddress) }) {
-                    Label("네이버 지도로 보기", systemImage: "map")
-                }
+                    Button(action: { openMapApp(type: .naver, address: animal.careAddress) }) {
+                        Label("네이버 지도로 보기", systemImage: "map")
+                    }
 
-                Button(action: { openMapApp(type: .kakao, address: animal.careAddress) }) {
-                    Label("카카오맵으로 보기", systemImage: "mappin.and.ellipse")
+                    Button(action: { openMapApp(type: .kakao, address: animal.careAddress) }) {
+                        Label("카카오맵으로 보기", systemImage: "mappin.and.ellipse")
+                    }
+                } label: {
+                    // 기존 primaryButton 스타일 유지
+                    Text("입양 문의")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color(white: 0.2))
+                        .cornerRadius(12)
+                        .foregroundColor(.white)
                 }
-            } label: {
-                // 기존 primaryButton 스타일 유지
-                Text("입양 문의")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color(white: 0.2))
-                    .cornerRadius(12)
-                    .foregroundColor(.white)
             }
 
         }

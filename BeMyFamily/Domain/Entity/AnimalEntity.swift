@@ -13,7 +13,7 @@ struct AnimalEntity: Identifiable, Hashable {
     let noticeNumber: String
     let noticeStartDate: String
     let noticeEndDate: String
-    let processState: String
+    let processState: InNoticeProcessState
     let happenDate: String
     let happenPlace: String
     let updatedTime: String?
@@ -58,22 +58,30 @@ struct AnimalEntity: Identifiable, Hashable {
 }
 
 extension AnimalEntity {
-    // 공고 등록 후 경과 시간을 문자열로 반환
+    // 공고 등록 후 경과 시간을 문자열로 반환 (14일 기준 단위 변경)
     var relativeNoticeDate: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyyMMdd" // 데이터 형식에 맞게 수정 필요 (예: 2024-01-15)
+        formatter.dateFormat = "yyyyMMdd"
 
         guard let startDate = formatter.date(from: noticeStartDate) else {
             return ""
         }
 
         let calendar = Calendar.current
-        let components = calendar.dateComponents([.day], from: startDate, to: Date())
+        let now = Date()
+        let components = calendar.dateComponents([.day], from: startDate, to: now)
 
-        if let day = components.day {
-            if day == 0 { return "오늘" }
+        guard let day = components.day else { return "" }
+
+        if day == 0 {
+            return "오늘"
+        } else if day <= 14 {
+            // 1일 전 ~ 14일 전까지 표시
             return "\(day)일 전"
+        } else {
+            // 14일 이후부터는 주 단위로 계산
+            let week = day / 7
+            return "\(week)주 전"
         }
-        return ""
     }
 }

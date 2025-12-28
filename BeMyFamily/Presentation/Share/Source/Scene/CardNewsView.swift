@@ -37,7 +37,7 @@ struct CardNewsView: View {
                 detailRow(label: "색:", value: animal.color)
                 detailRow(label: "나이:", value: animal.age)
                 detailRow(label: "무게:", value: animal.weight)
-                detailRow(label: "처리 상태:", value: animal.processState)
+                detailRow(label: "처리 상태:", value: animal.processState.rawValue)
                 detailRow(label: "성별:", value: animal.sexCd.text)
                 detailRow(label: "중성화 여부:", value: animal.neuterYn.text)
                 detailRow(label: "보호소 이름:", value: animal.careName)
