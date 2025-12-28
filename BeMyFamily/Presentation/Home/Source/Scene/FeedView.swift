@@ -17,13 +17,17 @@ struct FeedView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
+
             ScrollView {
+                appLogo
+
                 feedList
             }
             .scrollIndicators(.never)
-
-            if viewModel.isLoading {
-                ProgressView()
+            .overlay {
+                if viewModel.isLoading {
+                    ProgressView()
+                }
             }
 
             if !viewModel.hasMore {
@@ -40,6 +44,24 @@ struct FeedView: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private var appLogo: some View {
+        HStack {
+            Image(.bemyfamilyIconTrans)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 35, height: 35)
+                .padding(.trailing, 4)
+
+            Text("Be My Family")
+                .font(.appTitle)
+                .foregroundStyle(.black)
+
+            Spacer()
+        }
+        .padding([.bottom, .leading], 16)
     }
 
     @ViewBuilder
