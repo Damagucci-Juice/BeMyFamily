@@ -24,7 +24,6 @@ struct AnimalDTO: Codable, Equatable, Identifiable {
     // 3. 동물 상세 정보
     let kindCd: String
     let kindNm: String
-    let kindFullNm: String
     let upKindCd: String
     let upKindNm: String
     let colorCd: String
@@ -95,7 +94,7 @@ struct AnimalDTO: Codable, Equatable, Identifiable {
         case happenPlace, kindCd, colorCd, age, weight, evntImg, updTm, endReason
         case careRegNo, noticeSdt, noticeEdt, popfile1, processState, sexCd, neuterYn
         case specialMark, careNm, careTel, careAddr, orgNm, sfeSoci, sfeHealth, etcBigo
-        case kindFullNm, upKindCd, upKindNm, kindNm, popfile2, popfile3, popfile5
+        case upKindCd, upKindNm, kindNm, popfile2, popfile3, popfile5
         case popfile6, popfile7, popfile8, careOwnerNm, vaccinationChk, healthChk
         case adptnTitle, adptnSDate, adptnEDate, adptnConditionLimitTxt, adptnTxt
         case adptnImg, sprtTitle, sprtSDate, sprtConditionLimitTxt, sprtTxt, sprtImg

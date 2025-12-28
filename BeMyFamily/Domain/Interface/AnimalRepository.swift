@@ -14,4 +14,6 @@ protocol AnimalRepository {
     ) async throws -> ([AnimalEntity], Paging)
 
     func refreshAnimals(filter: AnimalSearchFilter) async throws -> [AnimalEntity]
+
+    func fetchAnAnimal(id: String) async throws -> AnimalEntity
 }

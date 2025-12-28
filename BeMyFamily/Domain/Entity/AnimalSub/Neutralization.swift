@@ -21,11 +21,11 @@ enum Neutralization: String, Codable, CaseIterable {
     var text: String {
         switch self {
         case .yes:
-            return "예"
+            return "완료"
         case .no:
-            return "아니요"
+            return "안함"
         case .unknown:
-            return "미상"
+            return "알 수 없음"
         }
     }
 }

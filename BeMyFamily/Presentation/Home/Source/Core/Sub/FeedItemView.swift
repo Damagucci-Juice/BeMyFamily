@@ -19,14 +19,6 @@ struct FeedItemView: View {
 
     var body: some View {
         VStack {
-            HStack(alignment: .lastTextBaseline) {
-                Text(animal.specialMark)
-                    .font(.animalName)
-                    .lineLimit(1)
-                Spacer()
-                Text(animal.processState)
-                    .font(.processState)
-            }
 
             LazyImage(url: URL(string: animal.image1)) { state in
                 let roundedRectangle = RoundedRectangle(cornerRadius: UIConstants.Radius.mainImagePlaceholder)
@@ -65,19 +57,25 @@ struct FeedItemView: View {
                 }
             }
 
+            // 사진 밑에 뷰
             HStack {
+                Text(animal.specialMark.limitText(to: 30))
+                    .font(.animalName)
+                    .lineLimit(1)
+
                 Spacer()
 
                 if let favoriteViweModel = diContainer.resolveFactory(
                     FavoriteButtonViewModel.self, parameter: animal
                 ) {
-                    FavoriteButtonView(viewModel: favoriteViweModel)
+                    BlackFavoriteButtonView(viewModel: favoriteViweModel)
                 }
 
-                ShareButton(renderedImage: $renderedImage, hasImage: hasImage)
+                BlackShareButton(renderedImage: $renderedImage, hasImage: hasImage)
             }
         }
         .padding(.horizontal, UIConstants.Padding.feedImemViewHorizontal)
+        .padding(.bottom, 2)
     }
 }
 

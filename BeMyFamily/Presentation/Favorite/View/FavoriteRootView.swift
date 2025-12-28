@@ -28,7 +28,7 @@ struct FavoriteRootView: View {
                     .navigationDestination(for: FavoriteRoute.self) { route in
                         switch route {
                         case .detail(let animal):
-                            AnimalDetailView(animal: animal)
+                            AnimalDetailView(animal)
                         }
                     }
             }

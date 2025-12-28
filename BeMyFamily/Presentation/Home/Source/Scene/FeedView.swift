@@ -20,6 +20,7 @@ struct FeedView: View {
             ScrollView {
                 feedList
             }
+            .scrollIndicators(.never)
 
             if viewModel.isLoading {
                 ProgressView()
@@ -45,18 +46,24 @@ struct FeedView: View {
     private var feedList: some View {
         LazyVStack(spacing: UIConstants.Spacing.interFeedItem) {
             ForEach(viewModel.animals) { animal in
-                NavigationLink(value: FeedRoute.detail(entity: animal)) {
-                    FeedItemView(animal: animal)
-                        .onAppear {
-                            if let last = viewModel.animals.last, animal.id == last.id {
-                                isReachedToBottom = true
-                                Task {
-                                    await viewModel.fetchAnimalsIfCan()
+                VStack {
+                    NavigationLink(value: FeedRoute.detail(entity: animal)) {
+                        FeedItemView(animal: animal)
+                            .onAppear {
+                                if let last = viewModel.animals.last, animal.id == last.id {
+                                    isReachedToBottom = true
+                                    Task {
+                                        await viewModel.fetchAnimalsIfCan()
+                                    }
                                 }
                             }
-                        }
+                    }
+                    .tint(.primary)
+
+                    if animal.id != viewModel.animals.last?.id {
+                        Divider()
+                    }
                 }
-                .tint(.primary)
             }
         }
     }

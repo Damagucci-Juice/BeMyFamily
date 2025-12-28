@@ -9,7 +9,7 @@ import UIKit
 
 struct UIConstants {
     struct Frame {
-        static let heartHeight = 28.0
+        static let heartHeight = 16.0
         static let heartBorderHeight = 32.0
         static let shareHeight = 32.0
         static let feedImageHeight = 500.0
@@ -17,6 +17,7 @@ struct UIConstants {
         static let screenHeight = UIScreen.main.bounds.height
         static let screenSize = UIScreen.main.bounds.size
         static let screenWidthWithPadding = screenWidth - UIConstants.Padding.feedImemViewHorizontal
+        static let naviBarHeight = 44.0
     }
 
     struct Padding {

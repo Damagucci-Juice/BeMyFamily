@@ -60,6 +60,11 @@ final class DIContainer {
                                 animalRepository: animalRepo,
                                 favoriteRepository: favoriteRepo
                               ))
+
+            registerSingleton(FetchAnAnimalUseCase.self, instance: FetchAnAnimalUseCase(
+                animalRepository: animalRepo,
+                favoriteRepository: favoriteRepo
+            ))
         }
 
         // MARK: - ViewModels(Factory)
@@ -71,6 +76,11 @@ final class DIContainer {
                 fatalError("Failed to resolve FetchAnimalsUseCase")
             }
             return FeedViewModel(fetchAnimalsUseCase: useCase, favorRepo: repo)
+        }
+
+        registerFactory(AnimalDetailViewModel.self) { [weak self] in
+            guard let self = self else { fatalError("Failed to resolve AnimalDetailViewModel") }
+            return AnimalDetailViewModel()
         }
 
         registerFactory(FavoriteButtonViewModel.self) { [weak self] animal in

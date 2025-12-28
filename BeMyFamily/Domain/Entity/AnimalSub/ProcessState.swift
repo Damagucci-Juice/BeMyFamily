@@ -38,3 +38,13 @@ enum ProcessState: String, CaseIterable {
         }
     }
 }
+
+enum InNoticeProcessState: String {
+    case inProtect = "보호중"
+    case endReturn = "종료(반환)"
+    case endNaturalDeath = "종료(자연사)"
+    case endMercyKill = "종료(안락사)"
+    case endDonate = "종료(기증)"
+    case endOther = "종료(기타)"
+    case unknown = "알 수 없음"
+}

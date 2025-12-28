@@ -4,6 +4,7 @@
 //
 //  Created by Gucci on 12/21/25.
 //
+import Foundation
 
 struct AnimalEntity: Identifiable, Hashable {
     var id: String { noticeNumber }
@@ -12,17 +13,13 @@ struct AnimalEntity: Identifiable, Hashable {
     let noticeNumber: String
     let noticeStartDate: String
     let noticeEndDate: String
-    let processState: String
+    let processState: InNoticeProcessState
     let happenDate: String
     let happenPlace: String
     let updatedTime: String?
     let endReason: String?          // 사인: 수의사 판단으로한 안락사
 
-    let kindCode: String            // 610000
-    let kindName: String            // 비숑프리제
-    let kindFullName: String        // [개] 비숑프리제
-    let upKindCode: String          // 417000
-    let upKindName: String          // 개
+    let kind: KindEntity
     let color: String
     let age: String
     let weight: String
@@ -57,5 +54,61 @@ struct AnimalEntity: Identifiable, Hashable {
 
     mutating func updateFavoriteStatus(_ currentStatus: Bool = false) {
         self.isFavorite = currentStatus
+    }
+}
+
+extension AnimalEntity {
+    // 공고 등록 후 경과 시간을 문자열로 반환 (14일 기준 단위 변경)
+    var relativeNoticeDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd"
+
+        guard let startDate = formatter.date(from: noticeStartDate) else {
+            return ""
+        }
+
+        let calendar = Calendar.current
+        let now = Date()
+        let components = calendar.dateComponents([.day], from: startDate, to: now)
+
+        guard let day = components.day else { return "" }
+
+        if day == 0 {
+            return "오늘"
+        } else if day <= 14 {
+            // 1일 전 ~ 14일 전까지 표시
+            return "\(day)일 전"
+        } else {
+            // 14일 이후부터는 주 단위로 계산
+            let week = day / 7
+            return "\(week)주 전"
+        }
+    }
+}
+
+extension AnimalEntity {
+    // 공고 시작일 변환: 20251215 -> 2025년 12월 15일
+    var noticeStartText: String {
+        formatDate(noticeStartDate)
+    }
+
+    // 공고 종료일 변환: 20251215 -> 2025년 12월 15일
+    var noticeEndText: String {
+        formatDate(noticeEndDate)
+    }
+
+    // 내부 공통 포맷터 함수
+    private func formatDate(_ dateString: String) -> String {
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "yyyyMMdd" // 원래 데이터 형식
+
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "yyyy년 MM월 dd일" // 표시하고 싶은 형식
+
+        if let date = inputFormatter.date(from: dateString) {
+            return outputFormatter.string(from: date)
+        }
+
+        return dateString // 변환 실패 시 원본 반환
     }
 }

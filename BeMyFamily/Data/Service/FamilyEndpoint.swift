@@ -12,7 +12,8 @@ enum FamilyEndpoint {
     case sigungu(sido: String)
     case shelter(sido: String, sigungu: String)
     case kind(upkind: String)
-    case animal(filteredItem: AnimalSearchFilter, page: Int)
+    case animals(filteredItem: AnimalSearchFilter, page: Int)
+    case anAnimal(_ id: String)
 }
 
 // MARK: - For URL Ingredients, Path, Params, Method etc..
@@ -33,7 +34,7 @@ extension FamilyEndpoint {
             return NetworkConstants.Path.shelter
         case .kind:
             return NetworkConstants.Path.kind
-        case .animal:
+        case .animals, .anAnimal:
             return NetworkConstants.Path.animal
         }
     }
@@ -64,11 +65,13 @@ extension FamilyEndpoint {
         case .kind(let upkind):
             dict.updateValue("\(upkind)", forKey: "up_kind_cd")
             dict.updateValue(NetworkConstants.Params.kindPayload, forKey: "numOfRows")
-        case .animal(let animalFilter, let page):
+        case .animals(let animalFilter, let page):
             animalFilter.toParams().enumerated().forEach { (_, value) in
                 dict.updateValue("\(value.value)", forKey: "\(value.key)")
             }
             dict.updateValue("\(page)", forKey: "pageNo")
+        case .anAnimal(let id):
+            dict.updateValue(id, forKey: "notice_no")
         }
         return dict
     }

@@ -27,7 +27,7 @@ struct FeedRootView: View {
                     .navigationDestination(for: FeedRoute.self) { route in
                         switch route {
                         case .detail(let animal):
-                            AnimalDetailView(animal: animal)
+                            AnimalDetailView(animal)
                         }
                     }
             }
