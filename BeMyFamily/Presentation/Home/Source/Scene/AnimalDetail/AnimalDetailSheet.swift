@@ -169,6 +169,7 @@ private extension AnimalDetailSheet {
         HStack(spacing: 12) {
             secondaryButton(title: "공유하기") {
                 // 공유 액션
+                shareAnimal()
             }
 
             if canShowAdoptionInfo {
