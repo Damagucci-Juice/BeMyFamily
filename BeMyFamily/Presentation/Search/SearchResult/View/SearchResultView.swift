@@ -50,7 +50,8 @@ struct SearchResultView: View {
             }
             .overlay {
                 if viewModel.isLoading && viewModel.animals.isEmpty {
-                    ProgressView("데이터를 불러오는 중...")
+                    ProgressView("아가들 정보를 가져오고 있어요...")
+                        .font(.noticeBody)
                         .background(Color(.systemBackground))
                 }
             }
