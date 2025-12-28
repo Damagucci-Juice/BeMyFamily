@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AnimalDetailSheet: View {
     let animal: AnimalEntity
+    @State private var isShowingActionSheet = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -22,6 +23,21 @@ struct AnimalDetailSheet: View {
         .presentationContentInteraction(.scrolls)
         .presentationDragIndicator(.visible)
         .presentationBackground(.ultraThinMaterial)
+        .confirmationDialog("입양 문의", isPresented: $isShowingActionSheet, titleVisibility: .visible) {
+            Button("전화 문의하기") {
+                makePhoneCall(phoneNumber: animal.careTel)
+            }
+
+            Button("네이버 지도로 주소 보기") {
+                openMapApp(type: .naver, address: animal.careAddress)
+            }
+
+            Button("카카오맵으로 주소 보기") {
+                openMapApp(type: .kakao, address: animal.careAddress)
+            }
+
+            Button("취소", role: .cancel) {}
+        }
     }
 }
 
@@ -39,6 +55,11 @@ private extension AnimalDetailSheet {
 
             Text(animal.kind.name)
                 .font(.animalName).bold()
+                .foregroundStyle(.primary)
+
+            Text(animal.relativeNoticeDate)
+                .font(.noticeDays)
+                .foregroundStyle(.secondary)
 
             Spacer()
 
@@ -114,7 +135,7 @@ private extension AnimalDetailSheet {
     var adoptionInfoSection: some View {
         SectionView(title: animal.adptnTitle ?? "입양 가능", backgroundColor: Color.purple.opacity(0.05)) {
             VStack(alignment: .leading, spacing: 8) {
-                Text(animal.adptnTxt ?? "건강하고 활발한 강아지입니다. \n사랑으로 키워주실 분을 기다립니다.")
+                Text(animal.adptnTxt ?? "건강하고 활발한 \(animal.kind.upKind.adoptionGuide)입니다. \n사랑으로 키워주실 분을 기다립니다.")
                 if let condition = animal.adptnConditionLimitTxt {
                     Text("조건: \(condition)")
                         .font(.system(size: 13))
@@ -123,20 +144,6 @@ private extension AnimalDetailSheet {
             }
             .font(.system(size: 15))
         }
-    }
-
-    // 9. 하단 버튼 액션
-    var actionButtonsSection: some View {
-        HStack(spacing: 12) {
-            secondaryButton(title: "공유하기") {
-                // 공유 액션
-            }
-            primaryButton(title: "입양 문의") {
-                // 입양 문의 액션
-            }
-        }
-        .padding(.top, 10)
-        .padding(.bottom, 30)
     }
 }
 
@@ -164,8 +171,61 @@ private extension AnimalDetailSheet {
         }
         .foregroundColor(.white)
     }
+
+    
 }
 
+private extension AnimalDetailSheet {
+
+    var actionButtonsSection: some View {
+        HStack(spacing: 12) {
+            secondaryButton(title: "공유하기") {
+                // 공유 액션
+            }
+            primaryButton(title: "입양 문의") {
+                isShowingActionSheet = true
+            }
+        }
+        .padding(.top, 10)
+        .padding(.bottom, 30)
+    }
+
+    // MARK: - Helper Methods
+
+    // 전화 걸기
+    func makePhoneCall(phoneNumber: String) {
+        let cleanNumber = phoneNumber.filter("0123456789".contains)
+        if let url = URL(string: "tel://\(cleanNumber)"), UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url)
+        }
+    }
+
+    enum MapType { case naver, kakao }
+
+    // 지도 앱 열기
+    func openMapApp(type: MapType, address: String) {
+        let encodedAddress = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        var appUrlString = ""
+        var webUrlString = ""
+
+        switch type {
+        case .naver:
+            appUrlString = "nmap://search?query=\(encodedAddress)&appname=BeMyFamily"
+            webUrlString = "https://m.map.naver.com/search2/search.naver?query=\(encodedAddress)"
+        case .kakao:
+            appUrlString = "kakaomap://search?q=\(encodedAddress)"
+            webUrlString = "https://map.kakao.com/link/search/\(encodedAddress)"
+        }
+
+        if let appUrl = URL(string: appUrlString), UIApplication.shared.canOpenURL(appUrl) {
+            // 앱이 있으면 앱으로 실행
+            UIApplication.shared.open(appUrl)
+        } else if let webUrl = URL(string: webUrlString) {
+            // 앱이 없으면 사파리 브라우저로 실행
+            UIApplication.shared.open(webUrl)
+        }
+    }
+}
 
 private struct InfoCard: View {
     let title: String
@@ -230,3 +290,4 @@ private struct IconLabelRow: View {
         }
     }
 }
+

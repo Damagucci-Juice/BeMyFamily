@@ -11,4 +11,5 @@ extension Font {
     static let animalName = Font.system(size: 16, weight: .semibold)
     static let processState = Font.system(size: 16)
     static let noticeBody = Font.system(size: 16, weight: .regular)
+    static let noticeDays = Font.system(size: 14, weight: .regular)
 }

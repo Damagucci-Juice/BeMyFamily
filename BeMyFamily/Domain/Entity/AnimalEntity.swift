@@ -4,6 +4,7 @@
 //
 //  Created by Gucci on 12/21/25.
 //
+import Foundation
 
 struct AnimalEntity: Identifiable, Hashable {
     var id: String { noticeNumber }
@@ -53,5 +54,26 @@ struct AnimalEntity: Identifiable, Hashable {
 
     mutating func updateFavoriteStatus(_ currentStatus: Bool = false) {
         self.isFavorite = currentStatus
+    }
+}
+
+extension AnimalEntity {
+    // 공고 등록 후 경과 시간을 문자열로 반환
+    var relativeNoticeDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd" // 데이터 형식에 맞게 수정 필요 (예: 2024-01-15)
+
+        guard let startDate = formatter.date(from: noticeStartDate) else {
+            return ""
+        }
+
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.day], from: startDate, to: Date())
+
+        if let day = components.day {
+            if day == 0 { return "오늘" }
+            return "\(day)일 전"
+        }
+        return ""
     }
 }

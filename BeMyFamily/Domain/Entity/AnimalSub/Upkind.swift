@@ -25,4 +25,15 @@ enum Upkind: String, CaseIterable, Hashable {
             return "기타"
         }
     }
+
+    var adoptionGuide: String {
+        switch self {
+        case .dog:
+            return "강아지"
+        case .cat:
+            return "고양이"
+        case .other:
+            return "친구"
+        }
+    }
 }
