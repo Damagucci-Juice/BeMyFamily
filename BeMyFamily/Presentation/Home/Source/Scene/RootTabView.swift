@@ -43,7 +43,7 @@ struct RootTabView: View {
         .onChange(of: deepLinkManager.selectedDesertionNo) { _, newID in
             handleDeepLink(newID)
         }
-        .sheet(item: $animalToDisplay) { animal in
+        .fullScreenCover(item: $animalToDisplay) { animal in
             AnimalDetailView(animal)
                 .environment(diContainer)
         }

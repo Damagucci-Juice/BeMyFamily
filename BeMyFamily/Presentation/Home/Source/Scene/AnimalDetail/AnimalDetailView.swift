@@ -12,6 +12,7 @@ struct AnimalDetailView: View {
     // MARK: - Environment
     @Environment(\.displayScale) var displayScale
     @Environment(DIContainer.self) var diContainer: DIContainer
+    @Environment(\.dismiss) var dismiss
 
     // MARK: - State
     @State private var viewModel: AnimalDetailViewModel
@@ -42,7 +43,13 @@ struct AnimalDetailView: View {
             }
             .ignoresSafeArea()
 
-            if !viewModel.isZooming && !viewModel.isDetailPresented {
+            if viewModel.isInitialLoad {
+                closeButton
+            }
+
+
+            if !viewModel.isZooming &&
+                !viewModel.isDetailPresented {
                 BottomOverlayView(
                     animal: animal,
                     diContainer: diContainer,
@@ -53,10 +60,30 @@ struct AnimalDetailView: View {
         }
         .highPriorityGesture(viewModel.isZooming ? nil : viewModel.swipeGesture)
         .toolbar(.hidden, for: .tabBar)
-        .toolbar(viewModel.shouldHideNavigationBar ? .hidden : .visible, for: .navigationBar)
+        .toolbar(.hidden, for: .navigationBar)
         .sheet(isPresented: $viewModel.isDetailPresented) {
             AnimalDetailSheet(animal: animal)
                 .interactiveDismissDisabled(false)
+        }
+    }
+
+    @ViewBuilder
+    private var closeButton: some View {
+        VStack {
+            HStack {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                }
+                .buttonStyle(.glass)
+                .foregroundStyle(.white)
+
+                Spacer()
+            }
+            .padding([.top, .leading], 16)
+
+            Spacer()
         }
     }
 }
@@ -204,6 +231,7 @@ private struct BottomOverlayView: View {
     let diContainer: DIContainer
     @Binding var renderedImage: Image?
     let hasImage: Bool
+//    let onDismiss: () -> Void
 
     var body: some View {
         VStack {

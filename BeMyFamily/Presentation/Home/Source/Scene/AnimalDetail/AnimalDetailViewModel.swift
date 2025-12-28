@@ -30,6 +30,10 @@ final class AnimalDetailViewModel {
         isZooming || isDetailPresented
     }
 
+    var isInitialLoad: Bool {
+        !isZooming && !isDetailPresented
+    }
+
     // MARK: - Swipe Gesture
     var swipeGesture: some Gesture {
         DragGesture()
