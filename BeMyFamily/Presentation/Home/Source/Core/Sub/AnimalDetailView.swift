@@ -38,13 +38,31 @@ struct AnimalDetailView: View {
             backgroundLayer
 
             GeometryReader { proxy in
+                let topInset = proxy.safeAreaInsets.top
                 let screenHeight = proxy.size.height
-                let isPresented = isDetailPresented
+                let sheetTopEdge = screenHeight * 0.25
+                let availableHeight = sheetTopEdge - topInset
 
-                imageContentView(screenSize: proxy.size)
-                    .scaleEffect(isPresented ? 0.55 : 1.0)
-                    .offset(y: isPresented ? -screenHeight * 0.3 : 0)
-                    .animation(springAnim, value: isPresented)
+                VStack(spacing: 0) {
+                    // 1. 시트가 열렸을 때만 네비게이션 바 높이만큼 투명한 벽을 세웁니다.
+                    if isDetailPresented {
+                        Color.clear.frame(height: topInset)
+                    }
+
+                    // 2. 남은 가용 영역(availableHeight) 내에 이미지를 가둡니다.
+                    imageSection
+                        .scaleEffect(isDetailPresented ?
+                                     calculateFitScale(availableHeight: availableHeight, screenSize: proxy.size) :
+                                        scale)
+                    // 시트가 열리면 중앙 정렬이 아닌 상단 정렬 느낌을 주기 위해 offset 미세 조정
+                        .offset(y: isDetailPresented ? 0 : 0)
+                        .frame(maxWidth: .infinity, maxHeight: isDetailPresented ? availableHeight : .infinity)
+
+                    if isDetailPresented {
+                        Spacer(minLength: 0) // 아래쪽(시트 위) 여백
+                    }
+                }
+                .animation(springAnim, value: isDetailPresented)
             }
             .ignoresSafeArea()
 
@@ -286,3 +304,31 @@ private extension AnimalDetailView {
 }
 
 extension AnimalDetailView: @MainActor Sharable { }
+
+private extension AnimalDetailView {
+    func calculateFitScale(availableHeight: CGFloat, screenSize: CGSize) -> CGFloat {
+        guard imageSize.width > 0 && imageSize.height > 0 else { return 0.5 }
+        let aspectRatio = imageSize.width / imageSize.height
+        let currentImageHeight = screenSize.width / aspectRatio
+
+        // 0.95 정도가 적당히 네비게이션 바와 시트 사이에 꽉 차 보이게 합니다.
+        let scaleTarget = (availableHeight / currentImageHeight) * 0.95
+        return min(scaleTarget, 0.7)
+    }
+}
+
+/**
+ private extension AnimalDetailView {
+ func calculateFitScale(availableHeight: CGFloat, screenSize: CGSize) -> CGFloat {
+ guard imageSize.width > 0 && imageSize.height > 0 else { return 0.5 }
+
+ let aspectRatio = imageSize.width / imageSize.height
+ let currentImageHeight = screenSize.width / aspectRatio
+
+ // 0.95 -> 0.90 으로 변경하여 상하 여백을 조금 더 확보합니다.
+ let scaleTarget = (availableHeight / currentImageHeight) * 0.90
+
+ return min(scaleTarget, 0.7)
+ }
+ }
+ */
