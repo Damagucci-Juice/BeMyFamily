@@ -33,10 +33,10 @@ struct RootTabView: View {
     }
 
     var body: some View {
-        // TabView 내부를 최대한 단순하게 유지
         TabView {
             tabContentView
         }
+        .tabViewStyle(.sidebarAdaptable)
         .environment(diContainer)
         .animation(.easeInOut, value: networkMonitor.isConnected)
         // 2. onChange 로직을 명확하게 분리
@@ -56,11 +56,11 @@ struct RootTabView: View {
             FeedRootView(router: feedRouter)
                 .tabItem { Label("Home", systemImage: "house") }
 
-            SearchRootView(router: searchRouter)
-                .tabItem { Label("Search", systemImage: "magnifyingglass") }
-
             FavoriteRootView(router: favoriteRouter)
                 .tabItem { Label("Heart", systemImage: "heart") }
+
+            SearchRootView(router: searchRouter)
+                .tabItem { Label("Search", systemImage: "magnifyingglass") }
         } else {
             NetworkDisconnectView()
                 .tabItem { Label("Offline", systemImage: "network.slash") }
