@@ -82,7 +82,7 @@ struct AnimalDetailView: View {
         .background(Color.black)
         .highPriorityGesture(isZooming ? nil : swipeGesture)
         .toolbar(.hidden, for: .tabBar)
-        .toolbar(isZooming ? .hidden : .visible, for: .navigationBar)
+        .toolbar(isZooming || isDetailPresented ? .hidden : .visible, for: .navigationBar)
         .sheet(isPresented: $isDetailPresented) {
             VStack {
                 Text(animal.kind.name)
