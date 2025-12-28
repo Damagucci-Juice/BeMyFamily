@@ -88,7 +88,9 @@ private extension AnimalDetailSheet {
     var locationAndDateSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             IconLabelRow(icon: "mappin.and.ellipse", text: "발견 장소", subText: animal.happenPlace)
-            IconLabelRow(icon: "calendar", text: "공고 기간", subText: "\(animal.noticeStartDate) ~ \(animal.noticeEndDate)")
+            IconLabelRow(icon: "calendar",
+                         text: "공고 기간",
+                         subText: "\(animal.noticeStartText) ~ \(animal.noticeEndText)")
         }
         .padding(.horizontal, 4)
     }
@@ -168,7 +170,6 @@ private extension AnimalDetailSheet {
     var actionButtonsSection: some View {
         HStack(spacing: 12) {
             secondaryButton(title: "공유하기") {
-                // 공유 액션
                 shareAnimal()
             }
 

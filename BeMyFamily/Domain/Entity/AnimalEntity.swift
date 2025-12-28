@@ -85,3 +85,30 @@ extension AnimalEntity {
         }
     }
 }
+
+extension AnimalEntity {
+    // 공고 시작일 변환: 20251215 -> 2025년 12월 15일
+    var noticeStartText: String {
+        formatDate(noticeStartDate)
+    }
+
+    // 공고 종료일 변환: 20251215 -> 2025년 12월 15일
+    var noticeEndText: String {
+        formatDate(noticeEndDate)
+    }
+
+    // 내부 공통 포맷터 함수
+    private func formatDate(_ dateString: String) -> String {
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "yyyyMMdd" // 원래 데이터 형식
+
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "yyyy년 MM월 dd일" // 표시하고 싶은 형식
+
+        if let date = inputFormatter.date(from: dateString) {
+            return outputFormatter.string(from: date)
+        }
+
+        return dateString // 변환 실패 시 원본 반환
+    }
+}
