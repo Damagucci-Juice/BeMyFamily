@@ -22,31 +22,33 @@ struct AnimalDetailView: View {
     @State private var lastOffset: CGSize = .zero    // 직전 이동 위치
     @State private var isZooming: Bool = false
     @GestureState private var dragOffset: CGSize = .zero
+    @State private var imageSize: CGSize = .zero // 실제 이미지의 렌더링 사이즈 저장
 
     let animal: AnimalEntity
     private var hasImage: Bool { loadedImage != nil ? false : true }
 
     var body: some View {
         ZStack {
+            // 1. 배경을 검정으로 꽉 채워 전체 캔버스 확보
             Color.black.ignoresSafeArea()
 
-            imageSection
-                .offset(x: offset.width + dragOffset.width, y: offset.height + dragOffset.height)
-                .scaleEffect(scale)
-                // MARK: 렌더링 최적화 - 복잡한 뷰 계층을 하나의 비트맵으로 렌더링하여 성능을 끌어올립니다.
-                .drawingGroup()
-                // 개별 제스처 대신 결합된 제스처 하나만 사용
-                .gesture(combinedGesture)
+            GeometryReader { proxy in
+                imageSection
+                    .scaleEffect(scale)
+                    .offset(x: offset.width + dragOffset.width, y: offset.height + dragOffset.height)
+                    .frame(width: proxy.size.width, height: proxy.size.height)
+                    .gesture(combinedGesture(screenSize: proxy.size))
+                    .drawingGroup()
+            }
+            .ignoresSafeArea()
 
             if !isZooming {
                 bottomGradientLayer
-                    .transition(.opacity.animation(.easeInOut))
                 briefInfoSection
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        .background(Color.black)
         .toolbar(.hidden, for: .tabBar)
-        .toolbar(isZooming ? .hidden : .visible, for: .navigationBar)
     }
 
     // 중복 로직 분리
@@ -60,9 +62,9 @@ struct AnimalDetailView: View {
         }
     }
 
-    private var combinedGesture: some Gesture {
-        // 줌과 드래그를 동시에 인식하도록 결합
-        MagnificationGesture()
+    private func combinedGesture(screenSize: CGSize) -> some Gesture {
+        // 1. 확대/축소 제스처
+        let magnification = MagnificationGesture()
             .onChanged { value in
                 let delta = value / lastScale
                 lastScale = value
@@ -71,18 +73,54 @@ struct AnimalDetailView: View {
             }
             .onEnded { _ in
                 lastScale = 1.0
-                handleZoomEnded()
+                withAnimation(.spring()) {
+                    if scale <= 1.05 {
+                        resetZoom() // 원래 크기로 복구
+                    } else {
+                        updateOffsetInRange(screenSize: screenSize) // 경계 안으로 튕기기
+                    }
+                }
             }
-        .simultaneously(with: DragGesture(minimumDistance: 0) // 반응성 향상을 위해 거리 0 설정
+
+        // 2. 드래그 이동 제스처
+        let drag = DragGesture(minimumDistance: 0)
             .updating($dragOffset) { value, state, _ in
-                guard isZooming else { return }
-                state = value.translation
+                if isZooming { state = value.translation }
             }
             .onEnded { value in
-                guard isZooming else { return }
-                offset.width += value.translation.width
-                offset.height += value.translation.height
-            })
+                if isZooming {
+                    offset.width += value.translation.width
+                    offset.height += value.translation.height
+                    withAnimation(.spring()) {
+                        updateOffsetInRange(screenSize: screenSize)
+                    }
+                }
+            }
+
+        return magnification.simultaneously(with: drag)
+    }
+
+    // 초기화 헬퍼 함수
+    private func resetZoom() {
+        scale = 1.0
+        offset = .zero
+        isZooming = false
+    }
+
+    // MARK: - 경계값 계산 및 오프셋 보정 로직
+    private func updateOffsetInRange(screenSize: CGSize) {
+        // 이미지가 .fit 모드일 때 화면 내에서 차지하는 실제 영역 계산
+        // (화면 너비는 꽉 차지만 높이는 이미지 비율에 따라 남을 수 있음)
+        let zoomedWidth = screenSize.width * scale
+        let zoomedHeight = (screenSize.width / (imageSize.width / imageSize.height)) * scale
+
+        // 가로 경계값: (확대된 너비 - 화면 너비) / 2
+        let maxW = max(0, (zoomedWidth - screenSize.width) / 2)
+        // 세로 경계값: (확대된 높이 - 화면 높이) / 2 (이미지가 화면보다 작으면 0)
+        let maxH = max(0, (zoomedHeight - screenSize.height) / 2)
+
+        offset.width = min(max(offset.width, -maxW), maxW)
+        offset.height = min(max(offset.height, -maxH), maxH)
     }
 
     // MARK: - 최적화된 드래그 제스처
@@ -196,23 +234,13 @@ struct AnimalDetailView: View {
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: UIScreen.main.bounds.width, maxHeight: UIScreen.main.bounds.height)
-                    .offset(x: offset.width + dragOffset.width, y: offset.height + dragOffset.height)
-                    .scaleEffect(scale)
-                    .drawingGroup() // 성능 최적화
+                // ⚠️ 핵심: 이미지의 프레임을 '화면 전체'로 선언합니다.
+                // 이렇게 해야 확대했을 때 중앙 틀에 갇히지 않고 화면 끝까지 나갑니다.
+                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
                     .onAppear { self.loadedImage = image }
             }
         }
-        .onChange(of: loadedImage) { _, newValue in
-            guard let newValue else { return }
-            Task {
-                self.renderedImage = render(
-                    object: animal,
-                    img: newValue,
-                    displayScale: displayScale
-                )
-            }
-        }
+        // 여기서 .clipped() 가 있다면 반드시 제거하세요!
     }
 
     @ViewBuilder
