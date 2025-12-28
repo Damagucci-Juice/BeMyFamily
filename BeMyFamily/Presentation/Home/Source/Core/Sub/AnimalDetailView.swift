@@ -22,6 +22,7 @@ struct AnimalDetailView: View {
     @State private var isZooming: Bool = false
     @GestureState private var dragOffset: CGSize = .zero
     @State private var imageSize: CGSize = .zero
+    @State private var isDetailPresented = false
 
     let animal: AnimalEntity
     private var hasImage: Bool { loadedImage != nil }
@@ -37,21 +38,51 @@ struct AnimalDetailView: View {
             backgroundLayer
 
             GeometryReader { proxy in
+                let screenHeight = proxy.size.height
+                let isPresented = isDetailPresented
+
                 imageContentView(screenSize: proxy.size)
+                    .scaleEffect(isPresented ? 0.55 : 1.0)
+                    .offset(y: isPresented ? -screenHeight * 0.3 : 0)
+                    .animation(springAnim, value: isPresented)
             }
             .ignoresSafeArea()
 
-            if !isZooming {
-
+            if !isZooming && !isDetailPresented {
                 bottomGradientLayer
-
                 briefInfoSection
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
         }
+        .onTapGesture {
+            if isDetailPresented {
+                withAnimation(.spring()) {
+                    isDetailPresented = false
+                }
+            }
+        }
         .background(Color.black)
+        .highPriorityGesture(isZooming ? nil : swipeGesture)
         .toolbar(.hidden, for: .tabBar)
         .toolbar(isZooming ? .hidden : .visible, for: .navigationBar)
+        .sheet(isPresented: $isDetailPresented) {
+            VStack {
+                Text(animal.kind.name)
+                    .font(.animalName)
+                    .bold()
+                    .foregroundStyle(.primary)
+                Spacer()
+            }
+            .padding()
+            // MARK: - 높이 조절 핵심 코드
+            .presentationDetents([
+                .fraction(0.75),
+                .large
+            ])
+            .presentationBackground(.ultraThinMaterial)
+            .presentationBackgroundInteraction(.enabled(upThrough: .fraction(0.75)))
+            .presentationDragIndicator(.visible)
+        }
     }
 }
 
@@ -67,6 +98,13 @@ private extension AnimalDetailView {
             .scaleEffect(scale)
             .offset(x: offset.width + dragOffset.width, y: offset.height + dragOffset.height)
             .frame(width: screenSize.width, height: screenSize.height)
+            .onTapGesture {
+                if isDetailPresented {
+                    withAnimation(.spring()) {
+                        isDetailPresented = false
+                    }
+                }
+            }
             .gesture(doubleTapGesture(screenSize: screenSize))
             .gesture(combinedGesture(screenSize: screenSize))
             .drawingGroup()
@@ -155,6 +193,18 @@ private extension AnimalDetailView {
 
 // MARK: - Gestures & Logic
 private extension AnimalDetailView {
+    var swipeGesture: some Gesture {
+        DragGesture()
+            .onEnded { value in
+                // 위로 스와이프 감지 (세로 이동 거리가 -50 미만일 때)
+                if value.translation.height < -50 {
+                    withAnimation(.spring()) {
+                        isDetailPresented = true
+                    }
+                }
+            }
+    }
+
     func combinedGesture(screenSize: CGSize) -> some Gesture {
         let magnification = MagnificationGesture()
             .onChanged { value in
@@ -175,12 +225,11 @@ private extension AnimalDetailView {
                 if isZooming { state = value.translation }
             }
             .onEnded { value in
-                if isZooming {
-                    offset.width += value.translation.width
-                    offset.height += value.translation.height
-                    withAnimation(springAnim) {
-                        updateOffsetInRange(screenSize: screenSize)
-                    }
+                guard !isDetailPresented && isZooming else { return }
+                offset.width += value.translation.width
+                offset.height += value.translation.height
+                withAnimation(springAnim) {
+                    updateOffsetInRange(screenSize: screenSize)
                 }
             }
 
@@ -191,6 +240,7 @@ private extension AnimalDetailView {
         SpatialTapGesture(count: 2)
             .onEnded { value in
                 withAnimation(springAnim) {
+                    guard !isDetailPresented else { return }
                     if scale > 1.1 {
                         resetZoom()
                     } else {
