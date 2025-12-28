@@ -247,7 +247,7 @@ private struct InfoCard: View {
                 .font(.system(size: 12))
                 .foregroundColor(.gray)
             Text(value)
-                .font(.system(size: 18, weight: .bold))
+                .font(.noticeBody)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
