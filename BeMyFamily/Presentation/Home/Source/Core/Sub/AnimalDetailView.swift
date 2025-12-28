@@ -42,7 +42,11 @@ struct AnimalDetailView: View {
             .ignoresSafeArea()
 
             if !isZooming {
-                overlayInformation
+
+                bottomGradientLayer
+
+                briefInfoSection
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
         }
         .background(Color.black)
@@ -101,7 +105,7 @@ private extension AnimalDetailView {
             Spacer()
             Rectangle()
                 .fill(LinearGradient(colors: [.clear, .black], startPoint: .top, endPoint: .bottom))
-                .frame(height: UIConstants.Frame.screenHeight * 0.4)
+                .frame(height: UIConstants.Frame.screenHeight * 0.5)
         }
         .ignoresSafeArea()
         .allowsHitTesting(false)
