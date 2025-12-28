@@ -23,7 +23,7 @@ struct SearchResultView: View {
                     ForEach(viewModel.animals) { animal in
                         VStack {
                             NavigationLink(destination: {
-                                AnimalDetailView(animal: animal)
+                                AnimalDetailView(animal)
                             }, label: {
                                 FeedItemView(animal: animal)
                             })

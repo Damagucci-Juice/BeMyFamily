@@ -73,6 +73,11 @@ final class DIContainer {
             return FeedViewModel(fetchAnimalsUseCase: useCase, favorRepo: repo)
         }
 
+        registerFactory(AnimalDetailViewModel.self) { [weak self] in
+            guard let self = self else { fatalError("Failed to resolve AnimalDetailViewModel") }
+            return AnimalDetailViewModel()
+        }
+
         registerFactory(FavoriteButtonViewModel.self) { [weak self] animal in
             guard let self = self,
                   let repository = self.resolveSingleton(FavoriteRepositoryImpl.self) else {
