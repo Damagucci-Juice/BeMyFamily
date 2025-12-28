@@ -38,28 +38,28 @@ struct AnimalDetailView: View {
             backgroundLayer
 
             GeometryReader { proxy in
-                let topInset = proxy.safeAreaInsets.top
                 let screenHeight = proxy.size.height
                 let sheetTopEdge = screenHeight * 0.25
-                let availableHeight = sheetTopEdge - topInset
+                let navigationBarHeight = UIConstants.Frame.naviBarHeight
+                let availableHeight = sheetTopEdge + navigationBarHeight
 
                 VStack(spacing: 0) {
-                    // 1. 시트가 열렸을 때만 네비게이션 바 높이만큼 투명한 벽을 세웁니다.
-                    if isDetailPresented {
-                        Color.clear.frame(height: topInset)
-                    }
+                    Color
+                        .clear
+                        .frame(height: navigationBarHeight)
 
-                    // 2. 남은 가용 영역(availableHeight) 내에 이미지를 가둡니다.
                     imageSection
                         .scaleEffect(isDetailPresented ?
                                      calculateFitScale(availableHeight: availableHeight, screenSize: proxy.size) :
                                         scale)
-                    // 시트가 열리면 중앙 정렬이 아닌 상단 정렬 느낌을 주기 위해 offset 미세 조정
-                        .offset(y: isDetailPresented ? 0 : 0)
-                        .frame(maxWidth: .infinity, maxHeight: isDetailPresented ? availableHeight : .infinity)
+                        .frame(
+                            maxWidth: .infinity,
+                            maxHeight: isDetailPresented ? availableHeight : screenHeight - navigationBarHeight
+                        )
+                        .clipped()
 
                     if isDetailPresented {
-                        Spacer(minLength: 0) // 아래쪽(시트 위) 여백
+                        Spacer(minLength: 0)
                     }
                 }
                 .animation(springAnim, value: isDetailPresented)
@@ -92,7 +92,6 @@ struct AnimalDetailView: View {
                 Spacer()
             }
             .padding()
-            // MARK: - 높이 조절 핵심 코드
             .presentationDetents([
                 .fraction(0.75),
                 .large

@@ -17,6 +17,7 @@ struct UIConstants {
         static let screenHeight = UIScreen.main.bounds.height
         static let screenSize = UIScreen.main.bounds.size
         static let screenWidthWithPadding = screenWidth - UIConstants.Padding.feedImemViewHorizontal
+        static let naviBarHeight = 44.0
     }
 
     struct Padding {
