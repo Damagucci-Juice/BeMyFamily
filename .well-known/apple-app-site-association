@@ -2,14 +2,21 @@
   "applinks": {
     "details": [
       {
-        "appIDs": [ "D7F6ZDDCV9.com.gucci.BeMyFamily" ],
+        "appIDs": [ "6499305197.com.gucci.BeMyFamily" ],
         "components": [
           {
             "/": "/BeMyFamily/detail*",
+            "comment": "상세 페이지 연결 경로 설정"
+          },
+	  {
+            "/": "/detail*",
             "comment": "상세 페이지 연결 경로 설정"
           }
         ]
       }
     ]
-  }
+  },
+   "webcredentials": {
+      "apps": [ "6499305197.com.gucci.BeMyFamily" ]
+   }
 }
