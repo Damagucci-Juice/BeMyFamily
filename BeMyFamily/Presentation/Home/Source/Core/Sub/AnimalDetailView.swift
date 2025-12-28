@@ -6,7 +6,6 @@
 //
 
 import NukeUI
-import SkeletonUI
 import SwiftUI
 
 struct AnimalDetailView: View {
@@ -53,6 +52,7 @@ struct AnimalDetailView: View {
         }
         .background(Color.black)
         .toolbar(.hidden, for: .tabBar)
+        .toolbar(isZooming ? .hidden : .visible, for: .navigationBar)
     }
 
     // 중복 로직 분리
