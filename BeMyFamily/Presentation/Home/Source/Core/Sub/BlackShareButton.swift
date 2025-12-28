@@ -1,5 +1,5 @@
 //
-//  ShareButton.swift
+//  BlackShareButton.swift
 //  BeMyFamily
 //
 //  Created by Gucci on 4/30/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ShareButton: View {
+struct BlackShareButton: View {
     @Binding var renderedImage: Image?
     var hasImage: Bool
 
@@ -30,5 +30,5 @@ struct ShareButton: View {
 #Preview {
     @State var image: Image? = Image(.bemyfamilyIconTrans)
 
-    return ShareButton(renderedImage: $image, hasImage: true)
+    return BlackShareButton(renderedImage: $image, hasImage: true)
 }

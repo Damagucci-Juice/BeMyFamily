@@ -1,5 +1,5 @@
 //
-//  FavoriteButtonView.swift
+//  BlackFavoriteButtonView.swift
 //  BeMyFamily
 //
 //  Created by Gucci on 4/30/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct FavoriteButtonView: View {
+struct BlackFavoriteButtonView: View {
     @State var viewModel: FavoriteButtonViewModel
 
     var body: some View {
@@ -39,6 +39,6 @@ struct FavoriteButtonView: View {
         FavoriteButtonViewModel.self,
         parameter: animal) {
 
-        FavoriteButtonView(viewModel: viewModel)
+        BlackFavoriteButtonView(viewModel: viewModel)
     }
 }

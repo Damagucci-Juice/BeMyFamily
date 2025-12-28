@@ -18,11 +18,7 @@ struct AnimalEntity: Identifiable, Hashable {
     let updatedTime: String?
     let endReason: String?          // 사인: 수의사 판단으로한 안락사
 
-    let kindCode: String            // 610000
-    let kindName: String            // 비숑프리제
-    let kindFullName: String        // [개] 비숑프리제
-    let upKindCode: String          // 417000
-    let upKindName: String          // 개
+    let kind: KindEntity
     let color: String
     let age: String
     let weight: String

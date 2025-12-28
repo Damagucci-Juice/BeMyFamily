@@ -68,10 +68,10 @@ struct FeedItemView: View {
                 if let favoriteViweModel = diContainer.resolveFactory(
                     FavoriteButtonViewModel.self, parameter: animal
                 ) {
-                    FavoriteButtonView(viewModel: favoriteViweModel)
+                    BlackFavoriteButtonView(viewModel: favoriteViweModel)
                 }
 
-                ShareButton(renderedImage: $renderedImage, hasImage: hasImage)
+                BlackShareButton(renderedImage: $renderedImage, hasImage: hasImage)
             }
         }
         .padding(.horizontal, UIConstants.Padding.feedImemViewHorizontal)

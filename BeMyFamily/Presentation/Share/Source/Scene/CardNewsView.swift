@@ -33,7 +33,7 @@ struct CardNewsView: View {
                 detailRow(label: "특이사항:", value: animal.specialMark)
                 detailRow(label: "접수일:", value: animal.happenDate)
                 detailRow(label: "발견장소:", value: animal.happenPlace)
-                detailRow(label: "품종:", value: animal.kindCode)
+                detailRow(label: "품종:", value: animal.kind.name)
                 detailRow(label: "색:", value: animal.color)
                 detailRow(label: "나이:", value: animal.age)
                 detailRow(label: "무게:", value: animal.weight)

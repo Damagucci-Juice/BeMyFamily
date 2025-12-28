@@ -7,6 +7,8 @@
 
 struct Mapper {
     static func animalDto2Entity(_ dto: AnimalDTO) -> AnimalEntity {
+        let kindEntity = kindDto2Entity(.init(id: dto.kindCd, name: dto.kindNm), dto.upKindCd)
+
         return AnimalEntity(
             isFavorite: false,
             desertionNo: dto.desertionNo,
@@ -18,11 +20,7 @@ struct Mapper {
             happenPlace: dto.happenPlace,
             updatedTime: dto.updTm,
             endReason: dto.endReason,
-            kindCode: dto.kindCd,
-            kindName: dto.kindNm,
-            kindFullName: dto.kindFullNm,
-            upKindCode: dto.upKindCd,
-            upKindName: dto.upKindNm,
+            kind: kindEntity,
             color: dto.colorCd,
             age: dto.age,
             weight: dto.weight,
@@ -53,6 +51,8 @@ struct Mapper {
     }
 
     static func animalEntity2Dto(_ entity: AnimalEntity) -> AnimalDTO {
+        let kindDto = kindEntity2Dto(entity.kind)
+
         return AnimalDTO(
             desertionNo: entity.desertionNo,
             noticeNo: entity.noticeNumber,
@@ -63,11 +63,10 @@ struct Mapper {
             happenPlace: entity.happenPlace,
             updTm: entity.updatedTime,
             endReason: entity.endReason,
-            kindCd: entity.kindCode,
-            kindNm: entity.kindName,
-            kindFullNm: entity.kindFullName,
-            upKindCd: entity.upKindCode,
-            upKindNm: entity.upKindName,
+            kindCd: kindDto.id,
+            kindNm: kindDto.name,
+            upKindCd: entity.kind.upKind.id,
+            upKindNm: entity.kind.upKind.text,
             colorCd: entity.color,
             age: entity.age,
             weight: entity.weight,
